@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Bernoulli – eventhistory</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-c1fac2584b48ed01fb6e278e36375074.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">eventhistory</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#derivations-in-math" id="toc-derivations-in-math" class="nav-link active" data-scroll-target="#derivations-in-math">Derivations in math</a>
+  <ul class="collapse">
+  <li><a href="#marginal-setting" id="toc-marginal-setting" class="nav-link" data-scroll-target="#marginal-setting">Marginal setting</a></li>
+  <li><a href="#generalized-linear-model-setting" id="toc-generalized-linear-model-setting" class="nav-link" data-scroll-target="#generalized-linear-model-setting">Generalized Linear Model setting</a></li>
+  </ul></li>
+  <li><a href="#numerical-optimization" id="toc-numerical-optimization" class="nav-link" data-scroll-target="#numerical-optimization">Numerical optimization</a>
+  <ul class="collapse">
+  <li><a href="#without-predictors" id="toc-without-predictors" class="nav-link" data-scroll-target="#without-predictors">Without predictors</a></li>
+  <li><a href="#with-predictors" id="toc-with-predictors" class="nav-link" data-scroll-target="#with-predictors">With predictors</a></li>
+  <li><a href="#simulating-predicted-probabilities" id="toc-simulating-predicted-probabilities" class="nav-link" data-scroll-target="#simulating-predicted-probabilities">Simulating predicted probabilities</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Bernoulli</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Let <span class="math inline">\(y_1,\dots,y_n \stackrel{\text{iid}}{\sim} \text{Bernoulli}(\pi)\)</span> be <span class="math inline">\(n\)</span> independent flips of a weighted coin with probability <span class="math inline">\(\pi\)</span> of heads. In basic statistics, you already learned a common estimator <span class="math inline">\(\hat\pi = \frac{1}{n}\sum_i y_i\)</span>. You also learned that this estimator is asymptotically Normally distributed, with estimated variance <span class="math inline">\(\hat{\text{V}}(\hat\pi) = \frac{\hat\pi(1 - \hat\pi)}{n}\)</span>.</p>
+<p>This page will derive those same properties via Maximum Likelihood Estimation.</p>
+<section id="derivations-in-math" class="level2">
+<h2 class="anchored" data-anchor-id="derivations-in-math">Derivations in math</h2>
+<section id="marginal-setting" class="level3">
+<h3 class="anchored" data-anchor-id="marginal-setting">Marginal setting</h3>
+<p>The likelihood function is the probability of the data given the parameter <span class="math inline">\(\pi\)</span>.</p>
+<p><span class="math display">\[\begin{aligned}
+        L(\pi\mid \vec{y}) &amp;= \text{P}(\vec{Y} = \vec{y}\mid \pi) &amp;\text{by definition of likelihood} \\
+        &amp;= \prod_{i=1}^n \text{P}(Y_i = y_i) &amp;\text{by independence} \\
+        &amp;= \prod_{i=1}^n \pi^{y_i}(1-\pi)^{1-y_i} &amp;\text{by Bernoulli probability mass function}
+\end{aligned}\]</span></p>
+<p>The log likelihood is often easier to optimize. Taking the log,</p>
+<p><span class="math display">\[\begin{aligned}
+\ell(\pi\mid\vec{y}) &amp;= \log(L(\pi\mid\vec{y})) \\
+        &amp;= \log\left(\prod_i \pi^{y_i}(1-\pi)^{1-y_i}\right) \\
+        &amp;= \sum_i\log\left(\pi^{y_i}(1-\pi)^{1-y_i}\right) &amp;\text{since }\log(AB) = \log(A) + \log(B) \\
+        &amp;= \sum_i\left(\log(\pi^{y_i}) + \log((1-\pi)^{1-y_i})\right) &amp;\text{since }\log(AB) = \log(A) + \log(B) \\
+        &amp;= \sum_i \left(y_i\log(\pi) + (1 - y_i)\log(1 - \pi)\right) &amp;\text{since}\log(A^B)=B\log(A)
+\end{aligned}\]</span></p>
+<p>We want to find the estimate <span class="math inline">\(\hat\pi\)</span> that maximizes <span class="math inline">\(L(\pi\mid\vec{y})\)</span>. This is at a place where the derivative (slope) is zero. To find it, take the derivative.</p>
+<p><span class="math display">\[
+\begin{aligned}
+        \frac{\partial}{\partial \pi} \ell(\pi)
+        &amp;= \frac{\sum_i y_i}{\pi} - \frac{n - \sum_i y_i}{1 - \pi}
+\end{aligned}
+\]</span> Set equal to zero and solve. Let <span class="math inline">\(\tilde\pi\)</span> be a point where the derivative equals zero.</p>
+<p><span class="math display">\[
+\begin{aligned}
+        0 &amp;= \frac{\partial}{\partial \pi} \ell(\pi\mid \vec{y})\rvert_{\pi = \tilde{\pi}} \\
+        0 &amp;= \frac{\sum_i y_i}{\tilde\pi} - \frac{n - \sum_i y_i}{1 - \tilde\pi} \\
+        \tilde\pi &amp;= \frac{1}{n} \sum_i y_i
+\end{aligned}
+\]</span></p>
+<p>The likelihood function is flat at the point where <span class="math inline">\(\tilde\pi\)</span> equals the sample mean of <span class="math inline">\(Y\)</span>. Next, check the second derivative to see if this is a maximum.</p>
+<p><span class="math display">\[\begin{aligned}
+\frac{\partial^2}{\partial \pi^2} \ell(\pi\mid \vec{y}) &amp;= -\frac{\sum_i y_i}{\pi^2} - \frac{n - \sum_i y_i}{(1 - \pi)^2} \\
+&amp;= -\frac{\text{positive}}{\text{positive}} - \frac{\text{positive}}{\text{positive}} \\
+        &amp; &lt; 0
+\end{aligned}\]</span></p>
+<p>So it is a maximum! The second derivative of the log likelihood at the value that maximizes the function is called the <strong>Hessian</strong>. It is useful for deriving the standard error. Next we derive the Hessian. <span class="math display">\[\begin{aligned}
+H(\pi) &amp;= \frac{\partial^2}{\partial \pi^2} \ell(\pi\mid \vec{y})\rvert_{\pi = \hat\pi_\text{MLE}} &amp;\text{definition of Hessian} \\
+&amp;= -\frac{\sum_i y_i}{\hat\pi^2} - \frac{n - \sum_i y_i}{(1 - \hat\pi)^2} \\
+&amp;= -\frac{n\hat\pi}{\hat\pi^2} - \frac{n - n\hat\pi}{(1 - \hat\pi)^2} &amp;\text{by replacing }\sum_i y_i\text{ with }n\hat\pi \\
+&amp;= -\frac{n}{\hat\pi}-\frac{n}{1 - \hat\pi} \\
+&amp;= -\frac{n}{\hat\pi(1 - \hat\pi)}
+\end{aligned}\]</span></p>
+<p>From the statistical theory of Maximum Likelihood Estimation, the asymptotic variance of an MLE estimate is the negative inverse Hessian (also called the <strong>Fisher Information</strong>).</p>
+<p><span class="math display">\[\begin{aligned}
+V(\hat\pi) &amp;= -\left[H(\hat\pi)\right]^{-1} \\
+&amp;= \frac{\hat\pi(1 - \hat\pi)}{n}
+\end{aligned}\]</span></p>
+<p>which is a formulat that may be familiar! Because of the Central Limit Theorem, <span class="math inline">\(\hat\pi\)</span> is asymptotically Normally distributed with this mean and variance. Thus we can construct a 95% confidence interval by a Normal approximation.</p>
+<p><span class="math display">\[\begin{aligned}
+\hat\pi_\text{Lower} &amp;= \hat\pi - \Phi^{-1}(.975) \sqrt{\frac{\hat\pi(1 - \hat\pi)}{n}} \\
+\hat\pi_\text{Upper} &amp;= \hat\pi + \Phi^{-1}(.975) \sqrt{\frac{\hat\pi(1 - \hat\pi)}{n}}
+\end{aligned}\]</span></p>
+<p>Recap: The exercise used the theory of Maximum Likelihood Estimation to produce familiar formulas:</p>
+<ul>
+<li>estimator of a proportion is the sample mean</li>
+<li>variance of that estimated proportion</li>
+<li>confidence intervals by asymptotic Normality</li>
+</ul>
+</section>
+<section id="generalized-linear-model-setting" class="level3">
+<h3 class="anchored" data-anchor-id="generalized-linear-model-setting">Generalized Linear Model setting</h3>
+<p>What if every person <span class="math inline">\(i\)</span> flips their own coin with probability <span class="math inline">\(\pi_i\)</span>, as in logistic regression? Suppose for simplicity that each person has covariates <span class="math inline">\(\vec{x}_i\)</span> and the probability follows the functional form of logistic regression.</p>
+<p><span class="math display">\[
+\log\left(\frac{\pi_i}{1 - \pi_i}\right) = \vec{X}_i\vec\beta
+\]</span></p>
+<p>We will refer to this function as the <strong>logit function</strong> and will use it and its inverse.</p>
+<p><span class="math display">\[
+\begin{align}
+&amp;\text{Logit function:} &amp; \text{logit}(x) &amp;= \log\left(\frac{x}{1 - x}\right) \\
+&amp;\text{Inverse logit function:} &amp; \text{logit}^{-1}(x) &amp;= \frac{1}{1 + e^{-x}} \\
+\end{align}
+\]</span></p>
+<p>These functions are useful because in logistic regression <span class="math inline">\(\text{logit}(\pi_i) = \vec{X}_i\vec\beta\)</span> and <span class="math inline">\(\text{logit}^{-1}(\vec{X}_i\vec\beta) = \pi\)</span>. This is helpful because:</p>
+<ul>
+<li>any likelihood in terms of <span class="math inline">\(\pi_i\)</span> is equivalently a likelihood in terms of <span class="math inline">\(\vec\beta\)</span></li>
+<li>these functions are available in R: <code>qlogis</code> is logit and <code>plogis</code> is the inverse logit</li>
+</ul>
+<p>Maximum likelihood for logistic regression becomes the task: what parameter vector <span class="math inline">\(\vec\beta\)</span> produces a probability vector <span class="math inline">\(\vec\pi\)</span> under which the data <span class="math inline">\(\vec{y}\)</span> are most likely?</p>
+<p>Appealing to the marginal case above, the log likelihood is</p>
+<p><span class="math display">\[\begin{aligned}
+\ell(\vec\pi\mid\vec{y}) &amp;= \sum_i\left(y_i\log\pi_i + (1 - y_i)\log(1 - \pi_i)\right)
+\end{aligned}\]</span></p>
+<p>Using the inverse logit function, we express this in terms of <span class="math inline">\(\vec\beta\)</span>. <span class="math display">\[\begin{aligned}
+\ell(\vec\beta\mid\vec{y})
+&amp;= \sum_i\left(y_i\log(\text{logit}^{-1}(\vec{X}_i\vec\beta)) + (1 - y_i)\log(1 - \text{logit}^{-1}(\vec{X}_i\vec\beta))\right)
+\end{aligned}\]</span> Rather than solve this analytically, we will work with it by numerically optimizing the log likelihood.</p>
+</section>
+</section>
+<section id="numerical-optimization" class="level2">
+<h2 class="anchored" data-anchor-id="numerical-optimization">Numerical optimization</h2>
+<p>Here we will numerically optimize the log likelihood.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mvtnorm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="without-predictors" class="level3">
+<h3 class="anchored" data-anchor-id="without-predictors">Without predictors</h3>
+<p>We first illustrate for the marginal case: estimating a constant <span class="math inline">\(\pi\)</span> that applies to all cases with no predictors. We know from math that the MLE is the sample mean, <span class="math inline">\(\hat\pi_\text{MLE} = \frac{1}{n}\sum_i y_i\)</span>. But what if we only knew the likelihood function? We could optimize numerically, as we illustrate with simulated data with <span class="math inline">\(\pi = 0.4\)</span>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(<span class="at">n =</span> <span class="dv">1000</span>, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> .<span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>In the marginal case, we saw above that the log likelihood is <span class="math display">\[
+\ell(\pi\mid\vec{y}) = \sum_i \left(y_i\log(\pi) + (1 - y_i)\log(1 - \pi)\right)
+\]</span></p>
+<p>We can code this in a function.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>log_likelihood <span class="ot">&lt;-</span> <span class="cf">function</span>(pi, y) {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>(y <span class="sc">*</span> <span class="fu">log</span>(pi) <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">-</span> y) <span class="sc">*</span> <span class="fu">log</span>(<span class="dv">1</span> <span class="sc">-</span> pi))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Then we can use <code>optimize</code> to find the maximum of the function.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>optimize.out <span class="ot">&lt;-</span> <span class="fu">optimize</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  log_likelihood,  <span class="co"># function to optimize</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">lower =</span> <span class="dv">0</span>,       <span class="co"># lower limit of pi candidates</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">upper =</span> <span class="dv">1</span>,       <span class="co"># upper limit of pi candidates</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">maximum =</span> <span class="cn">TRUE</span>,  <span class="co"># search for maximum</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">tol =</span> .<span class="dv">01</span>,       <span class="co"># get within tol of truth</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> y            <span class="co"># other argument to log_likelihood</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Our estimate is stored in the <code>maximum</code> list item of the resulting object.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>optimize.out<span class="sc">$</span>maximum</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.4163974</code></pre>
+</div>
+</div>
+<p>We can note that this is approximately equal to the analytical result that we know is the maximum: the sample mean.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.415</code></pre>
+</div>
+</div>
+</section>
+<section id="with-predictors" class="level3">
+<h3 class="anchored" data-anchor-id="with-predictors">With predictors</h3>
+<p>Numerical optimization is often most helpful for generalized linear models that include predictors. For practice, the code below generates data with numeric predictors <code>x1</code> and <code>x2</code> and binary outcome <code>y</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>simulated <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>) <span class="sc">|&gt;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">x1 =</span> <span class="fu">rnorm</span>(<span class="fu">n</span>()),</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">x2 =</span> <span class="fu">rnorm</span>(<span class="fu">n</span>()),</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">pi =</span> <span class="fu">plogis</span>(x1 <span class="sc">+</span> x2),</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fu">rbinom</span>(<span class="fu">n</span>(), <span class="dv">1</span>, pi)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The <code>optim</code> function in R carries out numerical optimization. To use it, we first need to write down a function for our log likelihood.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>log_likelihood <span class="ot">&lt;-</span> <span class="cf">function</span>(parameters, data, formula) {</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create the beta vector given the parameters</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  beta <span class="ot">&lt;-</span> parameters</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  X <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(formula, <span class="at">data =</span> data)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> data<span class="sc">$</span>y</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  log_likelihood <span class="ot">&lt;-</span> <span class="fu">sum</span>(</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    y <span class="sc">*</span> <span class="fu">log</span>(<span class="fu">plogis</span>(X <span class="sc">%*%</span> beta)) <span class="sc">+</span> </span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>      (<span class="dv">1</span> <span class="sc">-</span> y) <span class="sc">*</span> <span class="fu">log</span>(<span class="dv">1</span> <span class="sc">-</span> <span class="fu">plogis</span>(X <span class="sc">%*%</span> beta))</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(log_likelihood)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We optimize this with a call to the <code>optim</code> function.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>optim.out <span class="ot">&lt;-</span> <span class="fu">optim</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">par =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>), <span class="co"># initial values of the parameters</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">fn =</span> log_likelihood,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">list</span>(<span class="at">fnscale =</span> <span class="sc">-</span><span class="dv">1</span>),</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">hessian =</span> <span class="cn">TRUE</span>,   <span class="co"># multiplies by -1 to find maximum instead of minimum</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Other arguments to be passed to log_likelihood</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> simulated,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> <span class="fu">formula</span>(y <span class="sc">~</span> x1 <span class="sc">+</span> x2)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can extract the coefficient estimates.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>beta_hat <span class="ot">&lt;-</span> optim.out<span class="sc">$</span>par <span class="sc">|&gt;</span> <span class="fu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.01887572 0.83477290 0.83743034</code></pre>
+</div>
+</div>
+<p>We can extract the Hessian.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>hessian <span class="ot">&lt;-</span> optim.out<span class="sc">$</span>hessian</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can solve for the variance-covariance matrix <span class="math inline">\(\hat{\text{V}}(\hat{\vec\beta})\)</span>: the negative inverse Hessian. In R, the <code>solve</code> function finds the inverse of a matrix.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>beta_hat_vcov <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">solve</span>(hessian)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This can give us our coefficients and standard errors (the square root of the diagonal of the variance covariance matrix).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">variable =</span> <span class="fu">c</span>(<span class="st">"Intercept"</span>,<span class="st">"x1"</span>,<span class="st">"x2"</span>),</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta =</span> beta_hat,</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">se =</span> <span class="fu">sqrt</span>(<span class="fu">diag</span>(beta_hat_vcov))</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 3
+  variable    beta    se
+  &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt;
+1 Intercept 0.0189 0.230
+2 x1        0.835  0.244
+3 x2        0.837  0.253</code></pre>
+</div>
+</div>
+<p>We can compare that to the output from logistic regression.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>canned_fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(y <span class="sc">~</span> x1 <span class="sc">+</span> x2, <span class="at">data =</span> simulated, <span class="at">family =</span> binomial)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(canned_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = y ~ x1 + x2, family = binomial, data = simulated)
+
+Coefficients:
+            Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)  0.01887    0.22988   0.082 0.934562    
+x1           0.83507    0.24358   3.428 0.000607 ***
+x2           0.83748    0.25280   3.313 0.000924 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 137.99  on 99  degrees of freedom
+Residual deviance: 114.73  on 97  degrees of freedom
+AIC: 120.73
+
+Number of Fisher Scoring iterations: 3</code></pre>
+</div>
+</div>
+</section>
+<section id="simulating-predicted-probabilities" class="level3">
+<h3 class="anchored" data-anchor-id="simulating-predicted-probabilities">Simulating predicted probabilities</h3>
+<p>We can simulate predicted probabilities. Suppose we are interested in the prediction at <span class="math inline">\((X_1,X_2) = (1,1)\)</span>. Define these data to predict,</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>to_predict <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">x1 =</span> <span class="dv">0</span>, <span class="at">x2 =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>create an <span class="math inline">\(X\)</span> matrix at those values</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>X_new <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(<span class="sc">~</span> x1 <span class="sc">+</span> x2, <span class="at">data =</span> to_predict)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>and make predictions from that <span class="math inline">\(X\)</span> matrix.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>pi_hat <span class="ot">&lt;-</span> <span class="fu">plogis</span>(X_new <span class="sc">%*%</span> beta_hat) <span class="sc">|&gt;</span> <span class="fu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       [,1]
+1 0.7018883</code></pre>
+</div>
+</div>
+<p>To get a standard error on the predictions, we can use simulation. We know that <span class="math inline">\(\hat{\vec\beta}\)</span> is asymptotically multivariate normal. We can simulate many coefficient vectors <span class="math inline">\(\vec\beta^*\)</span> from that distribution,</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>beta_star <span class="ot">&lt;-</span> mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="at">n =</span> <span class="dv">1000</span>, <span class="at">mean =</span> beta_hat, <span class="at">sigma =</span> beta_hat_vcov)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>and we can generate a predicted probability from each simulated value.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>pi_star <span class="ot">&lt;-</span> <span class="fu">plogis</span>(X_new <span class="sc">%*%</span> <span class="fu">t</span>(beta_star))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The standard error is the standard deviation of these simulated draws.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>se_pi_hat <span class="ot">&lt;-</span> <span class="fu">sd</span>(pi_star)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can likewise predict with the canned version of the model,</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>canned_prediction <span class="ot">&lt;-</span> <span class="fu">predict</span>(canned_fit, <span class="at">type =</span> <span class="st">"response"</span>, <span class="at">newdata =</span> to_predict, <span class="at">se =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>and compare to see that they are approximately the same.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">method =</span> <span class="fu">c</span>(<span class="st">"diy"</span>,<span class="st">"canned"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">pi_hat =</span> <span class="fu">c</span>(pi_hat, canned_prediction<span class="sc">$</span>fit),</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">se =</span> <span class="fu">c</span>(se_pi_hat, canned_prediction<span class="sc">$</span>se.fit)</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 3
+  method pi_hat     se
+  &lt;chr&gt;   &lt;dbl&gt;  &lt;dbl&gt;
+1 diy     0.702 0.0662
+2 canned  0.702 0.0683</code></pre>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

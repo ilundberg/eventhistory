@@ -1,0 +1,5 @@
+---
+title: "Event History Analysis"
+---
+
+This website is to share code on event history analysis, for UCLA Soc 213B. Potentially in the future it will be a more outward-facing website!

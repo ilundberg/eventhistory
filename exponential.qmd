@@ -1,0 +1,308 @@
+---
+title: "Exponential"
+format:
+  html:
+    toc: true
+    toc-expansion: true
+---
+
+```{r, echo = F, warning = F, message = F}
+library(tidyverse)
+```
+
+An Exponential survival model is a Generalized Linear Model just like logistic regression (previous page). We will estimate this model by writing down the log likelihood and carrying out numerical optimization with `optim`. As with the previous model, we will recover estimates that match those produced by canned functions.
+
+As a reminder, the Exponential(1) distribution looks like this:
+```{r, echo = F, fig.height = 2}
+
+tibble(p = seq(.01,.99,.01)) |>
+  mutate(
+    y = qexp(p),
+    `Probability\nDensity\nFunction` = dexp(y),
+    `Cumulative\nDistribution\nFunction` = pexp(y),
+    `Survival\nFunction` = 1 - pexp(y),
+    `Hazard\nFunction` = 1
+  ) |>
+  pivot_longer(cols = -c(1:2)) |>
+  mutate(name = fct_relevel(factor(name), c("Probability\nDensity\nFunction","Cumulative\nDistribution\nFunction","Survival\nFunction","Hazard\nFunction"))) |>
+  ggplot(aes(x = y, y = value)) +
+  geom_line() +
+  facet_wrap(~name, nrow = 1) +
+  ylab("Value of Function") +
+  xlab("Time") +
+  theme_minimal()
+```
+
+## Without predictors
+
+Assume a data generating process of $n$ independent observations.
+
+* $t_1,\dots,t_n\sim\text{Exponential}(\lambda)$ are event times
+* $\tilde{t}_1,\dots,\tilde{t}_n$ are observation times (either events or censoring)
+* $c_1,\dots c_n$ indicate whether an observation is censored ($c_i = 1$) or the event occurs ($c_i = 0$)
+
+The code below will simulate data with $\lambda = 1$ and censoring at $t = 3$.
+```{r}
+simulated <- tibble(id = 1:1000) |>
+  mutate(
+    # Exponential draws
+    t = rexp(n()),
+    # Trial cuts off at time 3
+    c = t > 3,
+    # Observed y is truncated at 3
+    t_tilde = ifelse(t > 3, 3, t)
+  )
+```
+
+## One-parameter likelihood in math
+
+Let $f(t,\lambda)$ be the PDF of the exponential distribution. Let $F(t,\lambda)$ be the CDF. The likelihood is the probability of observing the data if the parameter takes the value $\lambda$. The observed data either tells us:
+
+1) an event occurred at time $t$ (uncensored)
+     * occurs with probability density $f(t\mid\lambda)$
+2) an event occurred at time greater than $t$ (censoring)
+     * occurs with probability $1 - F(t\mid\lambda)$
+     
+Translating to math, the likelihood for a given observation is
+$$
+\underbrace{\left(f(\tilde{t}_i\mid\lambda)\right)^{1-c_i}}_{\text{PDF at }\tilde{t}_i\text{ if uncensored}}\quad\times\quad \underbrace{\left(1 - F(\tilde{t}_i\mid\lambda)\right)^{c_i}}_{\text{Survival past }\tilde{t}_i\text{ if censored}}
+$$
+
+We can put these together into a likelihood function for the vector of independent observations,
+$$
+L(\vec{\tilde{t}},\vec{c}\mid\lambda) = \prod_i \left(f(\tilde{t}_i\mid\lambda)\right)^{1-c_i}\left(1 - F(\tilde{t}_i\mid\lambda)\right)^{c_i}
+$$
+and take the log to get the log likelihood.
+$$
+\ell(\vec{\tilde{t}},\vec{c}\mid\lambda) = \sum_i \left((1-c_i)\log[f(\tilde{t}_i\mid\lambda)] + c_i\log[1 - F(\tilde{t}_i\mid\lambda)]\right)
+$$
+
+## One-parameter likelihood in code
+
+Write the log likelihood as a function in R.
+
+```{r}
+log_likelihood <- function(log_lambda, data) {
+  data |>
+    mutate(
+      likelihood_i = case_when(
+        c == 0 ~ dexp(t_tilde, rate = exp(log_lambda)),
+        c == 1 ~ pexp(t_tilde, rate = exp(log_lambda), lower.tail = FALSE)
+      )
+    ) |>
+    summarize(
+      log_likelihood = sum(log(likelihood_i))
+    ) |>
+    pull(log_likelihood)
+}
+```
+
+## One-parameter optimization
+
+Using `optim`, we can numerically find the value $\hat\lambda$ that maximizes the log likelihood function.
+
+```{r}
+optimize.out <- optimize(
+  log_likelihood,  # function to optimize
+  lower = -1,      # lower limit of log_lambda candidates
+  upper = 1,       # upper limit of log_lambda candidates
+  maximum = TRUE,  # search for maximum
+  tol = .01,       # get within tol of truth
+  data = simulated # other argument to log_likelihood
+)
+```
+
+Remember that we set our parameter to be the log of the rate $\lambda$. Thus, we need to exponentiate the estimated parameter.
+
+```{r}
+log_lambda_hat <- optimize.out$maximum
+lambda_hat <- exp(log_lambda_hat) |> print()
+```
+
+## With predictors
+
+Now consider the setting where $\lambda_i$ varies across units $i$ according to a Generalized Linear model,
+$$
+\begin{aligned}
+y_i&\sim\text{Exponential}(\lambda_i) \\
+\log(\lambda_i) &= \vec{X}_i\vec\beta
+\end{aligned}
+$$
+
+The code below generates data to illustrate with two predictors, $X_1$ and $X_2$.
+
+```{r}
+simulated <- tibble(id = 1:1000) |>
+  mutate(
+    x1 = rnorm(n()),
+    x2 = rnorm(n()),
+    lambda = exp(-1 + .5 * x1 + .5 * x2),
+    t = rexp(n(), rate = lambda),
+    # Create censoring at time 3
+    c = t > 3,
+    t_tilde = ifelse(t > 3, 3, t)
+  ) |>
+  select(x1, x2, c, t_tilde)
+```
+
+## Vector-parameter likelihood in math
+
+The likelihood has not changed much from the case without predictors. The $\lambda$ terms become $\lambda_i$,
+$$
+\ell(\vec{\tilde{t}},\vec{c}\mid\vec\lambda) = \sum_i \left((1-c_i)\log[f(\tilde{t}_i\mid\lambda_i)] + c_i\log[1 - F(\tilde{t}_i\mid\lambda_i)]\right)
+$$
+
+and when coding this we will use the assumption that $\lambda_i = \text{exp}(\vec{X}_i\vec\beta)$.
+
+## Vector-parameter likelihood in code
+
+The log likelihood takes parameters and data and returns a likelihood value. When coding this, it is helpful that the `dexp` and `pexp` functions are the PDF and CDF of the Exponential distribution with `rate` parameter equal to $\lambda$.
+
+```{r}
+log_likelihood <- function(parameters, data, formula) {
+  
+  # Parameters are coefficients
+  beta <- parameters
+  
+  # Get the X matrix
+  X <- model.matrix(formula, data = data)
+  
+  # Calculate lambda values at that parameter vector
+  lambda <- exp(X %*% beta)
+  
+  # Calculate the likelihood
+  data |>
+    # Create a column with the lambda values for each case
+    mutate(lambda = lambda) |>
+    summarize(
+      # Use the formula from above, translated to code
+      log_likelihood = sum(
+        (1 - c) * log(dexp(t_tilde, rate = lambda)) + 
+          c * log(1 - pexp(t_tilde, rate = lambda))
+      )
+    ) |>
+    # Pull the log likelihood value to return
+    pull(log_likelihood)
+}
+```
+
+## Vector-parameter optimization
+
+Now optimize with a call to `optim`.
+
+```{r}
+optim.out <- optim(
+  par = c(0,0,0),                # initial parameter values
+  fn = log_likelihood,           # function to optimize
+  control = list(fnscale = -1),  # find max instead of min
+  hessian = TRUE,                # also return the Hessian
+  data = simulated,              # passed to log_likelihood
+  formula = formula(t_tilde ~ x1 + x2) # passed to log_likelihood
+)
+```
+
+We can extract the coefficient estimates.
+```{r}
+beta_hat <- optim.out$par |> print()
+```
+
+We can extract the Hessian.
+```{r}
+hessian <- optim.out$hessian
+```
+
+We can solve for the variance-covariance matrix $\hat{\text{V}}(\hat{\vec\beta})$: the negative inverse Hessian. In R, the `solve` function finds the inverse of a matrix.
+```{r}
+beta_hat_vcov <- -solve(hessian)
+```
+
+This can give us our coefficients and standard errors (the square root of the diagonal of the variance covariance matrix).
+
+```{r}
+tibble(
+  variable = c("Intercept","x1","x2"),
+  beta = beta_hat,
+  se = sqrt(diag(beta_hat_vcov))
+)
+```
+
+We can compare that to the output from logistic regression.
+```{r}
+library(survival)
+canned_fit <- survreg(
+  Surv(time = t_tilde, event = 1 - c) ~ x1 + x2,
+  data = simulated,
+  dist = "exponential"
+)
+summary(canned_fit)
+```
+
+Note that the canned fit is modeling the mean time to event $\frac{1}{\lambda}$ whereas our fit modeled the rate of events $\lambda$. Because $\beta$ coefficients are on the scale of $\log(\lamda)$, the canned fit estimates are the negative of our DIY estimates.
+
+## Simulate predictions
+
+We can simulate predicted the hazard and survival probabilities. Suppose we are interested in the prediction at $(X_1,X_2) = (1,1)$. Define these data to predict,
+```{r}
+to_predict <- tibble(x1 = 0, x2 = 1)
+```
+create an $X$ matrix at those values
+```{r}
+X_new <- model.matrix(~ x1 + x2, data = to_predict)
+```
+and make predictions from that $X$ matrix.
+```{r}
+lambda_hat <- exp(X_new %*% beta_hat) |> print()
+```
+
+We may not just want the hazard: perhaps we want the probability of surviving past time $t = 2$. Recall that `pexp` is the CDF, and with the option `lower.tail = FALSE` it is the survival function.
+```{r}
+survival_hat <- pexp(2, rate = lambda_hat, lower.tail = FALSE)
+```
+
+To get a standard error on the predictions, we can use simulation. We know that $\hat{\vec\beta}$ is asymptotically multivariate normal. We can simulate many coefficient vectors $\vec\beta^*$ from that distribution,
+```{r}
+beta_star <- mvtnorm::rmvnorm(n = 1000, mean = beta_hat, sigma = beta_hat_vcov)
+```
+and we can generate a predicted hazard from each simulated value,
+```{r}
+lambda_star <- exp(X_new %*% t(beta_star))
+```
+and a predicted survival probability
+```{r}
+survival_star <- pexp(2, rate = lambda_star, lower.tail = FALSE)
+```
+The standard error is the standard deviation of these simulated draws.
+```{r}
+se_survial_hat <- sd(survival_star)
+```
+
+## Canned comparison
+
+We can likewise predict with the canned version of the model,
+```{r}
+canned_linear_prediction <- predict(
+  canned_fit, 
+  type = "linear", 
+  newdata = to_predict
+)
+```
+
+Recall that this package has modeled $\vec{X}_i\beta = \log(\frac{1}{\lambda_i}$. Thus we need to convert back to $\lambda$.
+```{r}
+canned_lambda_hat <- 1 / exp(canned_linear_prediction)
+```
+
+Note that they are approximately the same!
+```{r}
+cbind(
+  diy = lambda_hat[1,1],
+  canned = canned_lambda_hat
+)
+```
+
+Advantages of the DIY coding yourself include
+
+* you know exactly how the model worked (e.g., modeling $\lambda$ vs $1 / \lambda$)
+* you know how to get standard errors for any quantity of interest
+* you can generalize to models that are not canned
+

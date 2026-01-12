@@ -1,0 +1,287 @@
+---
+title: "Bernoulli"
+---
+
+Let $y_1,\dots,y_n \stackrel{\text{iid}}{\sim} \text{Bernoulli}(\pi)$ be $n$ independent flips of a weighted coin with probability $\pi$ of heads. In basic statistics, you already learned a common estimator $\hat\pi = \frac{1}{n}\sum_i y_i$. You also learned that this estimator is asymptotically Normally distributed, with estimated variance $\hat{\text{V}}(\hat\pi) = \frac{\hat\pi(1 - \hat\pi)}{n}$.
+
+This page will derive those same properties via Maximum Likelihood Estimation.
+
+## Derivations in math
+
+### Without predictors
+
+The likelihood function is the probability of the data given the parameter $\pi$.
+
+$$\begin{aligned}
+        L(\pi\mid \vec{y}) &= \text{P}(\vec{Y} = \vec{y}\mid \pi) &\text{by definition of likelihood} \\
+        &= \prod_{i=1}^n \text{P}(Y_i = y_i) &\text{by independence} \\
+        &= \prod_{i=1}^n \pi^{y_i}(1-\pi)^{1-y_i} &\text{by Bernoulli probability mass function}
+\end{aligned}$$
+
+The log likelihood is often easier to optimize. Taking the log,
+
+$$\begin{aligned}
+\ell(\pi\mid\vec{y}) &= \log(L(\pi\mid\vec{y})) \\
+        &= \log\left(\prod_i \pi^{y_i}(1-\pi)^{1-y_i}\right) \\
+        &= \sum_i\log\left(\pi^{y_i}(1-\pi)^{1-y_i}\right) &\text{since }\log(AB) = \log(A) + \log(B) \\
+        &= \sum_i\left(\log(\pi^{y_i}) + \log((1-\pi)^{1-y_i})\right) &\text{since }\log(AB) = \log(A) + \log(B) \\
+        &= \sum_i \left(y_i\log(\pi) + (1 - y_i)\log(1 - \pi)\right) &\text{since}\log(A^B)=B\log(A)
+\end{aligned}$$
+
+We want to find the estimate $\hat\pi$ that maximizes $L(\pi\mid\vec{y})$. This is at a place where the derivative (slope) is zero. To find it, take the derivative.
+
+$$
+\begin{aligned}
+        \frac{\partial}{\partial \pi} \ell(\pi) 
+        &= \frac{\sum_i y_i}{\pi} - \frac{n - \sum_i y_i}{1 - \pi}
+\end{aligned}
+$$
+Set equal to zero and solve. Let $\tilde\pi$ be a point where the derivative equals zero.
+
+$$
+\begin{aligned}
+        0 &= \frac{\partial}{\partial \pi} \ell(\pi\mid \vec{y})\rvert_{\pi = \tilde{\pi}} \\
+        0 &= \frac{\sum_i y_i}{\tilde\pi} - \frac{n - \sum_i y_i}{1 - \tilde\pi} \\
+        \tilde\pi &= \frac{1}{n} \sum_i y_i
+\end{aligned}
+$$
+
+The likelihood function is flat at the point where $\tilde\pi$ equals the sample mean of $Y$. Next, check the second derivative to see if this is a maximum.
+
+$$\begin{aligned}
+\frac{\partial^2}{\partial \pi^2} \ell(\pi\mid \vec{y}) &= -\frac{\sum_i y_i}{\pi^2} - \frac{n - \sum_i y_i}{(1 - \pi)^2} \\
+&= -\frac{\text{positive}}{\text{positive}} - \frac{\text{positive}}{\text{positive}} \\
+        & < 0
+\end{aligned}$$
+
+So it is a maximum! The second derivative of the log likelihood at the value that maximizes the function is called the **Hessian**. It is useful for deriving the standard error. Next we derive the Hessian.
+$$\begin{aligned}
+H(\pi) &= \frac{\partial^2}{\partial \pi^2} \ell(\pi\mid \vec{y})\rvert_{\pi = \hat\pi_\text{MLE}} &\text{definition of Hessian} \\
+&= -\frac{\sum_i y_i}{\hat\pi^2} - \frac{n - \sum_i y_i}{(1 - \hat\pi)^2} \\
+&= -\frac{n\hat\pi}{\hat\pi^2} - \frac{n - n\hat\pi}{(1 - \hat\pi)^2} &\text{by replacing }\sum_i y_i\text{ with }n\hat\pi \\
+&= -\frac{n}{\hat\pi}-\frac{n}{1 - \hat\pi} \\
+&= -\frac{n}{\hat\pi(1 - \hat\pi)}
+\end{aligned}$$
+
+From the statistical theory of Maximum Likelihood Estimation, the asymptotic variance of an MLE estimate is the negative inverse Hessian (also called the **Fisher Information**).
+
+$$\begin{aligned}
+V(\hat\pi) &= -\left[H(\hat\pi)\right]^{-1} \\
+&= \frac{\hat\pi(1 - \hat\pi)}{n}
+\end{aligned}$$
+
+which is a formulat that may be familiar! Because of the Central Limit Theorem, $\hat\pi$ is asymptotically Normally distributed with this mean and variance. Thus we can construct a 95\% confidence interval by a Normal approximation.
+
+$$\begin{aligned}
+\hat\pi_\text{Lower} &= \hat\pi - \Phi^{-1}(.975) \sqrt{\frac{\hat\pi(1 - \hat\pi)}{n}} \\
+\hat\pi_\text{Upper} &= \hat\pi + \Phi^{-1}(.975) \sqrt{\frac{\hat\pi(1 - \hat\pi)}{n}}
+\end{aligned}$$
+
+Recap: The exercise used the theory of Maximum Likelihood Estimation to produce familiar formulas:
+
+* estimator of a proportion is the sample mean
+* variance of that estimated proportion
+* confidence intervals by asymptotic Normality
+
+### With predictors: Logistic regression
+
+What if every person $i$ flips their own coin with probability $\pi_i$, as in logistic regression? Suppose for simplicity that each person has covariates $\vec{x}_i$ and the probability follows the functional form of logistic regression.
+
+$$
+\log\left(\frac{\pi_i}{1 - \pi_i}\right) = \vec{X}_i\vec\beta 
+$$
+
+We will refer to this function as the **logit function** and will use it and its inverse.
+
+$$
+\begin{align}
+&\text{Logit function:} & \text{logit}(x) &= \log\left(\frac{x}{1 - x}\right) \\
+&\text{Inverse logit function:} & \text{logit}^{-1}(x) &= \frac{1}{1 + e^{-x}} \\
+\end{align}
+$$
+
+These functions are useful because in logistic regression $\text{logit}(\pi_i) = \vec{X}_i\vec\beta$ and $\text{logit}^{-1}(\vec{X}_i\vec\beta) = \pi$. This is helpful because:
+
+* any likelihood in terms of $\pi_i$ is equivalently a likelihood in terms of $\vec\beta$
+* these functions are available in R: `qlogis` is logit and `plogis` is the inverse logit
+
+Maximum likelihood for logistic regression becomes the task: what parameter vector $\vec\beta$ produces a probability vector $\vec\pi$ under which the data $\vec{y}$ are most likely?
+
+Appealing to the marginal case above, the log likelihood is
+
+$$\begin{aligned}
+\ell(\vec\pi\mid\vec{y}) &= \sum_i\left(y_i\log\pi_i + (1 - y_i)\log(1 - \pi_i)\right)
+\end{aligned}$$
+
+Using the inverse logit function, we express this in terms of $\vec\beta$.
+$$\begin{aligned}
+\ell(\vec\beta\mid\vec{y}) 
+&= \sum_i\left(y_i\log(\text{logit}^{-1}(\vec{X}_i\vec\beta)) + (1 - y_i)\log(1 - \text{logit}^{-1}(\vec{X}_i\vec\beta))\right)
+\end{aligned}$$
+Rather than solve this analytically, we will work with it by numerically optimizing the log likelihood.
+
+## Numerical optimization
+
+Here we will numerically optimize the log likelihood.
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(mvtnorm)
+```
+
+### Without predictors
+
+We first illustrate for the marginal case: estimating a constant $\pi$ that applies to all cases with no predictors. We know from math that the MLE is the sample mean, $\hat\pi_\text{MLE} = \frac{1}{n}\sum_i y_i$. But what if we only knew the likelihood function? We could optimize numerically, as we illustrate with simulated data with $\pi = 0.4$.
+```{r}
+y <- rbinom(n = 1000, size = 1, prob = .4)
+```
+
+In the marginal case, we saw above that the log likelihood is 
+$$
+\ell(\pi\mid\vec{y}) = \sum_i \left(y_i\log(\pi) + (1 - y_i)\log(1 - \pi)\right)
+$$
+
+We can code this in a function.
+```{r}
+log_likelihood <- function(pi, y) {
+  sum(y * log(pi) + (1 - y) * log(1 - pi))
+}
+```
+
+Then we can use `optimize` to find the maximum of the function.
+```{r}
+optimize.out <- optimize(
+  log_likelihood,  # function to optimize
+  lower = 0,       # lower limit of pi candidates
+  upper = 1,       # upper limit of pi candidates
+  maximum = TRUE,  # search for maximum
+  tol = .01,       # get within tol of truth
+  y = y            # other argument to log_likelihood
+)
+```
+
+Our estimate is stored in the `maximum` list item of the resulting object.
+```{r}
+optimize.out$maximum
+```
+We can note that this is approximately equal to the analytical result that we know is the maximum: the sample mean. Thus, `optimize` computationally re-created a result we knew from math.
+```{r}
+mean(y)
+```
+
+### With predictors
+
+Numerical optimization is often most helpful for generalized linear models that include predictors. For practice, the code below generates data with numeric predictors `x1` and `x2` and binary outcome `y`.
+
+```{r}
+simulated <- tibble(id = 1:100) |>
+  mutate(
+    x1 = rnorm(n()),
+    x2 = rnorm(n()),
+    pi = plogis(x1 + x2),
+    y = rbinom(n(), 1, pi)
+  )
+```
+
+The `optim` function in R carries out numerical optimization. To use it, we first need to write down a function for our log likelihood.
+
+```{r}
+log_likelihood <- function(parameters, data, formula) {
+  # Create the beta vector given the parameters
+  beta <- parameters
+  X <- model.matrix(formula, data = data)
+  y <- data$y
+  log_likelihood <- sum(
+    y * log(plogis(X %*% beta)) + 
+      (1 - y) * log(1 - plogis(X %*% beta))
+  )
+  return(log_likelihood)
+}
+```
+
+We optimize this with a call to the `optim` function.
+```{r}
+optim.out <- optim(
+  par = c(0,0,0), # initial values of the parameters
+  fn = log_likelihood,
+  control = list(fnscale = -1),
+  hessian = TRUE,   # multiplies by -1 to find maximum instead of minimum
+  # Other arguments to be passed to log_likelihood
+  data = simulated,
+  formula = formula(y ~ x1 + x2)
+)
+```
+
+We can extract the coefficient estimates.
+```{r}
+beta_hat <- optim.out$par |> print()
+```
+
+We can extract the Hessian.
+```{r}
+hessian <- optim.out$hessian
+```
+
+We can solve for the variance-covariance matrix $\hat{\text{V}}(\hat{\vec\beta})$: the negative inverse Hessian. In R, the `solve` function finds the inverse of a matrix.
+```{r}
+beta_hat_vcov <- -solve(hessian)
+```
+
+This can give us our coefficients and standard errors (the square root of the diagonal of the variance covariance matrix).
+
+```{r}
+tibble(
+  variable = c("Intercept","x1","x2"),
+  beta = beta_hat,
+  se = sqrt(diag(beta_hat_vcov))
+)
+```
+
+We can compare that to the output from logistic regression.
+```{r}
+canned_fit <- glm(y ~ x1 + x2, data = simulated, family = binomial)
+summary(canned_fit)
+```
+
+#### Simulating predicted probabilities
+
+We can simulate predicted probabilities. Suppose we are interested in the prediction at $(X_1,X_2) = (1,1)$. Define these data to predict,
+```{r}
+to_predict <- tibble(x1 = 0, x2 = 1)
+```
+create an $X$ matrix at those values
+```{r}
+X_new <- model.matrix(~ x1 + x2, data = to_predict)
+```
+and make predictions from that $X$ matrix.
+```{r}
+pi_hat <- plogis(X_new %*% beta_hat) |> print()
+```
+
+To get a standard error on the predictions, we can use simulation. We know that $\hat{\vec\beta}$ is asymptotically multivariate normal. We can simulate many coefficient vectors $\vec\beta^*$ from that distribution,
+```{r}
+beta_star <- mvtnorm::rmvnorm(n = 1000, mean = beta_hat, sigma = beta_hat_vcov)
+```
+and we can generate a predicted probability from each simulated value.
+```{r}
+pi_star <- plogis(X_new %*% t(beta_star))
+```
+The standard error is the standard deviation of these simulated draws.
+```{r}
+se_pi_hat <- sd(pi_star)
+```
+
+We can likewise predict with the canned version of the model,
+```{r}
+canned_prediction <- predict(canned_fit, type = "response", newdata = to_predict, se = T)
+```
+and compare to see that they are approximately the same.
+```{r}
+tibble(method = c("diy","canned")) |>
+  mutate(
+    pi_hat = c(pi_hat, canned_prediction$fit),
+    se = c(se_pi_hat, canned_prediction$se.fit)
+  )
+```
+
+

@@ -1,0 +1,25 @@
+project:
+  type: website
+  output-dir: docs
+  render: 
+    - "*.qmd"
+    - "!/assets/"
+
+execute: 
+  freeze: auto
+
+website:
+  title: "SOCIOL 212B: Quantitative Data Analysis"
+  description: "Using tools from data science and causal inference to answer social science research questions."
+  sidebar:
+    style: "docked"
+    search: true
+    contents:
+      - bernoulli.qmd
+      - exponential.qmd
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
