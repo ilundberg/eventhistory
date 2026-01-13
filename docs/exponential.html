@@ -202,6 +202,7 @@ window.Quarto = {
   <li><a href="#vector-parameter-optimization" id="toc-vector-parameter-optimization" class="nav-link" data-scroll-target="#vector-parameter-optimization">Vector-parameter optimization</a></li>
   <li><a href="#simulate-predictions" id="toc-simulate-predictions" class="nav-link" data-scroll-target="#simulate-predictions">Simulate predictions</a></li>
   <li><a href="#canned-comparison" id="toc-canned-comparison" class="nav-link" data-scroll-target="#canned-comparison">Canned comparison</a></li>
+  <li><a href="#exercise" id="toc-exercise" class="nav-link" data-scroll-target="#exercise">Exercise</a></li>
   </ul>
 </nav>
     </div>
@@ -318,7 +319,7 @@ L(\vec{\tilde{t}},\vec{c}\mid\lambda) = \prod_i \left(f(\tilde{t}_i\mid\lambda)\
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>log_lambda_hat <span class="ot">&lt;-</span> optimize.out<span class="sc">$</span>maximum</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>lambda_hat <span class="ot">&lt;-</span> <span class="fu">exp</span>(log_lambda_hat) <span class="sc">|&gt;</span> <span class="fu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9808973</code></pre>
+<pre><code>[1] 1.007788</code></pre>
 </div>
 </div>
 </section>
@@ -400,7 +401,7 @@ y_i&amp;\sim\text{Exponential}(\lambda_i) \\
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>beta_hat <span class="ot">&lt;-</span> optim.out<span class="sc">$</span>par <span class="sc">|&gt;</span> <span class="fu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -1.0179787  0.4640804  0.6061929</code></pre>
+<pre><code>[1] -0.9116232  0.4979968  0.5117867</code></pre>
 </div>
 </div>
 <p>We can extract the Hessian.</p>
@@ -422,9 +423,9 @@ y_i&amp;\sim\text{Exponential}(\lambda_i) \\
 <pre><code># A tibble: 3 × 3
   variable    beta     se
   &lt;chr&gt;      &lt;dbl&gt;  &lt;dbl&gt;
-1 Intercept -1.02  0.0416
-2 x1         0.464 0.0405
-3 x2         0.606 0.0429</code></pre>
+1 Intercept -0.912 0.0408
+2 x1         0.498 0.0410
+3 x2         0.512 0.0398</code></pre>
 </div>
 </div>
 <p>We can compare that to the output from logistic regression.</p>
@@ -442,15 +443,15 @@ Call:
 survreg(formula = Surv(time = t_tilde, event = 1 - c) ~ x1 + 
     x2, data = simulated, dist = "exponential")
               Value Std. Error     z      p
-(Intercept)  1.0181     0.0416  24.5 &lt;2e-16
-x1          -0.4642     0.0405 -11.5 &lt;2e-16
-x2          -0.6062     0.0429 -14.1 &lt;2e-16
+(Intercept)  0.9117     0.0408  22.4 &lt;2e-16
+x1          -0.4982     0.0410 -12.1 &lt;2e-16
+x2          -0.5117     0.0398 -12.9 &lt;2e-16
 
 Scale fixed at 1 
 
 Exponential distribution
-Loglik(model)= -1149.8   Loglik(intercept only)= -1301.9
-    Chisq= 304.19 on 2 degrees of freedom, p= 8.8e-67 
+Loglik(model)= -1145.5   Loglik(intercept only)= -1288.8
+    Chisq= 286.66 on 2 degrees of freedom, p= 5.7e-63 
 Number of Newton-Raphson Iterations: 4 
 n= 1000 </code></pre>
 </div>
@@ -472,7 +473,7 @@ n= 1000 </code></pre>
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>lambda_hat <span class="ot">&lt;-</span> <span class="fu">exp</span>(X_new <span class="sc">%*%</span> beta_hat) <span class="sc">|&gt;</span> <span class="fu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>       [,1]
-1 0.6624662</code></pre>
+1 0.6704297</code></pre>
 </div>
 </div>
 <p>We may not just want the hazard: perhaps we want the probability of surviving past time <span class="math inline">\(t = 2\)</span>. Recall that <code>pexp</code> is the CDF, and with the option <code>lower.tail = FALSE</code> it is the survival function.</p>
@@ -518,7 +519,7 @@ n= 1000 </code></pre>
 <span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>        diy    canned
-1 0.6624662 0.6623683</code></pre>
+1 0.6704297 0.6703185</code></pre>
 </div>
 </div>
 <p>Advantages of the DIY coding yourself include</p>
@@ -527,6 +528,60 @@ n= 1000 </code></pre>
 <li>you know how to get standard errors for any quantity of interest</li>
 <li>you can generalize to models that are not canned</li>
 </ul>
+</section>
+<section id="exercise" class="level2">
+<h2 class="anchored" data-anchor-id="exercise">Exercise</h2>
+<p>This exercise uses data from a medical trial that tracked survival outcomes of patients receiving heart transplants.</p>
+<blockquote class="blockquote">
+<p>Crowley, J., &amp; Hu, M. (1977). Covariance analysis of heart transplant survival data. Journal of the American Statistical Association, 72(357), 27-36.</p>
+</blockquote>
+<p>We will access the data from the <code>survival</code> package in R. The trail enrolled people eligible for heart transplants, some of whom later received transplants and some did not. We will focus on survival outcomes post-transplant for transplant recipients. The code below prepares data on variables we will use.</p>
+<ul>
+<li><code>t</code> is time in years from transplant until either death or censoring</li>
+<li><code>c</code> is censoring, coded <code>TRUE</code> for censoring and <code>FALSE</code> for death</li>
+<li><code>age</code> is the patient’s age at the time of transplant</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>heart_recipients <span class="ot">&lt;-</span> <span class="fu">tibble</span>(survival<span class="sc">::</span>jasa) <span class="sc">|&gt;</span> </span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Keep those who received a transplant</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(tx.date)) <span class="sc">|&gt;</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Remove if died on the day of transplant</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(tx.date <span class="sc">!=</span> fu.date) <span class="sc">|&gt;</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Construct variables we will use</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Age at transplant is difference between treatment date and birth date</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">age =</span> <span class="fu">as.numeric</span>(<span class="fu">difftime</span>(tx.date, birth.dt, <span class="at">units =</span> <span class="st">"days"</span>)) <span class="sc">/</span> <span class="fl">365.25</span>,</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Time is difference between follow-up date and treatment date</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">t =</span> <span class="fu">as.numeric</span>(<span class="fu">difftime</span>(fu.date, tx.date, <span class="at">units =</span> <span class="st">"days"</span>)) <span class="sc">/</span> <span class="fl">365.25</span>,</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Censoring is defined by follow-up status</span></span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">c =</span> fustat <span class="sc">==</span> <span class="dv">0</span></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(age, c, t) <span class="sc">|&gt;</span></span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="at">n =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 68 × 3
+    age c           t
+  &lt;dbl&gt; &lt;lgl&gt;   &lt;dbl&gt;
+1  54.3 FALSE 0.0411 
+2  40.4 FALSE 0.00821
+3  51.0 FALSE 1.71   
+# ℹ 65 more rows</code></pre>
+</div>
+</div>
+<p>Using these data:</p>
+<ol type="1">
+<li><p>Fit an Exponential survival model in which the log hazard is a linear function of age at transplant. <span class="math display">\[
+T_i\sim \text{Exponential}(\lambda_i)
+\]</span> <span class="math display">\[
+\log(\lambda_i) = \beta_0 + \beta_1\text{Age}_i
+\]</span></p></li>
+<li><p>At each observed value of the predictors, predict the hazard of death <span class="math inline">\(\hat\lambda_i\)</span>.</p></li>
+<li><p>Convert the rate into an expected survival time <span class="math inline">\(\text{E}(T\mid \text{Age} = x)\)</span>. Note that the expected value of the Exponential distribution with rate <span class="math inline">\(\hat\lambda_i\)</span> is <span class="math inline">\(\frac{1}{\hat\lambda_i}\)</span>. Make a graph to visualize the expected survival time as a function of age.</p></li>
+<li><p>At each observed value of the predictors, calculate the probability of surviving at least 2 years post-transplant: <span class="math inline">\(\text{P}(T &gt; 2\mid \text{Age} = x)\)</span>. Note that the survival function for the Exponential distribution with rate <code>lambda</code> at time <code>t</code> is <code>pexp(q = t, rate = lambda, lower.tail = FALSE)</code>. Plot these survival probabilities as a function of age.</p></li>
+<li><p>For at least one estimate from (3) or (4), construct a 95% confidence interval by simulating many draws of <span class="math inline">\(\vec\beta^*\)</span> from its estimated Multivariate Normal sampling distribution, translating each draw to a predicted quantity of interest. You can either construct your confidence interval by a Normal approximation to the predicted quantity of interest or by taking the middle 95% of simulated draws.</p></li>
+</ol>
+<p>Submit either your raw R script or a PDF report (e.g., from .Rmd or .Qmd) that embeds your code.</p>
+<p>Full credit for carrying out estimation with <code>optim</code>. High partial credit for carrying out estimation using the <code>survreg()</code> function in the <code>survival</code> package. Note that with <code>survreg</code>, prediction with <code>type = response</code> will predict a scale parameter <span class="math inline">\(\frac{1}{\lambda}\)</span> rather than a rate parameter <span class="math inline">\(\lambda\)</span>.</p>
 
 
 </section>
