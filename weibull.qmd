@@ -1,0 +1,194 @@
+---
+title: "Weibull"
+format:
+  html:
+    toc: true
+    toc-expansion: true
+    fig-height: 3
+---
+
+```{r, echo = F, warning = F, message = F}
+library(tidyverse)
+library(foreach)
+theme_set(theme_bw())
+library(survival)
+```
+
+Like the Exponential, the Weibull is a distribution defined on positive real numbers. The Weibull is commonly used in survival analysis because it produces a hazard function that can increase with time or decrease with time. The Weibull hazard is always monotonic (either always increasing or always decreasing, or flat). The distribution functions in R are `*weibull` with `*` being `d`, `r`, `q`, or `p`.
+
+These functions parameterize the Weibull with two parameters: shape and scale.
+
+The shape determines how the hazard function changes with time. Below are Weibull hazards with several `shape` parameters and with fixed `scale = 1`.
+
+```{r}
+#| code-fold: true
+foreach(shape_value = c(.9,1,2,4), .combine = "rbind") %do% {
+  tibble(p = seq(.01, .99, .01)) |>
+    mutate(
+      t = qweibull(p, shape = shape_value, scale = 1),
+      f = dweibull(t, shape = shape_value, scale = 1),
+      S = pweibull(t, shape = shape_value, scale = 1, lower.tail = FALSE),
+      h = f / S,
+      shape = shape_value
+    )
+} |>
+  ggplot(aes(x = t, y = h)) +
+  geom_line() +
+  facet_wrap(~shape, scales = "free", labeller = as_labeller(\(x) paste("Shape =",x)), nrow = 1) +
+  labs(
+    x = "Time",
+    y = "Hazard",
+    title = "Weibull hazard functions: By shape parameter, at scale = 1"
+  )
+```
+
+The `scale` parameter determines the scale of the `time` axis. A longer scale means longer survival times.
+
+```{r}
+#| code-fold: true
+foreach(scale_value = c(.5,1,2), .combine = "rbind") %do% {
+  tibble(p = seq(.01, .99, .01)) |>
+    mutate(
+      t = qweibull(p, shape = 4, scale = scale_value),
+      f = dweibull(t, shape = 4, scale = scale_value),
+      S = pweibull(t, shape = 4, scale = scale_value, lower.tail = FALSE),
+      h = f / S,
+      scale = paste0("Scale = ",scale_value)
+    )
+} |>
+  ggplot(aes(x = t, y = h)) +
+  geom_line() +
+  facet_wrap(~scale, scales = "free") +
+  labs(
+    x = "Time",
+    y = "Hazard",
+    title = "Weibull hazard functions: By scale parameter, at shape = 4. Note the x-axis."
+  )
+```
+
+## Weibull model
+
+When modeling Weibull outcomes as a function of predictors $\vec{X}$, we will often assume
+
+* the `shape` is the same regardless of $\vec{X}$
+* the `scale` equals $\log(\vec{X}_i\vec\beta)$
+
+As an illustration, we will generate a simulation where survival times differ as a function of a binary predictor $X$,
+
+$$\begin{aligned}
+X &\sim \text{Bernoulli}(0.5) \\
+T &\sim \text{Weibull}\left(\texttt{shape} = \alpha,\texttt{scale} = \exp(\beta_0 + \beta_1 X)\right)
+\end{aligned}$$
+
+for $\alpha = 3$,  $\beta_0 = 0$, and $\beta_1 = 2$. Below we set these parameters.
+
+```{r}
+alpha <- 3
+beta0 <- 0
+beta1 <- 1
+```
+
+Then we simulate some data from this process.
+
+```{r}
+simulated <- tibble(id = 1:1e4) |>
+  mutate(
+    x = rbinom(n(), 1, .5),
+    scale = exp(beta0 + beta1 * x),
+    # Simulate from the Weibull
+    t = rweibull(n(), shape = alpha, scale = scale),
+    c = 0
+  )
+```
+
+We can then fit a Weibull survival model with the `survreg` function,
+```{r}
+model <- survreg(
+  Surv(t, 1 - c) ~ x,
+  data = simulated,
+  dist = "weibull"
+)
+```
+```{r, echo = FALSE}
+saveRDS(model, file = "assets/weibull_model.RDS")
+```
+
+and we can confirm that the estimated parameters match their true values. First, we extract the `shape` parameter $\hat\alpha$ which (confusingly) is the inverse of the `scale` element of the fitted model.
+
+```{r}
+alpha_estimate <- 1 / model$scale
+```
+
+Then, we can extract the coefficients $\hat{\vec\beta}$.
+```{r}
+beta_estimate <- coef(model)
+```
+
+We can confirm that these are correct.
+```{r}
+cbind(
+  truth = c(alpha = alpha, beta0 = beta0, beta1 = beta1), 
+  estimate = c(alpha = alpha_estimate, beta_estimate)
+)
+```
+
+## Simulate quantities of interest
+
+Finally, we can convert to quantities of interest. For example, what is the estimated survival function from time 0 to 10 in each group?
+
+First, define the groups for which to make predictions.
+
+```{r}
+to_predict <- tibble(x = 0:1)
+```
+
+Then, predict the `scale` and `shape` parameters from the model. Note that you can calculate the `scale` parameter manually by extracting $\hat{\vec\beta}$ as we did above, or you can use `predict()` with the argument `type = "linear"` to automatically predict the value of the linear predictor $\vec{X}'\vec\beta$ (which is the log of the `scale` parameter, since `scale` = $\exp(\vec{X}'\vec\beta)$.
+```{r}
+predicted_parameters <- to_predict |>
+  mutate(
+    shape = 1 / model$scale,
+    log_scale = predict(
+      model, 
+      newdata = to_predict, 
+      type = "linear"
+    ),
+    scale = exp(log_scale)
+  )
+```
+
+At this point, each row of `predicted_parameters` corresponds to a person. We want to expand to person-periods.
+
+```{r}
+predicted_survival <- predicted_parameters |>
+  group_by(x) |>
+  # Create 100 copies of each line
+  uncount(weights = 100) |>
+  # Create a sequence over the times to predict
+  mutate(
+    time = seq(from = 0.01, to = 4, length.out = 100)
+  ) |>
+  # Calculate the survival probability at that time
+  mutate(
+    S = pweibull(
+      q = time,
+      shape = shape,
+      scale = scale,
+      lower.tail = FALSE
+    )
+  )
+```
+```{r, echo = F}
+predicted_survival |>
+  write_csv("assets/predicted_survival_weibull.csv")
+```
+
+We can plot those survival curves!
+
+```{r}
+predicted_survival |>
+  # Make x a character for easier plotting
+  mutate(x = paste("x =",x)) |>
+  ggplot(aes(x = time, y = S, color = x, linetype = x)) +
+  geom_line()
+```
+

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Bernoulli – SOCIOL 212B: Quantitative Data Analysis</title>
+<title>MLE Review: Bernoulli – SOCIOL 212B: Quantitative Data Analysis</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -145,7 +145,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./bernoulli.html">Bernoulli</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./bernoulli.html">MLE Review: Bernoulli</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -172,14 +172,38 @@ window.Quarto = {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./kaplanmeier.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Kaplan-Meier</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./bernoulli.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Bernoulli</span></a>
+ <span class="menu-text">MLE Review: Bernoulli</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./exponential.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Exponential</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./weibull.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Weibull</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./proportional_hazards.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Proportional Hazards</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./cox.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Cox Proportional Hazards</span></a>
   </div>
 </li>
     </ul>
@@ -210,7 +234,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Bernoulli</h1>
+<h1 class="title">MLE Review: Bernoulli</h1>
 </div>
 
 
@@ -357,14 +381,14 @@ V(\hat\pi) &amp;= -\left[H(\hat\pi)\right]^{-1} \\
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>optimize.out<span class="sc">$</span>maximum</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.4333952</code></pre>
+<pre><code>[1] 0.4020969</code></pre>
 </div>
 </div>
 <p>We can note that this is approximately equal to the analytical result that we know is the maximum: the sample mean. Thus, <code>optimize</code> computationally re-created a result we knew from math.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.433</code></pre>
+<pre><code>[1] 0.403</code></pre>
 </div>
 </div>
 </section>
@@ -410,7 +434,7 @@ V(\hat\pi) &amp;= -\left[H(\hat\pi)\right]^{-1} \\
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>beta_hat <span class="ot">&lt;-</span> optim.out<span class="sc">$</span>par <span class="sc">|&gt;</span> <span class="fu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -0.004142605  0.867452526  0.921018502</code></pre>
+<pre><code>[1] 0.4642444 1.3269376 1.4215027</code></pre>
 </div>
 </div>
 <p>We can extract the Hessian.</p>
@@ -430,11 +454,11 @@ V(\hat\pi) &amp;= -\left[H(\hat\pi)\right]^{-1} \\
 <span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 3
-  variable      beta    se
-  &lt;chr&gt;        &lt;dbl&gt; &lt;dbl&gt;
-1 Intercept -0.00414 0.234
-2 x1         0.867   0.257
-3 x2         0.921   0.269</code></pre>
+  variable   beta    se
+  &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;
+1 Intercept 0.464 0.256
+2 x1        1.33  0.336
+3 x2        1.42  0.360</code></pre>
 </div>
 </div>
 <p>We can compare that to the output from logistic regression.</p>
@@ -448,19 +472,19 @@ glm(formula = y ~ x1 + x2, family = binomial, data = simulated)
 
 Coefficients:
             Estimate Std. Error z value Pr(&gt;|z|)    
-(Intercept) -0.00422    0.23426  -0.018 0.985629    
-x1           0.86761    0.25675   3.379 0.000727 ***
-x2           0.92115    0.26944   3.419 0.000629 ***
+(Intercept)   0.4642     0.2565   1.810   0.0703 .  
+x1            1.3270     0.3363   3.947 7.93e-05 ***
+x2            1.4217     0.3598   3.951 7.77e-05 ***
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 (Dispersion parameter for binomial family taken to be 1)
 
-    Null deviance: 137.99  on 99  degrees of freedom
-Residual deviance: 109.94  on 97  degrees of freedom
-AIC: 115.94
+    Null deviance: 137.628  on 99  degrees of freedom
+Residual deviance:  97.723  on 97  degrees of freedom
+AIC: 103.72
 
-Number of Fisher Scoring iterations: 4</code></pre>
+Number of Fisher Scoring iterations: 5</code></pre>
 </div>
 </div>
 <section id="simulating-predicted-probabilities" class="level4">
@@ -478,7 +502,7 @@ Number of Fisher Scoring iterations: 4</code></pre>
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>pi_hat <span class="ot">&lt;-</span> <span class="fu">plogis</span>(X_new <span class="sc">%*%</span> beta_hat) <span class="sc">|&gt;</span> <span class="fu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>       [,1]
-1 0.7144051</code></pre>
+1 0.8682699</code></pre>
 </div>
 </div>
 <p>To get a standard error on the predictions, we can use simulation. We know that <span class="math inline">\(\hat{\vec\beta}\)</span> is asymptotically multivariate normal. We can simulate many coefficient vectors <span class="math inline">\(\vec\beta^*\)</span> from that distribution,</p>
@@ -508,8 +532,8 @@ Number of Fisher Scoring iterations: 4</code></pre>
 <pre><code># A tibble: 2 × 3
   method pi_hat     se
   &lt;chr&gt;   &lt;dbl&gt;  &lt;dbl&gt;
-1 diy     0.714 0.0641
-2 canned  0.714 0.0678</code></pre>
+1 diy     0.868 0.0546
+2 canned  0.868 0.0535</code></pre>
 </div>
 </div>
 

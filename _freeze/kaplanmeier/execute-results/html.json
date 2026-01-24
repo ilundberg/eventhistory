@@ -1,0 +1,17 @@
+{
+  "hash": "3547fe670ee4d553ab07116a82b5aca2",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Kaplan-Meier\"\nformat:\n  html:\n    toc: true\n    toc-expansion: true\n    fig-height: 3\n---\n\n\n::: {.cell}\n\n:::\n\n\nThe **Kaplan-Meier** estimator is a nonparametric method to estimate a survival curve in the presence of censoring.\n\nFor each unit $i$ who dies at $t_i$, let\n\n* $d_i$ denote the number of units who died simultaneously with unit $i$\n* $n_i$ denote the number of units alive just before unit $i$ died\n\nTo survive to time $t$, one must survive every moment preceding $t$ when someone died. This motivates a survival curve estimate,\n$$\nS(t) = \\prod_{i:t_i\\leq t}\\left(1 - \\frac{d_i}{n_i}\\right)\n$$\nwhich at time $t$ takes the product over all death times preceding $t$ where the expression inside the product is the probability of surviving that death time.\n\nA Kaplan-Meier curve is easy to estimate in R with the `survfit` function. Here we use the heart recipients data from the Exponential page.\n\n\n::: {.cell}\n\n:::\n\n\n::: {.cell}\n\n```{.r .cell-code}\nheart_recipients <- read_csv(\"https://ilundberg.github.io/eventhistory/assets/heart_recipients.csv\")\n```\n:::\n\n\nFirst we learn the survival function,\n\n::: {.cell}\n\n```{.r .cell-code}\nkaplan_meier <- survfit(\n  Surv(t, event = 1 - c) ~ 1,\n  data = heart_recipients\n)\n```\n:::\n\nand then we can plot it\n\n::: {.cell}\n\n```{.r .cell-code}\nplot(kaplan_meier)\n```\n:::\n\nor with longer code can make a nice `ggplot`.\n\n::: {.cell}\n\n```{.r .cell-code  code-fold=\"true\"}\ntibble(\n  t = kaplan_meier$time,\n  S = kaplan_meier$surv,\n  lower = kaplan_meier$lower,\n  upper = kaplan_meier$upper\n) |>\n  ggplot(\n    aes(x = t, y = S, ymin = lower, ymax = upper)\n  ) +\n  geom_line() +\n  geom_ribbon(alpha = .4) +\n  labs(\n    x = \"Time\",\n    y = \"Estimated Survival Function\",\n    title = \"Kaplan-Meier estimates\"\n  )\n```\n\n::: {.cell-output-display}\n![](kaplanmeier_files/figure-html/unnamed-chunk-6-1.png){width=672}\n:::\n:::\n\n\nThe Kaplan-Meier curve is ideal for\n\n* summarizing a marginal survival curve\n* estimating survival in a few discrete subgroups\n\nWhen there are many population subgroups defined by a vector of predictor $\\vec{X}$ such that few units are observed in each subgroup, then parametric models may be preferable.\n",
+    "supporting": [
+      "kaplanmeier_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

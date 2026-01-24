@@ -1,5 +1,5 @@
 ---
-title: "Bernoulli"
+title: "MLE Review: Bernoulli"
 ---
 
 Let $y_1,\dots,y_n \stackrel{\text{iid}}{\sim} \text{Bernoulli}(\pi)$ be $n$ independent flips of a weighted coin with probability $\pi$ of heads. In basic statistics, you already learned a common estimator $\hat\pi = \frac{1}{n}\sum_i y_i$. You also learned that this estimator is asymptotically Normally distributed, with estimated variance $\hat{\text{V}}(\hat\pi) = \frac{\hat\pi(1 - \hat\pi)}{n}$.

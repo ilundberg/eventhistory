@@ -1,0 +1,76 @@
+---
+title: "Kaplan-Meier"
+format:
+  html:
+    toc: true
+    toc-expansion: true
+    fig-height: 3
+---
+
+```{r, echo = F, warning = F, message = F}
+library(tidyverse)
+library(foreach)
+theme_set(theme_bw())
+library(survival)
+```
+
+The **Kaplan-Meier** estimator is a nonparametric method to estimate a survival curve in the presence of censoring.
+
+For each unit $i$ who dies at $t_i$, let
+
+* $d_i$ denote the number of units who died simultaneously with unit $i$
+* $n_i$ denote the number of units alive just before unit $i$ died
+
+To survive to time $t$, one must survive every moment preceding $t$ when someone died. This motivates a survival curve estimate,
+$$
+S(t) = \prod_{i:t_i\leq t}\left(1 - \frac{d_i}{n_i}\right)
+$$
+which at time $t$ takes the product over all death times preceding $t$ where the expression inside the product is the probability of surviving that death time.
+
+A Kaplan-Meier curve is easy to estimate in R with the `survfit` function. Here we use the heart recipients data from the Exponential page.
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+heart_recipients <- read_csv("assets/heart_recipients.csv")
+```
+```{r, warning = FALSE, message = FALSE, eval = FALSE}
+heart_recipients <- read_csv("https://ilundberg.github.io/eventhistory/assets/heart_recipients.csv")
+```
+
+First we learn the survival function,
+```{r}
+kaplan_meier <- survfit(
+  Surv(t, event = 1 - c) ~ 1,
+  data = heart_recipients
+)
+```
+and then we can plot it
+```{r, eval = FALSE}
+plot(kaplan_meier)
+```
+or with longer code can make a nice `ggplot`.
+```{r}
+#| code-fold: true
+tibble(
+  t = kaplan_meier$time,
+  S = kaplan_meier$surv,
+  lower = kaplan_meier$lower,
+  upper = kaplan_meier$upper
+) |>
+  ggplot(
+    aes(x = t, y = S, ymin = lower, ymax = upper)
+  ) +
+  geom_line() +
+  geom_ribbon(alpha = .4) +
+  labs(
+    x = "Time",
+    y = "Estimated Survival Function",
+    title = "Kaplan-Meier estimates"
+  )
+```
+
+The Kaplan-Meier curve is ideal for
+
+* summarizing a marginal survival curve
+* estimating survival in a few discrete subgroups
+
+When there are many population subgroups defined by a vector of predictor $\vec{X}$ such that few units are observed in each subgroup, then parametric models may be preferable.

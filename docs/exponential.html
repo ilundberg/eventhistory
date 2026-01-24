@@ -172,14 +172,38 @@ window.Quarto = {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./kaplanmeier.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Kaplan-Meier</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./bernoulli.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Bernoulli</span></a>
+ <span class="menu-text">MLE Review: Bernoulli</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./exponential.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Exponential</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./weibull.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Weibull</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./proportional_hazards.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Proportional Hazards</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./cox.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Cox Proportional Hazards</span></a>
   </div>
 </li>
     </ul>
@@ -319,7 +343,7 @@ L(\vec{\tilde{t}},\vec{c}\mid\lambda) = \prod_i \left(f(\tilde{t}_i\mid\lambda)\
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>log_lambda_hat <span class="ot">&lt;-</span> optimize.out<span class="sc">$</span>maximum</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>lambda_hat <span class="ot">&lt;-</span> <span class="fu">exp</span>(log_lambda_hat) <span class="sc">|&gt;</span> <span class="fu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 1.007788</code></pre>
+<pre><code>[1] 1.023873</code></pre>
 </div>
 </div>
 </section>
@@ -401,7 +425,7 @@ y_i&amp;\sim\text{Exponential}(\lambda_i) \\
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>beta_hat <span class="ot">&lt;-</span> optim.out<span class="sc">$</span>par <span class="sc">|&gt;</span> <span class="fu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -0.9116232  0.4979968  0.5117867</code></pre>
+<pre><code>[1] -0.9961967  0.5103690  0.4532207</code></pre>
 </div>
 </div>
 <p>We can extract the Hessian.</p>
@@ -423,9 +447,9 @@ y_i&amp;\sim\text{Exponential}(\lambda_i) \\
 <pre><code># A tibble: 3 × 3
   variable    beta     se
   &lt;chr&gt;      &lt;dbl&gt;  &lt;dbl&gt;
-1 Intercept -0.912 0.0408
-2 x1         0.498 0.0410
-3 x2         0.512 0.0398</code></pre>
+1 Intercept -0.996 0.0409
+2 x1         0.510 0.0418
+3 x2         0.453 0.0416</code></pre>
 </div>
 </div>
 <p>We can compare that to the output from logistic regression.</p>
@@ -443,15 +467,15 @@ Call:
 survreg(formula = Surv(time = t_tilde, event = 1 - c) ~ x1 + 
     x2, data = simulated, dist = "exponential")
               Value Std. Error     z      p
-(Intercept)  0.9117     0.0408  22.4 &lt;2e-16
-x1          -0.4982     0.0410 -12.1 &lt;2e-16
-x2          -0.5117     0.0398 -12.9 &lt;2e-16
+(Intercept)  0.9961     0.0409  24.3 &lt;2e-16
+x1          -0.5105     0.0418 -12.2 &lt;2e-16
+x2          -0.4532     0.0416 -10.9 &lt;2e-16
 
 Scale fixed at 1 
 
 Exponential distribution
-Loglik(model)= -1145.5   Loglik(intercept only)= -1288.8
-    Chisq= 286.66 on 2 degrees of freedom, p= 5.7e-63 
+Loglik(model)= -1170.9   Loglik(intercept only)= -1300.9
+    Chisq= 259.98 on 2 degrees of freedom, p= 3.5e-57 
 Number of Newton-Raphson Iterations: 4 
 n= 1000 </code></pre>
 </div>
@@ -473,7 +497,7 @@ n= 1000 </code></pre>
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>lambda_hat <span class="ot">&lt;-</span> <span class="fu">exp</span>(X_new <span class="sc">%*%</span> beta_hat) <span class="sc">|&gt;</span> <span class="fu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>       [,1]
-1 0.6704297</code></pre>
+1 0.5810166</code></pre>
 </div>
 </div>
 <p>We may not just want the hazard: perhaps we want the probability of surviving past time <span class="math inline">\(t = 2\)</span>. Recall that <code>pexp</code> is the CDF, and with the option <code>lower.tail = FALSE</code> it is the survival function.</p>
@@ -519,7 +543,7 @@ n= 1000 </code></pre>
 <span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>        diy    canned
-1 0.6704297 0.6703185</code></pre>
+1 0.5810166 0.5810865</code></pre>
 </div>
 </div>
 <p>Advantages of the DIY coding yourself include</p>

@@ -336,6 +336,9 @@ heart_recipients <- tibble(survival::jasa) |>
   select(age, c, t) |>
   print(n = 3)
 ```
+```{r, echo = FALSE}
+write_csv(heart_recipients, file = "assets/heart_recipients.csv")
+```
 
 Using these data:
 

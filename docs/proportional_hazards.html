@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Event History Analysis – SOCIOL 212B: Quantitative Data Analysis</title>
+<title>Proportional Hazards – SOCIOL 212B: Quantitative Data Analysis</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,6 +19,41 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -68,6 +103,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -81,9 +145,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">
-      SOCIOL 212B: Quantitative Data Analysis
-      </li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./proportional_hazards.html">Proportional Hazards</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -110,8 +172,14 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./kaplanmeier.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Kaplan-Meier</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./bernoulli.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Bernoulli</span></a>
+ <span class="menu-text">MLE Review: Bernoulli</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -128,14 +196,8 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./proportional_hazards.html" class="sidebar-item-text sidebar-link">
+  <a href="./proportional_hazards.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Proportional Hazards</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./kaplanmeier.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Kaplan-Meier</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -149,15 +211,25 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#math-for-exponential-and-weibull-ph" id="toc-math-for-exponential-and-weibull-ph" class="nav-link active" data-scroll-target="#math-for-exponential-and-weibull-ph">Math for Exponential and Weibull PH</a>
+  <ul class="collapse">
+  <li><a href="#exponential-ph-in-math" id="toc-exponential-ph-in-math" class="nav-link" data-scroll-target="#exponential-ph-in-math">Exponential PH in math</a></li>
+  <li><a href="#weibull-ph-in-math" id="toc-weibull-ph-in-math" class="nav-link" data-scroll-target="#weibull-ph-in-math">Weibull PH in math</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Event History Analysis</h1>
+<h1 class="title">Proportional Hazards</h1>
 </div>
 
 
@@ -174,9 +246,112 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>This website is to share code on event history analysis, for UCLA Soc 213B. Potentially in the future it will be a more outward-facing website!</p>
+<p>The Exponential and Weibull models we have already learned are examples of <strong>proportional hazards models</strong>. These models begin with a <strong>baseline hazard</strong> that applies when <span class="math inline">\(\vec{X} = \vec{0}\)</span>. For other values of <span class="math inline">\(\vec{X}\)</span>, the hazard equals the baseline hazard multiplied by <strong>hazard ratio</strong> <span class="math inline">\(e^{\vec{X}'\vec\beta}\)</span>.</p>
+<p><span class="math display">\[
+h(t\mid\vec{X}) = \underbrace{\lambda(t)}_{\substack{\text{baseline}\\\text{hazard}}}\underbrace{e^{\vec{X}'\vec\beta}}_{\substack{\text{hazard}\\\text{ratio}}}
+\]</span></p>
+<p>Let’s see proportional hazards in a concrete example. On the Weibull page, we created an object <code>predicted_survival</code> containing the predicted values of a survival curve. Below, we load this object again.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>predicted_survival <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"assets/predicted_survival_weibull.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Recall that this object has two units with <code>x = 0</code> and <code>x = 1</code>, with many rows per unit representing survival probabilities at each time point. We can calculate the hazard at these time points as well.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>predicted_hazard <span class="ot">&lt;-</span> predicted_survival <span class="sc">|&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculate the PDF at each point</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">f =</span> <span class="fu">dweibull</span>(<span class="at">x =</span> time, <span class="at">shape =</span> shape, <span class="at">scale =</span> scale),</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Hazard equals PDF over survival</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">h =</span> f <span class="sc">/</span> S</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Below we visualize these hazard functions. The hazard in population subgroup <span class="math inline">\(X = 0\)</span> is much higher than the hazard in subgroup <span class="math inline">\(X = 1\)</span>, at every time point.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>predicted_hazard <span class="sc">|&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(x, time, h) <span class="sc">|&gt;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> time, <span class="at">y =</span> h, <span class="at">color =</span> <span class="fu">factor</span>(x), <span class="at">linetype =</span> <span class="fu">factor</span>(x))) <span class="sc">+</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Hazard Function"</span>, </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Time"</span>, </span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Population</span><span class="sc">\n</span><span class="st">Subgroup (X)"</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="st">"Population</span><span class="sc">\n</span><span class="st">Subgroup (X)"</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="proportional_hazards_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Next, consider the <strong>hazard ratio</strong> at each time <span class="math inline">\(t\)</span>: the hazard in group <span class="math inline">\(X = 1\)</span> divided by the hazard in group <span class="math inline">\(X = 0\)</span>.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>predicted_hazard_ratios <span class="ot">&lt;-</span> predicted_hazard <span class="sc">|&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(x, time, h) <span class="sc">|&gt;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> <span class="st">"x"</span>, <span class="at">values_from =</span> <span class="st">"h"</span>, <span class="at">names_prefix =</span> <span class="st">"hazard_if_x_"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">hazard_ratio =</span> hazard_if_x_1 <span class="sc">/</span> hazard_if_x_0) <span class="sc">|&gt;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="at">n =</span> <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 100 × 4
+    time hazard_if_x_0 hazard_if_x_1 hazard_ratio
+   &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;        &lt;dbl&gt;
+1 0.01        0.000347     0.0000176       0.0507
+2 0.0503      0.00832      0.000422        0.0507
+3 0.0906      0.0265       0.00134         0.0507
+4 0.131       0.0546       0.00277         0.0507
+5 0.171       0.0926       0.00470         0.0507
+# ℹ 95 more rows</code></pre>
+</div>
+</div>
+<p>Note that the hazard ratio is <strong>constant</strong> in this model. The hazard ratio is 0.0507 at every time point. A hazard ratio that is constant over time is the hallmark of a proportional hazards model: the hazard function at every <span class="math inline">\(\vec{x}\)</span> value is proportional to a <strong>baseline hazard</strong> that exists if <span class="math inline">\(\vec{x} = \vec{0}\)</span>.</p>
+<section id="math-for-exponential-and-weibull-ph" class="level2">
+<h2 class="anchored" data-anchor-id="math-for-exponential-and-weibull-ph">Math for Exponential and Weibull PH</h2>
+<p>Here we use math to see the Exponential and Weibull models as proportional hazards models.</p>
+<section id="exponential-ph-in-math" class="level3">
+<h3 class="anchored" data-anchor-id="exponential-ph-in-math">Exponential PH in math</h3>
+<p>For the Exponential model <span class="math inline">\(T\sim\text{Exponential}(\lambda)\)</span> with where we model the rate parameter <span class="math inline">\(\lambda = \exp(\beta_0 + \beta_1 X)\)</span>, the hazard function is <span class="math inline">\(h(t) = \lambda = \exp(\beta_0 + \beta_1 X)\)</span>. The baseline hazard when <span class="math inline">\(X = 0\)</span> is <span class="math inline">\(\exp(\beta_0)\)</span>, and the hazard when <span class="math inline">\(X = 1\)</span> is <span class="math inline">\(\exp(\beta_0 + \beta_1)\)</span>. The hazard ratio for <span class="math inline">\(X = 1\)</span> vs <span class="math inline">\(X = 0\)</span> is <span class="math inline">\(\exp(\beta_1)\)</span>.</p>
+</section>
+<section id="weibull-ph-in-math" class="level3">
+<h3 class="anchored" data-anchor-id="weibull-ph-in-math">Weibull PH in math</h3>
+<p>For a Weibull with shape <span class="math inline">\(\alpha\)</span> and scale <span class="math inline">\(\sigma\)</span>, the probability density function is <span class="math display">\[
+f(t) = \alpha \sigma ^ {-\alpha} t^{\alpha-1}e^{-(\frac{1}{\sigma} t)^\alpha}
+\]</span> and the survival function is <span class="math display">\[
+S(t) = e^{-(\frac{1}{\sigma} t)^{\alpha}}
+\]</span> Taking the ratio, the hazard function is</p>
+<p><span class="math display">\[
+h(t) = \alpha \sigma ^ {-\alpha} t^{\alpha-1}
+\]</span></p>
+<p>When using the <code>survreg</code> function in the <code>survival</code> package, we model <span class="math inline">\(\sigma = \exp(\beta_0 + \beta_1 X)\)</span>. Plugging this in, we can see how the Weibull hazard function is proportional across values of <span class="math inline">\(X\)</span>.</p>
+<p><span class="math display">\[
+\begin{aligned}
+h(t) &amp;= \alpha \left(e^{\beta_0 + \beta_1 X}\right) ^ {-\alpha} t^{\alpha-1} \\
+&amp;= \underbrace{\alpha e^{-\alpha\beta_0}t^{\alpha - 1}}_{\substack{\text{baseline}\\\text{hazard}}}\underbrace{e^{\beta_1 X}}_{\substack{\text{hazard}\\\text{ratio}}} \\
+&amp;= \begin{cases}
+  \alpha e^{-\alpha\beta_0}t^{\alpha - 1} &amp;\text{if }x=0 \\
+  \alpha e^{-\alpha\beta_0}t^{\alpha - 1}e^{-\alpha\beta_1} &amp;\text{if }x=1
+\end{cases}
+\end{aligned}
+\]</span></p>
+<p>We can confirm that this hazard ratio is correct in the fitted model (see the Weibull page for fitting this model).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"https://ilundberg.github.io/eventhistory/assets/weibull_model.RDS"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>alpha_hat <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> model<span class="sc">$</span>scale</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>beta1_hat <span class="ot">&lt;-</span> <span class="fu">coef</span>(model)[<span class="dv">2</span>]</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>hazard_ratio <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="sc">-</span> alpha_hat <span class="sc">*</span> beta1_hat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The resulting hazard ratio 0.0507 is equal to the one we calculated from predicted values 0.0507. Thus, our mathematical understanding of the Weibull proportional hazards model aligns with the predicted values from the canned output.</p>
 
 
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
