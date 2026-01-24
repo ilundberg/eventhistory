@@ -9,8 +9,16 @@ execute:
   freeze: auto
 
 website:
-  title: "SOCIOL 212B: Quantitative Data Analysis"
-  description: "Using tools from data science and causal inference to answer social science research questions."
+  title: "SOCIOL 213B: Applied Event History Analysis"
+  description: "A course on survival models and causal inference with treatments over time."
+  navbar:
+    pinned: true
+    right:
+      - href: problem_sets.qmd
+        text: Problem Sets
+      - href: assets/syllabus.pdf
+        text: Syllabus
+      - about_me.qmd
   sidebar:
     style: "docked"
     search: true

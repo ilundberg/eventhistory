@@ -1,0 +1,33 @@
+---
+title: "About Me"
+# page-layout: full
+format:
+  html:
+    toc: false
+---
+
+::: {.grid}
+
+::: {.g-col-12}
+
+
+:::
+
+::: {.g-col-2}
+<img src="assets/profiles/ian.png" style="width:100%;">
+:::
+
+::: {.g-col-10}
+[**Ian Lundberg**](https://www.ianlundberg.org/)  
+[**ianlundberg@ucla.edu**](mailto:ianlundberg@ucla.edu)  
+(_he / him_)
+
+I am a sociologist and demographer working on developing quantitative methods to understand inequality. Survival analysis is a topic where you can quickly learn how to develop new models using Maximum Likelihood Estimation, so I hope this course will be a chance to think like a methodologist and develop new approaches tailored to your setting. Outside of work I enjoy hiking, surfing, and oatmeal with blueberries.
+
+I learned survival analysis in a course taught by Germán Rodriguez. Some of my materials are inspired by those materials available [here](https://grodri.github.io/survival/).
+:::
+
+
+
+
+

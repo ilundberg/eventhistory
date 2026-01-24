@@ -6,6 +6,7 @@
     "section": "",
     "text": "Like the Exponential, the Weibull is a distribution defined on positive real numbers. The Weibull is commonly used in survival analysis because it produces a hazard function that can increase with time or decrease with time. The Weibull hazard is always monotonic (either always increasing or always decreasing, or flat). The distribution functions in R are *weibull with * being d, r, q, or p.\nThese functions parameterize the Weibull with two parameters: shape and scale.\nThe shape determines how the hazard function changes with time. Below are Weibull hazards with several shape parameters and with fixed scale = 1.\nCode\nforeach(shape_value = c(.9,1,2,4), .combine = \"rbind\") %do% {\n  tibble(p = seq(.01, .99, .01)) |&gt;\n    mutate(\n      t = qweibull(p, shape = shape_value, scale = 1),\n      f = dweibull(t, shape = shape_value, scale = 1),\n      S = pweibull(t, shape = shape_value, scale = 1, lower.tail = FALSE),\n      h = f / S,\n      shape = shape_value\n    )\n} |&gt;\n  ggplot(aes(x = t, y = h)) +\n  geom_line() +\n  facet_wrap(~shape, scales = \"free\", labeller = as_labeller(\\(x) paste(\"Shape =\",x)), nrow = 1) +\n  labs(\n    x = \"Time\",\n    y = \"Hazard\",\n    title = \"Weibull hazard functions: By shape parameter, at scale = 1\"\n  )\nThe scale parameter determines the scale of the time axis. A longer scale means longer survival times.\nCode\nforeach(scale_value = c(.5,1,2), .combine = \"rbind\") %do% {\n  tibble(p = seq(.01, .99, .01)) |&gt;\n    mutate(\n      t = qweibull(p, shape = 4, scale = scale_value),\n      f = dweibull(t, shape = 4, scale = scale_value),\n      S = pweibull(t, shape = 4, scale = scale_value, lower.tail = FALSE),\n      h = f / S,\n      scale = paste0(\"Scale = \",scale_value)\n    )\n} |&gt;\n  ggplot(aes(x = t, y = h)) +\n  geom_line() +\n  facet_wrap(~scale, scales = \"free\") +\n  labs(\n    x = \"Time\",\n    y = \"Hazard\",\n    title = \"Weibull hazard functions: By scale parameter, at shape = 4. Note the x-axis.\"\n  )",
     "crumbs": [
+      "Problem Sets",
       "Weibull"
     ]
   },
@@ -16,6 +17,7 @@
     "section": "Weibull model",
     "text": "Weibull model\nWhen modeling Weibull outcomes as a function of predictors \\(\\vec{X}\\), we will often assume\n\nthe shape is the same regardless of \\(\\vec{X}\\)\nthe scale equals \\(\\log(\\vec{X}_i\\vec\\beta)\\)\n\nAs an illustration, we will generate a simulation where survival times differ as a function of a binary predictor \\(X\\),\n\\[\\begin{aligned}\nX &\\sim \\text{Bernoulli}(0.5) \\\\\nT &\\sim \\text{Weibull}\\left(\\texttt{shape} = \\alpha,\\texttt{scale} = \\exp(\\beta_0 + \\beta_1 X)\\right)\n\\end{aligned}\\]\nfor \\(\\alpha = 3\\), \\(\\beta_0 = 0\\), and \\(\\beta_1 = 2\\). Below we set these parameters.\n\nalpha &lt;- 3\nbeta0 &lt;- 0\nbeta1 &lt;- 1\n\nThen we simulate some data from this process.\n\nsimulated &lt;- tibble(id = 1:1e4) |&gt;\n  mutate(\n    x = rbinom(n(), 1, .5),\n    scale = exp(beta0 + beta1 * x),\n    # Simulate from the Weibull\n    t = rweibull(n(), shape = alpha, scale = scale),\n    c = 0\n  )\n\nWe can then fit a Weibull survival model with the survreg function,\n\nmodel &lt;- survreg(\n  Surv(t, 1 - c) ~ x,\n  data = simulated,\n  dist = \"weibull\"\n)\n\nand we can confirm that the estimated parameters match their true values. First, we extract the shape parameter \\(\\hat\\alpha\\) which (confusingly) is the inverse of the scale element of the fitted model.\n\nalpha_estimate &lt;- 1 / model$scale\n\nThen, we can extract the coefficients \\(\\hat{\\vec\\beta}\\).\n\nbeta_estimate &lt;- coef(model)\n\nWe can confirm that these are correct.\n\ncbind(\n  truth = c(alpha = alpha, beta0 = beta0, beta1 = beta1), \n  estimate = c(alpha = alpha_estimate, beta_estimate)\n)\n\n      truth     estimate\nalpha     3  2.966910687\nbeta0     0 -0.001290743\nbeta1     1  1.004828539",
     "crumbs": [
+      "Problem Sets",
       "Weibull"
     ]
   },
@@ -26,168 +28,58 @@
     "section": "Simulate quantities of interest",
     "text": "Simulate quantities of interest\nFinally, we can convert to quantities of interest. For example, what is the estimated survival function from time 0 to 10 in each group?\nFirst, define the groups for which to make predictions.\n\nto_predict &lt;- tibble(x = 0:1)\n\nThen, predict the scale and shape parameters from the model. Note that you can calculate the scale parameter manually by extracting \\(\\hat{\\vec\\beta}\\) as we did above, or you can use predict() with the argument type = \"linear\" to automatically predict the value of the linear predictor \\(\\vec{X}'\\vec\\beta\\) (which is the log of the scale parameter, since scale = \\(\\exp(\\vec{X}'\\vec\\beta)\\).\n\npredicted_parameters &lt;- to_predict |&gt;\n  mutate(\n    shape = 1 / model$scale,\n    log_scale = predict(\n      model, \n      newdata = to_predict, \n      type = \"linear\"\n    ),\n    scale = exp(log_scale)\n  )\n\nAt this point, each row of predicted_parameters corresponds to a person. We want to expand to person-periods.\n\npredicted_survival &lt;- predicted_parameters |&gt;\n  group_by(x) |&gt;\n  # Create 100 copies of each line\n  uncount(weights = 100) |&gt;\n  # Create a sequence over the times to predict\n  mutate(\n    time = seq(from = 0.01, to = 4, length.out = 100)\n  ) |&gt;\n  # Calculate the survival probability at that time\n  mutate(\n    S = pweibull(\n      q = time,\n      shape = shape,\n      scale = scale,\n      lower.tail = FALSE\n    )\n  )\n\nWe can plot those survival curves!\n\npredicted_survival |&gt;\n  # Make x a character for easier plotting\n  mutate(x = paste(\"x =\",x)) |&gt;\n  ggplot(aes(x = time, y = S, color = x, linetype = x)) +\n  geom_line()",
     "crumbs": [
+      "Problem Sets",
       "Weibull"
     ]
   },
   {
-    "objectID": "kaplanmeier.html",
-    "href": "kaplanmeier.html",
-    "title": "Kaplan-Meier",
+    "objectID": "problem_sets.html",
+    "href": "problem_sets.html",
+    "title": "Problem Sets",
     "section": "",
-    "text": "The Kaplan-Meier estimator is a nonparametric method to estimate a survival curve in the presence of censoring.\nFor each unit \\(i\\) who dies at \\(t_i\\), let\n\n\\(d_i\\) denote the number of units who died simultaneously with unit \\(i\\)\n\\(n_i\\) denote the number of units alive just before unit \\(i\\) died\n\nTo survive to time \\(t\\), one must survive every moment preceding \\(t\\) when someone died. This motivates a survival curve estimate, \\[\nS(t) = \\prod_{i:t_i\\leq t}\\left(1 - \\frac{d_i}{n_i}\\right)\n\\] which at time \\(t\\) takes the product over all death times preceding \\(t\\) where the expression inside the product is the probability of surviving that death time.\nA Kaplan-Meier curve is easy to estimate in R with the survfit function. Here we use the heart recipients data from the Exponential page.\n\nheart_recipients &lt;- read_csv(\"https://ilundberg.github.io/eventhistory/assets/heart_recipients.csv\")\n\nFirst we learn the survival function,\n\nkaplan_meier &lt;- survfit(\n  Surv(t, event = 1 - c) ~ 1,\n  data = heart_recipients\n)\n\nand then we can plot it\n\nplot(kaplan_meier)\n\nor with longer code can make a nice ggplot.\n\n\nCode\ntibble(\n  t = kaplan_meier$time,\n  S = kaplan_meier$surv,\n  lower = kaplan_meier$lower,\n  upper = kaplan_meier$upper\n) |&gt;\n  ggplot(\n    aes(x = t, y = S, ymin = lower, ymax = upper)\n  ) +\n  geom_line() +\n  geom_ribbon(alpha = .4) +\n  labs(\n    x = \"Time\",\n    y = \"Estimated Survival Function\",\n    title = \"Kaplan-Meier estimates\"\n  )\n\n\n\n\n\n\n\n\n\nThe Kaplan-Meier curve is ideal for\n\nsummarizing a marginal survival curve\nestimating survival in a few discrete subgroups\n\nWhen there are many population subgroups defined by a vector of predictor \\(\\vec{X}\\) such that few units are observed in each subgroup, then parametric models may be preferable.",
-    "crumbs": [
-      "Kaplan-Meier"
-    ]
+    "text": "Problem sets are currently posted on Piazza, but I plan to gather them on this page."
   },
   {
-    "objectID": "exponential.html",
-    "href": "exponential.html",
-    "title": "Exponential",
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Event History Analysis",
     "section": "",
-    "text": "An Exponential survival model is a Generalized Linear Model just like logistic regression (previous page). We will estimate this model by writing down the log likelihood and carrying out numerical optimization with optim. As with the previous model, we will recover estimates that match those produced by canned functions.\nAs a reminder, the Exponential(1) distribution looks like this:",
-    "crumbs": [
-      "Exponential"
-    ]
+    "text": "This course is being offered Winter 2026 at UCLA. See the syllabus."
   },
   {
-    "objectID": "exponential.html#without-predictors",
-    "href": "exponential.html#without-predictors",
-    "title": "Exponential",
-    "section": "Without predictors",
-    "text": "Without predictors\nAssume a data generating process of \\(n\\) independent observations.\n\n\\(t_1,\\dots,t_n\\sim\\text{Exponential}(\\lambda)\\) are event times\n\\(\\tilde{t}_1,\\dots,\\tilde{t}_n\\) are observation times (either events or censoring)\n\\(c_1,\\dots c_n\\) indicate whether an observation is censored (\\(c_i = 1\\)) or the event occurs (\\(c_i = 0\\))\n\nThe code below will simulate data with \\(\\lambda = 1\\) and censoring at \\(t = 3\\).\n\nsimulated &lt;- tibble(id = 1:1000) |&gt;\n  mutate(\n    # Exponential draws\n    t = rexp(n()),\n    # Trial cuts off at time 3\n    c = t &gt; 3,\n    # Observed y is truncated at 3\n    t_tilde = ifelse(t &gt; 3, 3, t)\n  )",
-    "crumbs": [
-      "Exponential"
-    ]
-  },
-  {
-    "objectID": "exponential.html#one-parameter-likelihood-in-math",
-    "href": "exponential.html#one-parameter-likelihood-in-math",
-    "title": "Exponential",
-    "section": "One-parameter likelihood in math",
-    "text": "One-parameter likelihood in math\nLet \\(f(t,\\lambda)\\) be the PDF of the exponential distribution. Let \\(F(t,\\lambda)\\) be the CDF. The likelihood is the probability of observing the data if the parameter takes the value \\(\\lambda\\). The observed data either tells us:\n\nan event occurred at time \\(t\\) (uncensored)\n\noccurs with probability density \\(f(t\\mid\\lambda)\\)\n\nan event occurred at time greater than \\(t\\) (censoring)\n\noccurs with probability \\(1 - F(t\\mid\\lambda)\\)\n\n\nTranslating to math, the likelihood for a given observation is \\[\n\\underbrace{\\left(f(\\tilde{t}_i\\mid\\lambda)\\right)^{1-c_i}}_{\\text{PDF at }\\tilde{t}_i\\text{ if uncensored}}\\quad\\times\\quad \\underbrace{\\left(1 - F(\\tilde{t}_i\\mid\\lambda)\\right)^{c_i}}_{\\text{Survival past }\\tilde{t}_i\\text{ if censored}}\n\\]\nWe can put these together into a likelihood function for the vector of independent observations, \\[\nL(\\vec{\\tilde{t}},\\vec{c}\\mid\\lambda) = \\prod_i \\left(f(\\tilde{t}_i\\mid\\lambda)\\right)^{1-c_i}\\left(1 - F(\\tilde{t}_i\\mid\\lambda)\\right)^{c_i}\n\\] and take the log to get the log likelihood. \\[\n\\ell(\\vec{\\tilde{t}},\\vec{c}\\mid\\lambda) = \\sum_i \\left((1-c_i)\\log[f(\\tilde{t}_i\\mid\\lambda)] + c_i\\log[1 - F(\\tilde{t}_i\\mid\\lambda)]\\right)\n\\]",
-    "crumbs": [
-      "Exponential"
-    ]
-  },
-  {
-    "objectID": "exponential.html#one-parameter-likelihood-in-code",
-    "href": "exponential.html#one-parameter-likelihood-in-code",
-    "title": "Exponential",
-    "section": "One-parameter likelihood in code",
-    "text": "One-parameter likelihood in code\nWrite the log likelihood as a function in R.\n\nlog_likelihood &lt;- function(log_lambda, data) {\n  data |&gt;\n    mutate(\n      likelihood_i = case_when(\n        c == 0 ~ dexp(t_tilde, rate = exp(log_lambda)),\n        c == 1 ~ pexp(t_tilde, rate = exp(log_lambda), lower.tail = FALSE)\n      )\n    ) |&gt;\n    summarize(\n      log_likelihood = sum(log(likelihood_i))\n    ) |&gt;\n    pull(log_likelihood)\n}",
-    "crumbs": [
-      "Exponential"
-    ]
-  },
-  {
-    "objectID": "exponential.html#one-parameter-optimization",
-    "href": "exponential.html#one-parameter-optimization",
-    "title": "Exponential",
-    "section": "One-parameter optimization",
-    "text": "One-parameter optimization\nUsing optim, we can numerically find the value \\(\\hat\\lambda\\) that maximizes the log likelihood function.\n\noptimize.out &lt;- optimize(\n  log_likelihood,  # function to optimize\n  lower = -1,      # lower limit of log_lambda candidates\n  upper = 1,       # upper limit of log_lambda candidates\n  maximum = TRUE,  # search for maximum\n  tol = .01,       # get within tol of truth\n  data = simulated # other argument to log_likelihood\n)\n\nRemember that we set our parameter to be the log of the rate \\(\\lambda\\). Thus, we need to exponentiate the estimated parameter.\n\nlog_lambda_hat &lt;- optimize.out$maximum\nlambda_hat &lt;- exp(log_lambda_hat) |&gt; print()\n\n[1] 1.023873",
-    "crumbs": [
-      "Exponential"
-    ]
-  },
-  {
-    "objectID": "exponential.html#with-predictors",
-    "href": "exponential.html#with-predictors",
-    "title": "Exponential",
-    "section": "With predictors",
-    "text": "With predictors\nNow consider the setting where \\(\\lambda_i\\) varies across units \\(i\\) according to a Generalized Linear model, \\[\n\\begin{aligned}\ny_i&\\sim\\text{Exponential}(\\lambda_i) \\\\\n\\log(\\lambda_i) &= \\vec{X}_i\\vec\\beta\n\\end{aligned}\n\\]\nThe code below generates data to illustrate with two predictors, \\(X_1\\) and \\(X_2\\).\n\nsimulated &lt;- tibble(id = 1:1000) |&gt;\n  mutate(\n    x1 = rnorm(n()),\n    x2 = rnorm(n()),\n    lambda = exp(-1 + .5 * x1 + .5 * x2),\n    t = rexp(n(), rate = lambda),\n    # Create censoring at time 3\n    c = t &gt; 3,\n    t_tilde = ifelse(t &gt; 3, 3, t)\n  ) |&gt;\n  select(x1, x2, c, t_tilde)",
-    "crumbs": [
-      "Exponential"
-    ]
-  },
-  {
-    "objectID": "exponential.html#vector-parameter-likelihood-in-math",
-    "href": "exponential.html#vector-parameter-likelihood-in-math",
-    "title": "Exponential",
-    "section": "Vector-parameter likelihood in math",
-    "text": "Vector-parameter likelihood in math\nThe likelihood has not changed much from the case without predictors. The \\(\\lambda\\) terms become \\(\\lambda_i\\), \\[\n\\ell(\\vec{\\tilde{t}},\\vec{c}\\mid\\vec\\lambda) = \\sum_i \\left((1-c_i)\\log[f(\\tilde{t}_i\\mid\\lambda_i)] + c_i\\log[1 - F(\\tilde{t}_i\\mid\\lambda_i)]\\right)\n\\]\nand when coding this we will use the assumption that \\(\\lambda_i = \\text{exp}(\\vec{X}_i\\vec\\beta)\\).",
-    "crumbs": [
-      "Exponential"
-    ]
-  },
-  {
-    "objectID": "exponential.html#vector-parameter-likelihood-in-code",
-    "href": "exponential.html#vector-parameter-likelihood-in-code",
-    "title": "Exponential",
-    "section": "Vector-parameter likelihood in code",
-    "text": "Vector-parameter likelihood in code\nThe log likelihood takes parameters and data and returns a likelihood value. When coding this, it is helpful that the dexp and pexp functions are the PDF and CDF of the Exponential distribution with rate parameter equal to \\(\\lambda\\).\n\nlog_likelihood &lt;- function(parameters, data, formula) {\n  \n  # Parameters are coefficients\n  beta &lt;- parameters\n  \n  # Get the X matrix\n  X &lt;- model.matrix(formula, data = data)\n  \n  # Calculate lambda values at that parameter vector\n  lambda &lt;- exp(X %*% beta)\n  \n  # Calculate the likelihood\n  data |&gt;\n    # Create a column with the lambda values for each case\n    mutate(lambda = lambda) |&gt;\n    summarize(\n      # Use the formula from above, translated to code\n      log_likelihood = sum(\n        (1 - c) * log(dexp(t_tilde, rate = lambda)) + \n          c * log(1 - pexp(t_tilde, rate = lambda))\n      )\n    ) |&gt;\n    # Pull the log likelihood value to return\n    pull(log_likelihood)\n}",
-    "crumbs": [
-      "Exponential"
-    ]
-  },
-  {
-    "objectID": "exponential.html#vector-parameter-optimization",
-    "href": "exponential.html#vector-parameter-optimization",
-    "title": "Exponential",
-    "section": "Vector-parameter optimization",
-    "text": "Vector-parameter optimization\nNow optimize with a call to optim.\n\noptim.out &lt;- optim(\n  par = c(0,0,0),                # initial parameter values\n  fn = log_likelihood,           # function to optimize\n  control = list(fnscale = -1),  # find max instead of min\n  hessian = TRUE,                # also return the Hessian\n  data = simulated,              # passed to log_likelihood\n  formula = formula(t_tilde ~ x1 + x2) # passed to log_likelihood\n)\n\nWe can extract the coefficient estimates.\n\nbeta_hat &lt;- optim.out$par |&gt; print()\n\n[1] -0.9961967  0.5103690  0.4532207\n\n\nWe can extract the Hessian.\n\nhessian &lt;- optim.out$hessian\n\nWe can solve for the variance-covariance matrix \\(\\hat{\\text{V}}(\\hat{\\vec\\beta})\\): the negative inverse Hessian. In R, the solve function finds the inverse of a matrix.\n\nbeta_hat_vcov &lt;- -solve(hessian)\n\nThis can give us our coefficients and standard errors (the square root of the diagonal of the variance covariance matrix).\n\ntibble(\n  variable = c(\"Intercept\",\"x1\",\"x2\"),\n  beta = beta_hat,\n  se = sqrt(diag(beta_hat_vcov))\n)\n\n# A tibble: 3 × 3\n  variable    beta     se\n  &lt;chr&gt;      &lt;dbl&gt;  &lt;dbl&gt;\n1 Intercept -0.996 0.0409\n2 x1         0.510 0.0418\n3 x2         0.453 0.0416\n\n\nWe can compare that to the output from logistic regression.\n\nlibrary(survival)\ncanned_fit &lt;- survreg(\n  Surv(time = t_tilde, event = 1 - c) ~ x1 + x2,\n  data = simulated,\n  dist = \"exponential\"\n)\nsummary(canned_fit)\n\n\nCall:\nsurvreg(formula = Surv(time = t_tilde, event = 1 - c) ~ x1 + \n    x2, data = simulated, dist = \"exponential\")\n              Value Std. Error     z      p\n(Intercept)  0.9961     0.0409  24.3 &lt;2e-16\nx1          -0.5105     0.0418 -12.2 &lt;2e-16\nx2          -0.4532     0.0416 -10.9 &lt;2e-16\n\nScale fixed at 1 \n\nExponential distribution\nLoglik(model)= -1170.9   Loglik(intercept only)= -1300.9\n    Chisq= 259.98 on 2 degrees of freedom, p= 3.5e-57 \nNumber of Newton-Raphson Iterations: 4 \nn= 1000 \n\n\nNote that the canned fit is modeling the mean time to event \\(\\frac{1}{\\lambda}\\) whereas our fit modeled the rate of events \\(\\lambda\\). Because \\(\\beta\\) coefficients are on the scale of \\(\\log(\\lamda)\\), the canned fit estimates are the negative of our DIY estimates.",
-    "crumbs": [
-      "Exponential"
-    ]
-  },
-  {
-    "objectID": "exponential.html#simulate-predictions",
-    "href": "exponential.html#simulate-predictions",
-    "title": "Exponential",
-    "section": "Simulate predictions",
-    "text": "Simulate predictions\nWe can simulate predicted the hazard and survival probabilities. Suppose we are interested in the prediction at \\((X_1,X_2) = (1,1)\\). Define these data to predict,\n\nto_predict &lt;- tibble(x1 = 0, x2 = 1)\n\ncreate an \\(X\\) matrix at those values\n\nX_new &lt;- model.matrix(~ x1 + x2, data = to_predict)\n\nand make predictions from that \\(X\\) matrix.\n\nlambda_hat &lt;- exp(X_new %*% beta_hat) |&gt; print()\n\n       [,1]\n1 0.5810166\n\n\nWe may not just want the hazard: perhaps we want the probability of surviving past time \\(t = 2\\). Recall that pexp is the CDF, and with the option lower.tail = FALSE it is the survival function.\n\nsurvival_hat &lt;- pexp(2, rate = lambda_hat, lower.tail = FALSE)\n\nTo get a standard error on the predictions, we can use simulation. We know that \\(\\hat{\\vec\\beta}\\) is asymptotically multivariate normal. We can simulate many coefficient vectors \\(\\vec\\beta^*\\) from that distribution,\n\nbeta_star &lt;- mvtnorm::rmvnorm(n = 1000, mean = beta_hat, sigma = beta_hat_vcov)\n\nand we can generate a predicted hazard from each simulated value,\n\nlambda_star &lt;- exp(X_new %*% t(beta_star))\n\nand a predicted survival probability\n\nsurvival_star &lt;- pexp(2, rate = lambda_star, lower.tail = FALSE)\n\nThe standard error is the standard deviation of these simulated draws.\n\nse_survial_hat &lt;- sd(survival_star)",
-    "crumbs": [
-      "Exponential"
-    ]
-  },
-  {
-    "objectID": "exponential.html#canned-comparison",
-    "href": "exponential.html#canned-comparison",
-    "title": "Exponential",
-    "section": "Canned comparison",
-    "text": "Canned comparison\nWe can likewise predict with the canned version of the model,\n\ncanned_linear_prediction &lt;- predict(\n  canned_fit, \n  type = \"linear\", \n  newdata = to_predict\n)\n\nRecall that this package has modeled \\(\\vec{X}_i\\beta = \\log(\\frac{1}{\\lambda_i}\\). Thus we need to convert back to \\(\\lambda\\).\n\ncanned_lambda_hat &lt;- 1 / exp(canned_linear_prediction)\n\nNote that they are approximately the same!\n\ncbind(\n  diy = lambda_hat[1,1],\n  canned = canned_lambda_hat\n)\n\n        diy    canned\n1 0.5810166 0.5810865\n\n\nAdvantages of the DIY coding yourself include\n\nyou know exactly how the model worked (e.g., modeling \\(\\lambda\\) vs \\(1 / \\lambda\\))\nyou know how to get standard errors for any quantity of interest\nyou can generalize to models that are not canned",
-    "crumbs": [
-      "Exponential"
-    ]
-  },
-  {
-    "objectID": "exponential.html#exercise",
-    "href": "exponential.html#exercise",
-    "title": "Exponential",
-    "section": "Exercise",
-    "text": "Exercise\nThis exercise uses data from a medical trial that tracked survival outcomes of patients receiving heart transplants.\n\nCrowley, J., & Hu, M. (1977). Covariance analysis of heart transplant survival data. Journal of the American Statistical Association, 72(357), 27-36.\n\nWe will access the data from the survival package in R. The trail enrolled people eligible for heart transplants, some of whom later received transplants and some did not. We will focus on survival outcomes post-transplant for transplant recipients. The code below prepares data on variables we will use.\n\nt is time in years from transplant until either death or censoring\nc is censoring, coded TRUE for censoring and FALSE for death\nage is the patient’s age at the time of transplant\n\n\nheart_recipients &lt;- tibble(survival::jasa) |&gt; \n  # Keep those who received a transplant\n  filter(!is.na(tx.date)) |&gt;\n  # Remove if died on the day of transplant\n  filter(tx.date != fu.date) |&gt;\n  # Construct variables we will use\n  mutate(\n    # Age at transplant is difference between treatment date and birth date\n    age = as.numeric(difftime(tx.date, birth.dt, units = \"days\")) / 365.25,\n    # Time is difference between follow-up date and treatment date\n    t = as.numeric(difftime(fu.date, tx.date, units = \"days\")) / 365.25,\n    # Censoring is defined by follow-up status\n    c = fustat == 0\n  ) |&gt;\n  select(age, c, t) |&gt;\n  print(n = 3)\n\n# A tibble: 68 × 3\n    age c           t\n  &lt;dbl&gt; &lt;lgl&gt;   &lt;dbl&gt;\n1  54.3 FALSE 0.0411 \n2  40.4 FALSE 0.00821\n3  51.0 FALSE 1.71   \n# ℹ 65 more rows\n\n\nUsing these data:\n\nFit an Exponential survival model in which the log hazard is a linear function of age at transplant. \\[\nT_i\\sim \\text{Exponential}(\\lambda_i)\n\\] \\[\n\\log(\\lambda_i) = \\beta_0 + \\beta_1\\text{Age}_i\n\\]\nAt each observed value of the predictors, predict the hazard of death \\(\\hat\\lambda_i\\).\nConvert the rate into an expected survival time \\(\\text{E}(T\\mid \\text{Age} = x)\\). Note that the expected value of the Exponential distribution with rate \\(\\hat\\lambda_i\\) is \\(\\frac{1}{\\hat\\lambda_i}\\). Make a graph to visualize the expected survival time as a function of age.\nAt each observed value of the predictors, calculate the probability of surviving at least 2 years post-transplant: \\(\\text{P}(T &gt; 2\\mid \\text{Age} = x)\\). Note that the survival function for the Exponential distribution with rate lambda at time t is pexp(q = t, rate = lambda, lower.tail = FALSE). Plot these survival probabilities as a function of age.\nFor at least one estimate from (3) or (4), construct a 95% confidence interval by simulating many draws of \\(\\vec\\beta^*\\) from its estimated Multivariate Normal sampling distribution, translating each draw to a predicted quantity of interest. You can either construct your confidence interval by a Normal approximation to the predicted quantity of interest or by taking the middle 95% of simulated draws.\n\nSubmit either your raw R script or a PDF report (e.g., from .Rmd or .Qmd) that embeds your code.\nFull credit for carrying out estimation with optim. High partial credit for carrying out estimation using the survreg() function in the survival package. Note that with survreg, prediction with type = response will predict a scale parameter \\(\\frac{1}{\\lambda}\\) rather than a rate parameter \\(\\lambda\\).",
-    "crumbs": [
-      "Exponential"
-    ]
-  },
-  {
-    "objectID": "bernoulli.html",
-    "href": "bernoulli.html",
-    "title": "MLE Review: Bernoulli",
+    "objectID": "index.html#welcome-to-soc-213b",
+    "href": "index.html#welcome-to-soc-213b",
+    "title": "Event History Analysis",
     "section": "",
-    "text": "Let \\(y_1,\\dots,y_n \\stackrel{\\text{iid}}{\\sim} \\text{Bernoulli}(\\pi)\\) be \\(n\\) independent flips of a weighted coin with probability \\(\\pi\\) of heads. In basic statistics, you already learned a common estimator \\(\\hat\\pi = \\frac{1}{n}\\sum_i y_i\\). You also learned that this estimator is asymptotically Normally distributed, with estimated variance \\(\\hat{\\text{V}}(\\hat\\pi) = \\frac{\\hat\\pi(1 - \\hat\\pi)}{n}\\).\nThis page will derive those same properties via Maximum Likelihood Estimation.",
-    "crumbs": [
-      "MLE Review: Bernoulli"
-    ]
+    "text": "This course is being offered Winter 2026 at UCLA. See the syllabus."
   },
   {
-    "objectID": "bernoulli.html#derivations-in-math",
-    "href": "bernoulli.html#derivations-in-math",
-    "title": "MLE Review: Bernoulli",
-    "section": "Derivations in math",
-    "text": "Derivations in math\n\nWithout predictors\nThe likelihood function is the probability of the data given the parameter \\(\\pi\\).\n\\[\\begin{aligned}\n        L(\\pi\\mid \\vec{y}) &= \\text{P}(\\vec{Y} = \\vec{y}\\mid \\pi) &\\text{by definition of likelihood} \\\\\n        &= \\prod_{i=1}^n \\text{P}(Y_i = y_i) &\\text{by independence} \\\\\n        &= \\prod_{i=1}^n \\pi^{y_i}(1-\\pi)^{1-y_i} &\\text{by Bernoulli probability mass function}\n\\end{aligned}\\]\nThe log likelihood is often easier to optimize. Taking the log,\n\\[\\begin{aligned}\n\\ell(\\pi\\mid\\vec{y}) &= \\log(L(\\pi\\mid\\vec{y})) \\\\\n        &= \\log\\left(\\prod_i \\pi^{y_i}(1-\\pi)^{1-y_i}\\right) \\\\\n        &= \\sum_i\\log\\left(\\pi^{y_i}(1-\\pi)^{1-y_i}\\right) &\\text{since }\\log(AB) = \\log(A) + \\log(B) \\\\\n        &= \\sum_i\\left(\\log(\\pi^{y_i}) + \\log((1-\\pi)^{1-y_i})\\right) &\\text{since }\\log(AB) = \\log(A) + \\log(B) \\\\\n        &= \\sum_i \\left(y_i\\log(\\pi) + (1 - y_i)\\log(1 - \\pi)\\right) &\\text{since}\\log(A^B)=B\\log(A)\n\\end{aligned}\\]\nWe want to find the estimate \\(\\hat\\pi\\) that maximizes \\(L(\\pi\\mid\\vec{y})\\). This is at a place where the derivative (slope) is zero. To find it, take the derivative.\n\\[\n\\begin{aligned}\n        \\frac{\\partial}{\\partial \\pi} \\ell(\\pi)\n        &= \\frac{\\sum_i y_i}{\\pi} - \\frac{n - \\sum_i y_i}{1 - \\pi}\n\\end{aligned}\n\\] Set equal to zero and solve. Let \\(\\tilde\\pi\\) be a point where the derivative equals zero.\n\\[\n\\begin{aligned}\n        0 &= \\frac{\\partial}{\\partial \\pi} \\ell(\\pi\\mid \\vec{y})\\rvert_{\\pi = \\tilde{\\pi}} \\\\\n        0 &= \\frac{\\sum_i y_i}{\\tilde\\pi} - \\frac{n - \\sum_i y_i}{1 - \\tilde\\pi} \\\\\n        \\tilde\\pi &= \\frac{1}{n} \\sum_i y_i\n\\end{aligned}\n\\]\nThe likelihood function is flat at the point where \\(\\tilde\\pi\\) equals the sample mean of \\(Y\\). Next, check the second derivative to see if this is a maximum.\n\\[\\begin{aligned}\n\\frac{\\partial^2}{\\partial \\pi^2} \\ell(\\pi\\mid \\vec{y}) &= -\\frac{\\sum_i y_i}{\\pi^2} - \\frac{n - \\sum_i y_i}{(1 - \\pi)^2} \\\\\n&= -\\frac{\\text{positive}}{\\text{positive}} - \\frac{\\text{positive}}{\\text{positive}} \\\\\n        & &lt; 0\n\\end{aligned}\\]\nSo it is a maximum! The second derivative of the log likelihood at the value that maximizes the function is called the Hessian. It is useful for deriving the standard error. Next we derive the Hessian. \\[\\begin{aligned}\nH(\\pi) &= \\frac{\\partial^2}{\\partial \\pi^2} \\ell(\\pi\\mid \\vec{y})\\rvert_{\\pi = \\hat\\pi_\\text{MLE}} &\\text{definition of Hessian} \\\\\n&= -\\frac{\\sum_i y_i}{\\hat\\pi^2} - \\frac{n - \\sum_i y_i}{(1 - \\hat\\pi)^2} \\\\\n&= -\\frac{n\\hat\\pi}{\\hat\\pi^2} - \\frac{n - n\\hat\\pi}{(1 - \\hat\\pi)^2} &\\text{by replacing }\\sum_i y_i\\text{ with }n\\hat\\pi \\\\\n&= -\\frac{n}{\\hat\\pi}-\\frac{n}{1 - \\hat\\pi} \\\\\n&= -\\frac{n}{\\hat\\pi(1 - \\hat\\pi)}\n\\end{aligned}\\]\nFrom the statistical theory of Maximum Likelihood Estimation, the asymptotic variance of an MLE estimate is the negative inverse Hessian (also called the Fisher Information).\n\\[\\begin{aligned}\nV(\\hat\\pi) &= -\\left[H(\\hat\\pi)\\right]^{-1} \\\\\n&= \\frac{\\hat\\pi(1 - \\hat\\pi)}{n}\n\\end{aligned}\\]\nwhich is a formulat that may be familiar! Because of the Central Limit Theorem, \\(\\hat\\pi\\) is asymptotically Normally distributed with this mean and variance. Thus we can construct a 95% confidence interval by a Normal approximation.\n\\[\\begin{aligned}\n\\hat\\pi_\\text{Lower} &= \\hat\\pi - \\Phi^{-1}(.975) \\sqrt{\\frac{\\hat\\pi(1 - \\hat\\pi)}{n}} \\\\\n\\hat\\pi_\\text{Upper} &= \\hat\\pi + \\Phi^{-1}(.975) \\sqrt{\\frac{\\hat\\pi(1 - \\hat\\pi)}{n}}\n\\end{aligned}\\]\nRecap: The exercise used the theory of Maximum Likelihood Estimation to produce familiar formulas:\n\nestimator of a proportion is the sample mean\nvariance of that estimated proportion\nconfidence intervals by asymptotic Normality\n\n\n\nWith predictors: Logistic regression\nWhat if every person \\(i\\) flips their own coin with probability \\(\\pi_i\\), as in logistic regression? Suppose for simplicity that each person has covariates \\(\\vec{x}_i\\) and the probability follows the functional form of logistic regression.\n\\[\n\\log\\left(\\frac{\\pi_i}{1 - \\pi_i}\\right) = \\vec{X}_i\\vec\\beta\n\\]\nWe will refer to this function as the logit function and will use it and its inverse.\n\\[\n\\begin{align}\n&\\text{Logit function:} & \\text{logit}(x) &= \\log\\left(\\frac{x}{1 - x}\\right) \\\\\n&\\text{Inverse logit function:} & \\text{logit}^{-1}(x) &= \\frac{1}{1 + e^{-x}} \\\\\n\\end{align}\n\\]\nThese functions are useful because in logistic regression \\(\\text{logit}(\\pi_i) = \\vec{X}_i\\vec\\beta\\) and \\(\\text{logit}^{-1}(\\vec{X}_i\\vec\\beta) = \\pi\\). This is helpful because:\n\nany likelihood in terms of \\(\\pi_i\\) is equivalently a likelihood in terms of \\(\\vec\\beta\\)\nthese functions are available in R: qlogis is logit and plogis is the inverse logit\n\nMaximum likelihood for logistic regression becomes the task: what parameter vector \\(\\vec\\beta\\) produces a probability vector \\(\\vec\\pi\\) under which the data \\(\\vec{y}\\) are most likely?\nAppealing to the marginal case above, the log likelihood is\n\\[\\begin{aligned}\n\\ell(\\vec\\pi\\mid\\vec{y}) &= \\sum_i\\left(y_i\\log\\pi_i + (1 - y_i)\\log(1 - \\pi_i)\\right)\n\\end{aligned}\\]\nUsing the inverse logit function, we express this in terms of \\(\\vec\\beta\\). \\[\\begin{aligned}\n\\ell(\\vec\\beta\\mid\\vec{y})\n&= \\sum_i\\left(y_i\\log(\\text{logit}^{-1}(\\vec{X}_i\\vec\\beta)) + (1 - y_i)\\log(1 - \\text{logit}^{-1}(\\vec{X}_i\\vec\\beta))\\right)\n\\end{aligned}\\] Rather than solve this analytically, we will work with it by numerically optimizing the log likelihood.",
-    "crumbs": [
-      "MLE Review: Bernoulli"
-    ]
+    "objectID": "index.html#who-should-take-this-course",
+    "href": "index.html#who-should-take-this-course",
+    "title": "Event History Analysis",
+    "section": "Who should take this course?",
+    "text": "Who should take this course?\nThe course is a good fit for PhD students in sociology, statistics, political science, economics, and other social sciences."
   },
   {
-    "objectID": "bernoulli.html#numerical-optimization",
-    "href": "bernoulli.html#numerical-optimization",
-    "title": "MLE Review: Bernoulli",
-    "section": "Numerical optimization",
-    "text": "Numerical optimization\nHere we will numerically optimize the log likelihood.\n\nlibrary(tidyverse)\nlibrary(mvtnorm)\n\n\nWithout predictors\nWe first illustrate for the marginal case: estimating a constant \\(\\pi\\) that applies to all cases with no predictors. We know from math that the MLE is the sample mean, \\(\\hat\\pi_\\text{MLE} = \\frac{1}{n}\\sum_i y_i\\). But what if we only knew the likelihood function? We could optimize numerically, as we illustrate with simulated data with \\(\\pi = 0.4\\).\n\ny &lt;- rbinom(n = 1000, size = 1, prob = .4)\n\nIn the marginal case, we saw above that the log likelihood is \\[\n\\ell(\\pi\\mid\\vec{y}) = \\sum_i \\left(y_i\\log(\\pi) + (1 - y_i)\\log(1 - \\pi)\\right)\n\\]\nWe can code this in a function.\n\nlog_likelihood &lt;- function(pi, y) {\n  sum(y * log(pi) + (1 - y) * log(1 - pi))\n}\n\nThen we can use optimize to find the maximum of the function.\n\noptimize.out &lt;- optimize(\n  log_likelihood,  # function to optimize\n  lower = 0,       # lower limit of pi candidates\n  upper = 1,       # upper limit of pi candidates\n  maximum = TRUE,  # search for maximum\n  tol = .01,       # get within tol of truth\n  y = y            # other argument to log_likelihood\n)\n\nOur estimate is stored in the maximum list item of the resulting object.\n\noptimize.out$maximum\n\n[1] 0.4020969\n\n\nWe can note that this is approximately equal to the analytical result that we know is the maximum: the sample mean. Thus, optimize computationally re-created a result we knew from math.\n\nmean(y)\n\n[1] 0.403\n\n\n\n\nWith predictors\nNumerical optimization is often most helpful for generalized linear models that include predictors. For practice, the code below generates data with numeric predictors x1 and x2 and binary outcome y.\n\nsimulated &lt;- tibble(id = 1:100) |&gt;\n  mutate(\n    x1 = rnorm(n()),\n    x2 = rnorm(n()),\n    pi = plogis(x1 + x2),\n    y = rbinom(n(), 1, pi)\n  )\n\nThe optim function in R carries out numerical optimization. To use it, we first need to write down a function for our log likelihood.\n\nlog_likelihood &lt;- function(parameters, data, formula) {\n  # Create the beta vector given the parameters\n  beta &lt;- parameters\n  X &lt;- model.matrix(formula, data = data)\n  y &lt;- data$y\n  log_likelihood &lt;- sum(\n    y * log(plogis(X %*% beta)) + \n      (1 - y) * log(1 - plogis(X %*% beta))\n  )\n  return(log_likelihood)\n}\n\nWe optimize this with a call to the optim function.\n\noptim.out &lt;- optim(\n  par = c(0,0,0), # initial values of the parameters\n  fn = log_likelihood,\n  control = list(fnscale = -1),\n  hessian = TRUE,   # multiplies by -1 to find maximum instead of minimum\n  # Other arguments to be passed to log_likelihood\n  data = simulated,\n  formula = formula(y ~ x1 + x2)\n)\n\nWe can extract the coefficient estimates.\n\nbeta_hat &lt;- optim.out$par |&gt; print()\n\n[1] 0.4642444 1.3269376 1.4215027\n\n\nWe can extract the Hessian.\n\nhessian &lt;- optim.out$hessian\n\nWe can solve for the variance-covariance matrix \\(\\hat{\\text{V}}(\\hat{\\vec\\beta})\\): the negative inverse Hessian. In R, the solve function finds the inverse of a matrix.\n\nbeta_hat_vcov &lt;- -solve(hessian)\n\nThis can give us our coefficients and standard errors (the square root of the diagonal of the variance covariance matrix).\n\ntibble(\n  variable = c(\"Intercept\",\"x1\",\"x2\"),\n  beta = beta_hat,\n  se = sqrt(diag(beta_hat_vcov))\n)\n\n# A tibble: 3 × 3\n  variable   beta    se\n  &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;\n1 Intercept 0.464 0.256\n2 x1        1.33  0.336\n3 x2        1.42  0.360\n\n\nWe can compare that to the output from logistic regression.\n\ncanned_fit &lt;- glm(y ~ x1 + x2, data = simulated, family = binomial)\nsummary(canned_fit)\n\n\nCall:\nglm(formula = y ~ x1 + x2, family = binomial, data = simulated)\n\nCoefficients:\n            Estimate Std. Error z value Pr(&gt;|z|)    \n(Intercept)   0.4642     0.2565   1.810   0.0703 .  \nx1            1.3270     0.3363   3.947 7.93e-05 ***\nx2            1.4217     0.3598   3.951 7.77e-05 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n(Dispersion parameter for binomial family taken to be 1)\n\n    Null deviance: 137.628  on 99  degrees of freedom\nResidual deviance:  97.723  on 97  degrees of freedom\nAIC: 103.72\n\nNumber of Fisher Scoring iterations: 5\n\n\n\nSimulating predicted probabilities\nWe can simulate predicted probabilities. Suppose we are interested in the prediction at \\((X_1,X_2) = (1,1)\\). Define these data to predict,\n\nto_predict &lt;- tibble(x1 = 0, x2 = 1)\n\ncreate an \\(X\\) matrix at those values\n\nX_new &lt;- model.matrix(~ x1 + x2, data = to_predict)\n\nand make predictions from that \\(X\\) matrix.\n\npi_hat &lt;- plogis(X_new %*% beta_hat) |&gt; print()\n\n       [,1]\n1 0.8682699\n\n\nTo get a standard error on the predictions, we can use simulation. We know that \\(\\hat{\\vec\\beta}\\) is asymptotically multivariate normal. We can simulate many coefficient vectors \\(\\vec\\beta^*\\) from that distribution,\n\nbeta_star &lt;- mvtnorm::rmvnorm(n = 1000, mean = beta_hat, sigma = beta_hat_vcov)\n\nand we can generate a predicted probability from each simulated value.\n\npi_star &lt;- plogis(X_new %*% t(beta_star))\n\nThe standard error is the standard deviation of these simulated draws.\n\nse_pi_hat &lt;- sd(pi_star)\n\nWe can likewise predict with the canned version of the model,\n\ncanned_prediction &lt;- predict(canned_fit, type = \"response\", newdata = to_predict, se = T)\n\nand compare to see that they are approximately the same.\n\ntibble(method = c(\"diy\",\"canned\")) |&gt;\n  mutate(\n    pi_hat = c(pi_hat, canned_prediction$fit),\n    se = c(se_pi_hat, canned_prediction$se.fit)\n  )\n\n# A tibble: 2 × 3\n  method pi_hat     se\n  &lt;chr&gt;   &lt;dbl&gt;  &lt;dbl&gt;\n1 diy     0.868 0.0546\n2 canned  0.868 0.0535",
-    "crumbs": [
-      "MLE Review: Bernoulli"
-    ]
+    "objectID": "index.html#schedule-of-topics",
+    "href": "index.html#schedule-of-topics",
+    "title": "Event History Analysis",
+    "section": "Schedule of topics",
+    "text": "Schedule of topics\nBelow is a tentative schedule of topics. This is my first time teaching the course, and the sequence of topics may change over the course of the quarter.\nPart 1: Survival analysis with events as outcomes.\n\nWeek 1: Basics of survival analysis and maximum likelihood. Exponential model in math.\nWeek 2: Review of Maximum Likelihood Estimation with the Bernoulli. Exponential model in software.\nWeek 3: Beyond the Exponential: Weibull for hazards that vary with time. Generalizing ideas to proportional hazards and the Cox model. We will contrast with nonparametric survival curve estimation by Kaplan-Meier.\nWeek 4: Unmodeled heterogeneity, competing risks, non-ignorable censoring, and other complications.\n\nPart 2: Causal inference with events as treatments.\n\nWeek 5: Causal inference for survival outcomes\nWeek 6: Event history treatments with non-survival outcomes (longitudinal inverse probability weighting, marginal structural models)\nWeek 7: Event history treatments with survival outcomes\nWeek 8: Causal inference in staggered adoption panels"
+  },
+  {
+    "objectID": "index.html#learning-goals",
+    "href": "index.html#learning-goals",
+    "title": "Event History Analysis",
+    "section": "Learning goals",
+    "text": "Learning goals\nStudents will learn to\n\ndefine key components of survival analysis (e.g., censoring)\nstate the assumptions required for a survival model\ntranslate from survival models to predicted quantities of interest\napply causal inference methods where events are treatments that unfold over time"
+  },
+  {
+    "objectID": "index.html#course-description",
+    "href": "index.html#course-description",
+    "title": "Event History Analysis",
+    "section": "Course description",
+    "text": "Course description\nIntroduction to regression-like analyses in which outcome is time to event. Topics include logit models for discrete-time event history models; piecewise exponential hazards models; proportional hazards; nonproportional hazards; parametric survival models. We will also cover events that unfold over time as causal treatment variables."
   },
   {
     "objectID": "cox.html",
@@ -196,6 +88,7 @@
     "section": "",
     "text": "The Cox proportional hazards model is a very popular approach to survival analysis which researchers use when they do not want to make assumptions about the shape of the baseline hazard. To understand the Cox model, recall that all proportional hazards models take the form below.\n\\[\nh(t\\mid\\vec{X}) = \\underbrace{\\lambda(t)}_{\\substack{\\text{baseline}\\\\\\text{hazard}}}\\underbrace{e^{\\vec{X}'\\vec\\beta}}_{\\substack{\\text{hazard}\\\\\\text{ratio}}}\n\\]\nIn the Exponential model, the baseline hazard is \\(\\lambda(t) = \\lambda = \\exp(\\vec{X}'\\vec\\beta)\\). In the Weibull model, the baseline hazard has a more complicated form that is a function of time \\(t\\).\nThe Cox proportional hazards model makes no assumptions about \\(\\lambda(t)\\). The insight of this model is to write the likelihood in a way that the baseline hazard \\(\\lambda(t)\\) drops out so that we can learn the hazard ratios without learning the baseline hazard.\nBelow we introduce the Cox model in math and then in code, before discussing its drawbacks.",
     "crumbs": [
+      "Problem Sets",
       "Cox Proportional Hazards"
     ]
   },
@@ -206,6 +99,7 @@
     "section": "In math",
     "text": "In math\nThe Cox model says: consider a time \\(t\\) at which some unit in the sample dies. What is the probability that it would be unit \\(i\\) (who is alive up to \\(t\\)), as opposed to some other unit (who is also alive up to \\(t\\))? This probability equals the ratio of the hazard for unit \\(i\\) to the sum of the hazards for all units at risk at time \\(t\\).\n\\[\n\\text{P}(\\text{Unit }i\\text{ dies at }t\\mid \\text{Some unit dies at }t) = \\frac{h(t\\mid \\vec{X} = \\vec{x}_i)}{\\sum_{j:t_j\\geq t} h(t\\mid \\vec{X} = \\vec{x}_j)}\n\\]\nRecall that in a proportional hazards model, the hazard equals the baseline hazard \\(\\lambda(t)\\) and the hazard ratio \\(\\exp(\\vec{x}'\\vec\\beta)\\). If we plug these in for \\(h()\\), the baseline hazard \\(\\lambda(t)\\) appears in the numerator and denominator and cancels.\n\\[\n\\text{P}(\\text{Unit }i\\text{ dies at }t\\mid \\text{Some unit dies at }t) = \\frac{\\exp(\\vec{x}_i'\\vec\\beta)}{\\sum_{j:t_j\\geq t} \\exp(\\vec{x}_j'\\vec\\beta)}\n\\]\nMultiplying over all time points when a unit dies, this produces a likelihood that is a function of \\(\\vec\\beta\\) and not a function of the baseline hazard \\(\\lambda(t)\\). By maximizing this likelihood, we can learn the coefficients \\(\\vec\\beta\\) predicting the log hazard (and thus the hazard ratios) without making any assumptions about the baseline hazard.",
     "crumbs": [
+      "Problem Sets",
       "Cox Proportional Hazards"
     ]
   },
@@ -216,6 +110,7 @@
     "section": "In code",
     "text": "In code\nTo practice the Cox model in code, first simulate some data. Here we simulate a binary \\(X\\sim\\text{Bernoulli}(0.5)\\) and define a rate parameter \\(\\lambda = \\exp(\\beta_0 + \\beta_1 X)\\) for \\(\\beta_0 = 0\\) and \\(\\beta_1 = 1\\). Then, we simulate Exponential draws from \\(T\\sim \\text{Exponential}(\\lambda)\\). For illustration, no one is censored (c = 0).\n\nbeta_0 &lt;- 0\nbeta_1 &lt;- 1\nsimulated &lt;- tibble(id = 1:1e4) |&gt;\n  mutate(\n    x = rbinom(n(), 1, .5),\n    lambda = exp(beta_0 + beta_1 * x),\n    # Simulate from the Exponential for this illustration:\n    # can be any hazard function\n    t = rexp(n(), rate = lambda),\n    c = 0\n  )\n\nNext, we fit a Cox proportional hazards model.\n\nmodel &lt;- coxph(\n  Surv(t, event = 1 - c) ~ x,\n  data = simulated\n)\n\nExtracting the coefficients of this model, we have a coefficient on the predictor \\(x\\).\n\ncoef(model)\n\n       x \n1.001093 \n\n\nThis approximately equals the true value of $_1 = $1 in this simulation, and it captures the additive change in the log hazard when moving from x = 0 to x = 1.\nExponentiating the coefficients, we get the hazard ratio \\(e^{\\beta_1}\\) for a shift from x = 0 to x = 1.\n\nexp(coef(model))\n\n       x \n2.721254",
     "crumbs": [
+      "Problem Sets",
       "Cox Proportional Hazards"
     ]
   },
@@ -226,6 +121,7 @@
     "section": "Drawbacks of the Cox model",
     "text": "Drawbacks of the Cox model\nThe Cox model is popular because it does not require assumptions about the baseline hazard. But it comes with a major drawback: one generally cannot simulate any quantities of interest beyond the hazard ratios with a Cox model.\nFor example, suppose we wanted to know the survival probability at time \\(t\\). This would require us to translate our model parameters to a survival function. But because the Cox model parameters are uninformative about the baseline hazard \\(\\lambda(t)\\), they are by extension uninformative about the survival function.",
     "crumbs": [
+      "Problem Sets",
       "Cox Proportional Hazards"
     ]
   },
@@ -236,6 +132,7 @@
     "section": "Overcoming drawbacks",
     "text": "Overcoming drawbacks\nOne way around this problem is to nonparametrically estimate the baseline survival function, and then to update it using the hazard ratios. Let the survival function at \\(t\\) for subgroup \\(\\vec{X} = \\vec{x}\\) be denoted \\(S(t,\\vec{x})\\). Let the baseline survival function be \\(S(t,\\vec{0})\\). With math that we do not show here, one can derive that the survival function at \\(\\vec{x}\\) equals the basline survival function raised to the power of the hazard ratio.\n\\[S(t,\\vec{x}) = S(t,\\vec{0})^{\\exp(\\vec{x}'\\vec\\beta)}\\]\nOne can therefore estimate \\(S(t,\\vec{x})\\) with two inputs\n\nA nonparametric estimate of \\(S(t,\\vec{0})\\) from Kaplan-Meier\nCox estimates of \\(\\vec\\beta\\) for the hazard ratio\n\nBelow, we illustrate this on the simulated data. First, we define the baseline subgroup with \\(X = 0\\).\n\nbaseline_subgroup &lt;- simulated |&gt; filter(x == 0)\n\nThen we estimate the baseline survival by Kaplan-Meier on this subgroup.\n\nbaseline_kaplanmeier &lt;- survfit(\n  Surv(t, event = 1 - c) ~ 1,\n  data = baseline_subgroup\n)\n\nThird, we extract the nonparametric estimate of the baseline survival function among the \\(X = 0\\).\n\nbaseline_survival &lt;- tibble(\n  t = baseline_kaplanmeier$time,\n  # Extract baseline survival among X = 0\n  S0 = baseline_kaplanmeier$surv\n)\n\nTo produce an estimate among the \\(X = 1\\) subgroup, we first need the hazard ratio from the Cox model.\n\nhazard_ratio &lt;- exp(coef(model))\n\nFinally, we can create the survival curve among \\(X = 1\\) by taking the baseline survival curve and raising it to the power of the hazard ratio.\n\nboth_survival &lt;- baseline_survival |&gt;\n  mutate(S1 = S0 ^ hazard_ratio)\n\nBelow we visualize these two estimated curves.\n\n\nCode\nboth_survival |&gt;\n  pivot_longer(cols = -t, names_to = \"X\", values_to = \"S\") |&gt;\n  mutate(X = str_replace(X,\"S\",\"X = \")) |&gt;\n  ggplot(aes(x = t, y = S, color = X, linetype = X)) +\n  geom_line() +\n  labs(\n    x = \"Time\", \n    y = \"Survival\",\n    color = \"Population\\nSubgroup\",\n    linetype = \"Population\\nSubgroup\"\n  )\n\n\n\n\n\n\n\n\n\nThus, it is possible to combine Cox estimates with a nonparametric baseline survival estimate to produce survival curves.",
     "crumbs": [
+      "Problem Sets",
       "Cox Proportional Hazards"
     ]
   },
@@ -246,15 +143,192 @@
     "section": "Rare circumstances",
     "text": "Rare circumstances\nThe combination of Kaplan-Meier + Cox is a creative one, but it applies only in a very rare setting (3) and is less useful in more common settings (1 and 2).\n1. Common setting: All \\(\\vec{x}\\)-values are well-populated. If \\(\\vec{X}\\) takes on only a few discrete values that are well-populated, you can directly use Kaplan-Meier to nonparametrically estimate the survival curves in each subgroup. There is no need to use a Cox model: you can avoid the proportional hazards assumption entirely. An example of this setting is a randomized experiment with a binary treatment.\n2. Common setting: No \\(\\vec{x}\\)-value is well populated. If \\(\\vec{X}\\) takes many values such that there is no value \\(\\vec{x}\\) that has many observation, then there is no baseline subgroup with enough cases to estimate a baseline Kaplan-Meier curve. In this setting, you cannot estimate the baseline hazard nonparametrically. You have two choies: (1) estimate a Cox model and only get hazard ratios or (2) assume a parametric distribution (e.g., Weibull) and gain the ability to simulate any quantity of interest.\n3. Rare setting: One well-populated baseline \\(\\vec{x}\\)-value. Suppose a randomized experiment occurs where many people are assigned a control condition (\\(x = 0\\)) and others are distributed over many number-valued treatment conditions (\\(x &gt; 0\\)). In this setting, many cases are available to estimate the baseline hazard by Kaplan-Meier among \\(x = 0\\). Kaplan-Meier is less useful for any \\(x&gt;0\\) because very few cases are seen at any particular \\(x\\)-value. But a Cox model can impose structure on this space and learn hazard ratios, thereby allowing the baseline hazard (learned on \\(x = 0\\)) to be updated for the other \\(x\\)-values.\nIn practice, researchers often default to Cox. But for setting (1) Kaplan-Meier would be better. For setting (2) fully parametric models (e.g., Weibull or Exponential) may be better because they allow simulation of any quantity of interest, at the small cost of assuming a family for the baseline hazard. Setting (3) is an ideal setting for the Cox model, but may correspond to very few actual research situations.",
     "crumbs": [
+      "Problem Sets",
       "Cox Proportional Hazards"
     ]
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Event History Analysis",
+    "objectID": "about_me.html",
+    "href": "about_me.html",
+    "title": "About Me",
     "section": "",
-    "text": "This website is to share code on event history analysis, for UCLA Soc 213B. Potentially in the future it will be a more outward-facing website!"
+    "text": "Ian Lundberg\nianlundberg@ucla.edu\n(he / him)\nI am a sociologist and demographer working on developing quantitative methods to understand inequality. Survival analysis is a topic where you can quickly learn how to develop new models using Maximum Likelihood Estimation, so I hope this course will be a chance to think like a methodologist and develop new approaches tailored to your setting. Outside of work I enjoy hiking, surfing, and oatmeal with blueberries.\nI learned survival analysis in a course taught by Germán Rodriguez. Some of my materials are inspired by those materials available here."
+  },
+  {
+    "objectID": "bernoulli.html",
+    "href": "bernoulli.html",
+    "title": "MLE Review: Bernoulli",
+    "section": "",
+    "text": "Let \\(y_1,\\dots,y_n \\stackrel{\\text{iid}}{\\sim} \\text{Bernoulli}(\\pi)\\) be \\(n\\) independent flips of a weighted coin with probability \\(\\pi\\) of heads. In basic statistics, you already learned a common estimator \\(\\hat\\pi = \\frac{1}{n}\\sum_i y_i\\). You also learned that this estimator is asymptotically Normally distributed, with estimated variance \\(\\hat{\\text{V}}(\\hat\\pi) = \\frac{\\hat\\pi(1 - \\hat\\pi)}{n}\\).\nThis page will derive those same properties via Maximum Likelihood Estimation.",
+    "crumbs": [
+      "Problem Sets",
+      "MLE Review: Bernoulli"
+    ]
+  },
+  {
+    "objectID": "bernoulli.html#derivations-in-math",
+    "href": "bernoulli.html#derivations-in-math",
+    "title": "MLE Review: Bernoulli",
+    "section": "Derivations in math",
+    "text": "Derivations in math\n\nWithout predictors\nThe likelihood function is the probability of the data given the parameter \\(\\pi\\).\n\\[\\begin{aligned}\n        L(\\pi\\mid \\vec{y}) &= \\text{P}(\\vec{Y} = \\vec{y}\\mid \\pi) &\\text{by definition of likelihood} \\\\\n        &= \\prod_{i=1}^n \\text{P}(Y_i = y_i) &\\text{by independence} \\\\\n        &= \\prod_{i=1}^n \\pi^{y_i}(1-\\pi)^{1-y_i} &\\text{by Bernoulli probability mass function}\n\\end{aligned}\\]\nThe log likelihood is often easier to optimize. Taking the log,\n\\[\\begin{aligned}\n\\ell(\\pi\\mid\\vec{y}) &= \\log(L(\\pi\\mid\\vec{y})) \\\\\n        &= \\log\\left(\\prod_i \\pi^{y_i}(1-\\pi)^{1-y_i}\\right) \\\\\n        &= \\sum_i\\log\\left(\\pi^{y_i}(1-\\pi)^{1-y_i}\\right) &\\text{since }\\log(AB) = \\log(A) + \\log(B) \\\\\n        &= \\sum_i\\left(\\log(\\pi^{y_i}) + \\log((1-\\pi)^{1-y_i})\\right) &\\text{since }\\log(AB) = \\log(A) + \\log(B) \\\\\n        &= \\sum_i \\left(y_i\\log(\\pi) + (1 - y_i)\\log(1 - \\pi)\\right) &\\text{since}\\log(A^B)=B\\log(A)\n\\end{aligned}\\]\nWe want to find the estimate \\(\\hat\\pi\\) that maximizes \\(L(\\pi\\mid\\vec{y})\\). This is at a place where the derivative (slope) is zero. To find it, take the derivative.\n\\[\n\\begin{aligned}\n        \\frac{\\partial}{\\partial \\pi} \\ell(\\pi)\n        &= \\frac{\\sum_i y_i}{\\pi} - \\frac{n - \\sum_i y_i}{1 - \\pi}\n\\end{aligned}\n\\] Set equal to zero and solve. Let \\(\\tilde\\pi\\) be a point where the derivative equals zero.\n\\[\n\\begin{aligned}\n        0 &= \\frac{\\partial}{\\partial \\pi} \\ell(\\pi\\mid \\vec{y})\\rvert_{\\pi = \\tilde{\\pi}} \\\\\n        0 &= \\frac{\\sum_i y_i}{\\tilde\\pi} - \\frac{n - \\sum_i y_i}{1 - \\tilde\\pi} \\\\\n        \\tilde\\pi &= \\frac{1}{n} \\sum_i y_i\n\\end{aligned}\n\\]\nThe likelihood function is flat at the point where \\(\\tilde\\pi\\) equals the sample mean of \\(Y\\). Next, check the second derivative to see if this is a maximum.\n\\[\\begin{aligned}\n\\frac{\\partial^2}{\\partial \\pi^2} \\ell(\\pi\\mid \\vec{y}) &= -\\frac{\\sum_i y_i}{\\pi^2} - \\frac{n - \\sum_i y_i}{(1 - \\pi)^2} \\\\\n&= -\\frac{\\text{positive}}{\\text{positive}} - \\frac{\\text{positive}}{\\text{positive}} \\\\\n        & &lt; 0\n\\end{aligned}\\]\nSo it is a maximum! The second derivative of the log likelihood at the value that maximizes the function is called the Hessian. It is useful for deriving the standard error. Next we derive the Hessian. \\[\\begin{aligned}\nH(\\pi) &= \\frac{\\partial^2}{\\partial \\pi^2} \\ell(\\pi\\mid \\vec{y})\\rvert_{\\pi = \\hat\\pi_\\text{MLE}} &\\text{definition of Hessian} \\\\\n&= -\\frac{\\sum_i y_i}{\\hat\\pi^2} - \\frac{n - \\sum_i y_i}{(1 - \\hat\\pi)^2} \\\\\n&= -\\frac{n\\hat\\pi}{\\hat\\pi^2} - \\frac{n - n\\hat\\pi}{(1 - \\hat\\pi)^2} &\\text{by replacing }\\sum_i y_i\\text{ with }n\\hat\\pi \\\\\n&= -\\frac{n}{\\hat\\pi}-\\frac{n}{1 - \\hat\\pi} \\\\\n&= -\\frac{n}{\\hat\\pi(1 - \\hat\\pi)}\n\\end{aligned}\\]\nFrom the statistical theory of Maximum Likelihood Estimation, the asymptotic variance of an MLE estimate is the negative inverse Hessian (also called the Fisher Information).\n\\[\\begin{aligned}\nV(\\hat\\pi) &= -\\left[H(\\hat\\pi)\\right]^{-1} \\\\\n&= \\frac{\\hat\\pi(1 - \\hat\\pi)}{n}\n\\end{aligned}\\]\nwhich is a formulat that may be familiar! Because of the Central Limit Theorem, \\(\\hat\\pi\\) is asymptotically Normally distributed with this mean and variance. Thus we can construct a 95% confidence interval by a Normal approximation.\n\\[\\begin{aligned}\n\\hat\\pi_\\text{Lower} &= \\hat\\pi - \\Phi^{-1}(.975) \\sqrt{\\frac{\\hat\\pi(1 - \\hat\\pi)}{n}} \\\\\n\\hat\\pi_\\text{Upper} &= \\hat\\pi + \\Phi^{-1}(.975) \\sqrt{\\frac{\\hat\\pi(1 - \\hat\\pi)}{n}}\n\\end{aligned}\\]\nRecap: The exercise used the theory of Maximum Likelihood Estimation to produce familiar formulas:\n\nestimator of a proportion is the sample mean\nvariance of that estimated proportion\nconfidence intervals by asymptotic Normality\n\n\n\nWith predictors: Logistic regression\nWhat if every person \\(i\\) flips their own coin with probability \\(\\pi_i\\), as in logistic regression? Suppose for simplicity that each person has covariates \\(\\vec{x}_i\\) and the probability follows the functional form of logistic regression.\n\\[\n\\log\\left(\\frac{\\pi_i}{1 - \\pi_i}\\right) = \\vec{X}_i\\vec\\beta\n\\]\nWe will refer to this function as the logit function and will use it and its inverse.\n\\[\n\\begin{align}\n&\\text{Logit function:} & \\text{logit}(x) &= \\log\\left(\\frac{x}{1 - x}\\right) \\\\\n&\\text{Inverse logit function:} & \\text{logit}^{-1}(x) &= \\frac{1}{1 + e^{-x}} \\\\\n\\end{align}\n\\]\nThese functions are useful because in logistic regression \\(\\text{logit}(\\pi_i) = \\vec{X}_i\\vec\\beta\\) and \\(\\text{logit}^{-1}(\\vec{X}_i\\vec\\beta) = \\pi\\). This is helpful because:\n\nany likelihood in terms of \\(\\pi_i\\) is equivalently a likelihood in terms of \\(\\vec\\beta\\)\nthese functions are available in R: qlogis is logit and plogis is the inverse logit\n\nMaximum likelihood for logistic regression becomes the task: what parameter vector \\(\\vec\\beta\\) produces a probability vector \\(\\vec\\pi\\) under which the data \\(\\vec{y}\\) are most likely?\nAppealing to the marginal case above, the log likelihood is\n\\[\\begin{aligned}\n\\ell(\\vec\\pi\\mid\\vec{y}) &= \\sum_i\\left(y_i\\log\\pi_i + (1 - y_i)\\log(1 - \\pi_i)\\right)\n\\end{aligned}\\]\nUsing the inverse logit function, we express this in terms of \\(\\vec\\beta\\). \\[\\begin{aligned}\n\\ell(\\vec\\beta\\mid\\vec{y})\n&= \\sum_i\\left(y_i\\log(\\text{logit}^{-1}(\\vec{X}_i\\vec\\beta)) + (1 - y_i)\\log(1 - \\text{logit}^{-1}(\\vec{X}_i\\vec\\beta))\\right)\n\\end{aligned}\\] Rather than solve this analytically, we will work with it by numerically optimizing the log likelihood.",
+    "crumbs": [
+      "Problem Sets",
+      "MLE Review: Bernoulli"
+    ]
+  },
+  {
+    "objectID": "bernoulli.html#numerical-optimization",
+    "href": "bernoulli.html#numerical-optimization",
+    "title": "MLE Review: Bernoulli",
+    "section": "Numerical optimization",
+    "text": "Numerical optimization\nHere we will numerically optimize the log likelihood.\n\nlibrary(tidyverse)\nlibrary(mvtnorm)\n\n\nWithout predictors\nWe first illustrate for the marginal case: estimating a constant \\(\\pi\\) that applies to all cases with no predictors. We know from math that the MLE is the sample mean, \\(\\hat\\pi_\\text{MLE} = \\frac{1}{n}\\sum_i y_i\\). But what if we only knew the likelihood function? We could optimize numerically, as we illustrate with simulated data with \\(\\pi = 0.4\\).\n\ny &lt;- rbinom(n = 1000, size = 1, prob = .4)\n\nIn the marginal case, we saw above that the log likelihood is \\[\n\\ell(\\pi\\mid\\vec{y}) = \\sum_i \\left(y_i\\log(\\pi) + (1 - y_i)\\log(1 - \\pi)\\right)\n\\]\nWe can code this in a function.\n\nlog_likelihood &lt;- function(pi, y) {\n  sum(y * log(pi) + (1 - y) * log(1 - pi))\n}\n\nThen we can use optimize to find the maximum of the function.\n\noptimize.out &lt;- optimize(\n  log_likelihood,  # function to optimize\n  lower = 0,       # lower limit of pi candidates\n  upper = 1,       # upper limit of pi candidates\n  maximum = TRUE,  # search for maximum\n  tol = .01,       # get within tol of truth\n  y = y            # other argument to log_likelihood\n)\n\nOur estimate is stored in the maximum list item of the resulting object.\n\noptimize.out$maximum\n\n[1] 0.4020969\n\n\nWe can note that this is approximately equal to the analytical result that we know is the maximum: the sample mean. Thus, optimize computationally re-created a result we knew from math.\n\nmean(y)\n\n[1] 0.403\n\n\n\n\nWith predictors\nNumerical optimization is often most helpful for generalized linear models that include predictors. For practice, the code below generates data with numeric predictors x1 and x2 and binary outcome y.\n\nsimulated &lt;- tibble(id = 1:100) |&gt;\n  mutate(\n    x1 = rnorm(n()),\n    x2 = rnorm(n()),\n    pi = plogis(x1 + x2),\n    y = rbinom(n(), 1, pi)\n  )\n\nThe optim function in R carries out numerical optimization. To use it, we first need to write down a function for our log likelihood.\n\nlog_likelihood &lt;- function(parameters, data, formula) {\n  # Create the beta vector given the parameters\n  beta &lt;- parameters\n  X &lt;- model.matrix(formula, data = data)\n  y &lt;- data$y\n  log_likelihood &lt;- sum(\n    y * log(plogis(X %*% beta)) + \n      (1 - y) * log(1 - plogis(X %*% beta))\n  )\n  return(log_likelihood)\n}\n\nWe optimize this with a call to the optim function.\n\noptim.out &lt;- optim(\n  par = c(0,0,0), # initial values of the parameters\n  fn = log_likelihood,\n  control = list(fnscale = -1),\n  hessian = TRUE,   # multiplies by -1 to find maximum instead of minimum\n  # Other arguments to be passed to log_likelihood\n  data = simulated,\n  formula = formula(y ~ x1 + x2)\n)\n\nWe can extract the coefficient estimates.\n\nbeta_hat &lt;- optim.out$par |&gt; print()\n\n[1] 0.4642444 1.3269376 1.4215027\n\n\nWe can extract the Hessian.\n\nhessian &lt;- optim.out$hessian\n\nWe can solve for the variance-covariance matrix \\(\\hat{\\text{V}}(\\hat{\\vec\\beta})\\): the negative inverse Hessian. In R, the solve function finds the inverse of a matrix.\n\nbeta_hat_vcov &lt;- -solve(hessian)\n\nThis can give us our coefficients and standard errors (the square root of the diagonal of the variance covariance matrix).\n\ntibble(\n  variable = c(\"Intercept\",\"x1\",\"x2\"),\n  beta = beta_hat,\n  se = sqrt(diag(beta_hat_vcov))\n)\n\n# A tibble: 3 × 3\n  variable   beta    se\n  &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;\n1 Intercept 0.464 0.256\n2 x1        1.33  0.336\n3 x2        1.42  0.360\n\n\nWe can compare that to the output from logistic regression.\n\ncanned_fit &lt;- glm(y ~ x1 + x2, data = simulated, family = binomial)\nsummary(canned_fit)\n\n\nCall:\nglm(formula = y ~ x1 + x2, family = binomial, data = simulated)\n\nCoefficients:\n            Estimate Std. Error z value Pr(&gt;|z|)    \n(Intercept)   0.4642     0.2565   1.810   0.0703 .  \nx1            1.3270     0.3363   3.947 7.93e-05 ***\nx2            1.4217     0.3598   3.951 7.77e-05 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n(Dispersion parameter for binomial family taken to be 1)\n\n    Null deviance: 137.628  on 99  degrees of freedom\nResidual deviance:  97.723  on 97  degrees of freedom\nAIC: 103.72\n\nNumber of Fisher Scoring iterations: 5\n\n\n\nSimulating predicted probabilities\nWe can simulate predicted probabilities. Suppose we are interested in the prediction at \\((X_1,X_2) = (1,1)\\). Define these data to predict,\n\nto_predict &lt;- tibble(x1 = 0, x2 = 1)\n\ncreate an \\(X\\) matrix at those values\n\nX_new &lt;- model.matrix(~ x1 + x2, data = to_predict)\n\nand make predictions from that \\(X\\) matrix.\n\npi_hat &lt;- plogis(X_new %*% beta_hat) |&gt; print()\n\n       [,1]\n1 0.8682699\n\n\nTo get a standard error on the predictions, we can use simulation. We know that \\(\\hat{\\vec\\beta}\\) is asymptotically multivariate normal. We can simulate many coefficient vectors \\(\\vec\\beta^*\\) from that distribution,\n\nbeta_star &lt;- mvtnorm::rmvnorm(n = 1000, mean = beta_hat, sigma = beta_hat_vcov)\n\nand we can generate a predicted probability from each simulated value.\n\npi_star &lt;- plogis(X_new %*% t(beta_star))\n\nThe standard error is the standard deviation of these simulated draws.\n\nse_pi_hat &lt;- sd(pi_star)\n\nWe can likewise predict with the canned version of the model,\n\ncanned_prediction &lt;- predict(canned_fit, type = \"response\", newdata = to_predict, se = T)\n\nand compare to see that they are approximately the same.\n\ntibble(method = c(\"diy\",\"canned\")) |&gt;\n  mutate(\n    pi_hat = c(pi_hat, canned_prediction$fit),\n    se = c(se_pi_hat, canned_prediction$se.fit)\n  )\n\n# A tibble: 2 × 3\n  method pi_hat     se\n  &lt;chr&gt;   &lt;dbl&gt;  &lt;dbl&gt;\n1 diy     0.868 0.0546\n2 canned  0.868 0.0535",
+    "crumbs": [
+      "Problem Sets",
+      "MLE Review: Bernoulli"
+    ]
+  },
+  {
+    "objectID": "exponential.html",
+    "href": "exponential.html",
+    "title": "Exponential",
+    "section": "",
+    "text": "An Exponential survival model is a Generalized Linear Model just like logistic regression (previous page). We will estimate this model by writing down the log likelihood and carrying out numerical optimization with optim. As with the previous model, we will recover estimates that match those produced by canned functions.\nAs a reminder, the Exponential(1) distribution looks like this:",
+    "crumbs": [
+      "Problem Sets",
+      "Exponential"
+    ]
+  },
+  {
+    "objectID": "exponential.html#without-predictors",
+    "href": "exponential.html#without-predictors",
+    "title": "Exponential",
+    "section": "Without predictors",
+    "text": "Without predictors\nAssume a data generating process of \\(n\\) independent observations.\n\n\\(t_1,\\dots,t_n\\sim\\text{Exponential}(\\lambda)\\) are event times\n\\(\\tilde{t}_1,\\dots,\\tilde{t}_n\\) are observation times (either events or censoring)\n\\(c_1,\\dots c_n\\) indicate whether an observation is censored (\\(c_i = 1\\)) or the event occurs (\\(c_i = 0\\))\n\nThe code below will simulate data with \\(\\lambda = 1\\) and censoring at \\(t = 3\\).\n\nsimulated &lt;- tibble(id = 1:1000) |&gt;\n  mutate(\n    # Exponential draws\n    t = rexp(n()),\n    # Trial cuts off at time 3\n    c = t &gt; 3,\n    # Observed y is truncated at 3\n    t_tilde = ifelse(t &gt; 3, 3, t)\n  )",
+    "crumbs": [
+      "Problem Sets",
+      "Exponential"
+    ]
+  },
+  {
+    "objectID": "exponential.html#one-parameter-likelihood-in-math",
+    "href": "exponential.html#one-parameter-likelihood-in-math",
+    "title": "Exponential",
+    "section": "One-parameter likelihood in math",
+    "text": "One-parameter likelihood in math\nLet \\(f(t,\\lambda)\\) be the PDF of the exponential distribution. Let \\(F(t,\\lambda)\\) be the CDF. The likelihood is the probability of observing the data if the parameter takes the value \\(\\lambda\\). The observed data either tells us:\n\nan event occurred at time \\(t\\) (uncensored)\n\noccurs with probability density \\(f(t\\mid\\lambda)\\)\n\nan event occurred at time greater than \\(t\\) (censoring)\n\noccurs with probability \\(1 - F(t\\mid\\lambda)\\)\n\n\nTranslating to math, the likelihood for a given observation is \\[\n\\underbrace{\\left(f(\\tilde{t}_i\\mid\\lambda)\\right)^{1-c_i}}_{\\text{PDF at }\\tilde{t}_i\\text{ if uncensored}}\\quad\\times\\quad \\underbrace{\\left(1 - F(\\tilde{t}_i\\mid\\lambda)\\right)^{c_i}}_{\\text{Survival past }\\tilde{t}_i\\text{ if censored}}\n\\]\nWe can put these together into a likelihood function for the vector of independent observations, \\[\nL(\\vec{\\tilde{t}},\\vec{c}\\mid\\lambda) = \\prod_i \\left(f(\\tilde{t}_i\\mid\\lambda)\\right)^{1-c_i}\\left(1 - F(\\tilde{t}_i\\mid\\lambda)\\right)^{c_i}\n\\] and take the log to get the log likelihood. \\[\n\\ell(\\vec{\\tilde{t}},\\vec{c}\\mid\\lambda) = \\sum_i \\left((1-c_i)\\log[f(\\tilde{t}_i\\mid\\lambda)] + c_i\\log[1 - F(\\tilde{t}_i\\mid\\lambda)]\\right)\n\\]",
+    "crumbs": [
+      "Problem Sets",
+      "Exponential"
+    ]
+  },
+  {
+    "objectID": "exponential.html#one-parameter-likelihood-in-code",
+    "href": "exponential.html#one-parameter-likelihood-in-code",
+    "title": "Exponential",
+    "section": "One-parameter likelihood in code",
+    "text": "One-parameter likelihood in code\nWrite the log likelihood as a function in R.\n\nlog_likelihood &lt;- function(log_lambda, data) {\n  data |&gt;\n    mutate(\n      likelihood_i = case_when(\n        c == 0 ~ dexp(t_tilde, rate = exp(log_lambda)),\n        c == 1 ~ pexp(t_tilde, rate = exp(log_lambda), lower.tail = FALSE)\n      )\n    ) |&gt;\n    summarize(\n      log_likelihood = sum(log(likelihood_i))\n    ) |&gt;\n    pull(log_likelihood)\n}",
+    "crumbs": [
+      "Problem Sets",
+      "Exponential"
+    ]
+  },
+  {
+    "objectID": "exponential.html#one-parameter-optimization",
+    "href": "exponential.html#one-parameter-optimization",
+    "title": "Exponential",
+    "section": "One-parameter optimization",
+    "text": "One-parameter optimization\nUsing optim, we can numerically find the value \\(\\hat\\lambda\\) that maximizes the log likelihood function.\n\noptimize.out &lt;- optimize(\n  log_likelihood,  # function to optimize\n  lower = -1,      # lower limit of log_lambda candidates\n  upper = 1,       # upper limit of log_lambda candidates\n  maximum = TRUE,  # search for maximum\n  tol = .01,       # get within tol of truth\n  data = simulated # other argument to log_likelihood\n)\n\nRemember that we set our parameter to be the log of the rate \\(\\lambda\\). Thus, we need to exponentiate the estimated parameter.\n\nlog_lambda_hat &lt;- optimize.out$maximum\nlambda_hat &lt;- exp(log_lambda_hat) |&gt; print()\n\n[1] 1.023873",
+    "crumbs": [
+      "Problem Sets",
+      "Exponential"
+    ]
+  },
+  {
+    "objectID": "exponential.html#with-predictors",
+    "href": "exponential.html#with-predictors",
+    "title": "Exponential",
+    "section": "With predictors",
+    "text": "With predictors\nNow consider the setting where \\(\\lambda_i\\) varies across units \\(i\\) according to a Generalized Linear model, \\[\n\\begin{aligned}\ny_i&\\sim\\text{Exponential}(\\lambda_i) \\\\\n\\log(\\lambda_i) &= \\vec{X}_i\\vec\\beta\n\\end{aligned}\n\\]\nThe code below generates data to illustrate with two predictors, \\(X_1\\) and \\(X_2\\).\n\nsimulated &lt;- tibble(id = 1:1000) |&gt;\n  mutate(\n    x1 = rnorm(n()),\n    x2 = rnorm(n()),\n    lambda = exp(-1 + .5 * x1 + .5 * x2),\n    t = rexp(n(), rate = lambda),\n    # Create censoring at time 3\n    c = t &gt; 3,\n    t_tilde = ifelse(t &gt; 3, 3, t)\n  ) |&gt;\n  select(x1, x2, c, t_tilde)",
+    "crumbs": [
+      "Problem Sets",
+      "Exponential"
+    ]
+  },
+  {
+    "objectID": "exponential.html#vector-parameter-likelihood-in-math",
+    "href": "exponential.html#vector-parameter-likelihood-in-math",
+    "title": "Exponential",
+    "section": "Vector-parameter likelihood in math",
+    "text": "Vector-parameter likelihood in math\nThe likelihood has not changed much from the case without predictors. The \\(\\lambda\\) terms become \\(\\lambda_i\\), \\[\n\\ell(\\vec{\\tilde{t}},\\vec{c}\\mid\\vec\\lambda) = \\sum_i \\left((1-c_i)\\log[f(\\tilde{t}_i\\mid\\lambda_i)] + c_i\\log[1 - F(\\tilde{t}_i\\mid\\lambda_i)]\\right)\n\\]\nand when coding this we will use the assumption that \\(\\lambda_i = \\text{exp}(\\vec{X}_i\\vec\\beta)\\).",
+    "crumbs": [
+      "Problem Sets",
+      "Exponential"
+    ]
+  },
+  {
+    "objectID": "exponential.html#vector-parameter-likelihood-in-code",
+    "href": "exponential.html#vector-parameter-likelihood-in-code",
+    "title": "Exponential",
+    "section": "Vector-parameter likelihood in code",
+    "text": "Vector-parameter likelihood in code\nThe log likelihood takes parameters and data and returns a likelihood value. When coding this, it is helpful that the dexp and pexp functions are the PDF and CDF of the Exponential distribution with rate parameter equal to \\(\\lambda\\).\n\nlog_likelihood &lt;- function(parameters, data, formula) {\n  \n  # Parameters are coefficients\n  beta &lt;- parameters\n  \n  # Get the X matrix\n  X &lt;- model.matrix(formula, data = data)\n  \n  # Calculate lambda values at that parameter vector\n  lambda &lt;- exp(X %*% beta)\n  \n  # Calculate the likelihood\n  data |&gt;\n    # Create a column with the lambda values for each case\n    mutate(lambda = lambda) |&gt;\n    summarize(\n      # Use the formula from above, translated to code\n      log_likelihood = sum(\n        (1 - c) * log(dexp(t_tilde, rate = lambda)) + \n          c * log(1 - pexp(t_tilde, rate = lambda))\n      )\n    ) |&gt;\n    # Pull the log likelihood value to return\n    pull(log_likelihood)\n}",
+    "crumbs": [
+      "Problem Sets",
+      "Exponential"
+    ]
+  },
+  {
+    "objectID": "exponential.html#vector-parameter-optimization",
+    "href": "exponential.html#vector-parameter-optimization",
+    "title": "Exponential",
+    "section": "Vector-parameter optimization",
+    "text": "Vector-parameter optimization\nNow optimize with a call to optim.\n\noptim.out &lt;- optim(\n  par = c(0,0,0),                # initial parameter values\n  fn = log_likelihood,           # function to optimize\n  control = list(fnscale = -1),  # find max instead of min\n  hessian = TRUE,                # also return the Hessian\n  data = simulated,              # passed to log_likelihood\n  formula = formula(t_tilde ~ x1 + x2) # passed to log_likelihood\n)\n\nWe can extract the coefficient estimates.\n\nbeta_hat &lt;- optim.out$par |&gt; print()\n\n[1] -0.9961967  0.5103690  0.4532207\n\n\nWe can extract the Hessian.\n\nhessian &lt;- optim.out$hessian\n\nWe can solve for the variance-covariance matrix \\(\\hat{\\text{V}}(\\hat{\\vec\\beta})\\): the negative inverse Hessian. In R, the solve function finds the inverse of a matrix.\n\nbeta_hat_vcov &lt;- -solve(hessian)\n\nThis can give us our coefficients and standard errors (the square root of the diagonal of the variance covariance matrix).\n\ntibble(\n  variable = c(\"Intercept\",\"x1\",\"x2\"),\n  beta = beta_hat,\n  se = sqrt(diag(beta_hat_vcov))\n)\n\n# A tibble: 3 × 3\n  variable    beta     se\n  &lt;chr&gt;      &lt;dbl&gt;  &lt;dbl&gt;\n1 Intercept -0.996 0.0409\n2 x1         0.510 0.0418\n3 x2         0.453 0.0416\n\n\nWe can compare that to the output from logistic regression.\n\nlibrary(survival)\ncanned_fit &lt;- survreg(\n  Surv(time = t_tilde, event = 1 - c) ~ x1 + x2,\n  data = simulated,\n  dist = \"exponential\"\n)\nsummary(canned_fit)\n\n\nCall:\nsurvreg(formula = Surv(time = t_tilde, event = 1 - c) ~ x1 + \n    x2, data = simulated, dist = \"exponential\")\n              Value Std. Error     z      p\n(Intercept)  0.9961     0.0409  24.3 &lt;2e-16\nx1          -0.5105     0.0418 -12.2 &lt;2e-16\nx2          -0.4532     0.0416 -10.9 &lt;2e-16\n\nScale fixed at 1 \n\nExponential distribution\nLoglik(model)= -1170.9   Loglik(intercept only)= -1300.9\n    Chisq= 259.98 on 2 degrees of freedom, p= 3.5e-57 \nNumber of Newton-Raphson Iterations: 4 \nn= 1000 \n\n\nNote that the canned fit is modeling the mean time to event \\(\\frac{1}{\\lambda}\\) whereas our fit modeled the rate of events \\(\\lambda\\). Because \\(\\beta\\) coefficients are on the scale of \\(\\log(\\lamda)\\), the canned fit estimates are the negative of our DIY estimates.",
+    "crumbs": [
+      "Problem Sets",
+      "Exponential"
+    ]
+  },
+  {
+    "objectID": "exponential.html#simulate-predictions",
+    "href": "exponential.html#simulate-predictions",
+    "title": "Exponential",
+    "section": "Simulate predictions",
+    "text": "Simulate predictions\nWe can simulate predicted the hazard and survival probabilities. Suppose we are interested in the prediction at \\((X_1,X_2) = (1,1)\\). Define these data to predict,\n\nto_predict &lt;- tibble(x1 = 0, x2 = 1)\n\ncreate an \\(X\\) matrix at those values\n\nX_new &lt;- model.matrix(~ x1 + x2, data = to_predict)\n\nand make predictions from that \\(X\\) matrix.\n\nlambda_hat &lt;- exp(X_new %*% beta_hat) |&gt; print()\n\n       [,1]\n1 0.5810166\n\n\nWe may not just want the hazard: perhaps we want the probability of surviving past time \\(t = 2\\). Recall that pexp is the CDF, and with the option lower.tail = FALSE it is the survival function.\n\nsurvival_hat &lt;- pexp(2, rate = lambda_hat, lower.tail = FALSE)\n\nTo get a standard error on the predictions, we can use simulation. We know that \\(\\hat{\\vec\\beta}\\) is asymptotically multivariate normal. We can simulate many coefficient vectors \\(\\vec\\beta^*\\) from that distribution,\n\nbeta_star &lt;- mvtnorm::rmvnorm(n = 1000, mean = beta_hat, sigma = beta_hat_vcov)\n\nand we can generate a predicted hazard from each simulated value,\n\nlambda_star &lt;- exp(X_new %*% t(beta_star))\n\nand a predicted survival probability\n\nsurvival_star &lt;- pexp(2, rate = lambda_star, lower.tail = FALSE)\n\nThe standard error is the standard deviation of these simulated draws.\n\nse_survial_hat &lt;- sd(survival_star)",
+    "crumbs": [
+      "Problem Sets",
+      "Exponential"
+    ]
+  },
+  {
+    "objectID": "exponential.html#canned-comparison",
+    "href": "exponential.html#canned-comparison",
+    "title": "Exponential",
+    "section": "Canned comparison",
+    "text": "Canned comparison\nWe can likewise predict with the canned version of the model,\n\ncanned_linear_prediction &lt;- predict(\n  canned_fit, \n  type = \"linear\", \n  newdata = to_predict\n)\n\nRecall that this package has modeled \\(\\vec{X}_i\\beta = \\log(\\frac{1}{\\lambda_i}\\). Thus we need to convert back to \\(\\lambda\\).\n\ncanned_lambda_hat &lt;- 1 / exp(canned_linear_prediction)\n\nNote that they are approximately the same!\n\ncbind(\n  diy = lambda_hat[1,1],\n  canned = canned_lambda_hat\n)\n\n        diy    canned\n1 0.5810166 0.5810865\n\n\nAdvantages of the DIY coding yourself include\n\nyou know exactly how the model worked (e.g., modeling \\(\\lambda\\) vs \\(1 / \\lambda\\))\nyou know how to get standard errors for any quantity of interest\nyou can generalize to models that are not canned",
+    "crumbs": [
+      "Problem Sets",
+      "Exponential"
+    ]
+  },
+  {
+    "objectID": "exponential.html#exercise",
+    "href": "exponential.html#exercise",
+    "title": "Exponential",
+    "section": "Exercise",
+    "text": "Exercise\nThis exercise uses data from a medical trial that tracked survival outcomes of patients receiving heart transplants.\n\nCrowley, J., & Hu, M. (1977). Covariance analysis of heart transplant survival data. Journal of the American Statistical Association, 72(357), 27-36.\n\nWe will access the data from the survival package in R. The trail enrolled people eligible for heart transplants, some of whom later received transplants and some did not. We will focus on survival outcomes post-transplant for transplant recipients. The code below prepares data on variables we will use.\n\nt is time in years from transplant until either death or censoring\nc is censoring, coded TRUE for censoring and FALSE for death\nage is the patient’s age at the time of transplant\n\n\nheart_recipients &lt;- tibble(survival::jasa) |&gt; \n  # Keep those who received a transplant\n  filter(!is.na(tx.date)) |&gt;\n  # Remove if died on the day of transplant\n  filter(tx.date != fu.date) |&gt;\n  # Construct variables we will use\n  mutate(\n    # Age at transplant is difference between treatment date and birth date\n    age = as.numeric(difftime(tx.date, birth.dt, units = \"days\")) / 365.25,\n    # Time is difference between follow-up date and treatment date\n    t = as.numeric(difftime(fu.date, tx.date, units = \"days\")) / 365.25,\n    # Censoring is defined by follow-up status\n    c = fustat == 0\n  ) |&gt;\n  select(age, c, t) |&gt;\n  print(n = 3)\n\n# A tibble: 68 × 3\n    age c           t\n  &lt;dbl&gt; &lt;lgl&gt;   &lt;dbl&gt;\n1  54.3 FALSE 0.0411 \n2  40.4 FALSE 0.00821\n3  51.0 FALSE 1.71   \n# ℹ 65 more rows\n\n\nUsing these data:\n\nFit an Exponential survival model in which the log hazard is a linear function of age at transplant. \\[\nT_i\\sim \\text{Exponential}(\\lambda_i)\n\\] \\[\n\\log(\\lambda_i) = \\beta_0 + \\beta_1\\text{Age}_i\n\\]\nAt each observed value of the predictors, predict the hazard of death \\(\\hat\\lambda_i\\).\nConvert the rate into an expected survival time \\(\\text{E}(T\\mid \\text{Age} = x)\\). Note that the expected value of the Exponential distribution with rate \\(\\hat\\lambda_i\\) is \\(\\frac{1}{\\hat\\lambda_i}\\). Make a graph to visualize the expected survival time as a function of age.\nAt each observed value of the predictors, calculate the probability of surviving at least 2 years post-transplant: \\(\\text{P}(T &gt; 2\\mid \\text{Age} = x)\\). Note that the survival function for the Exponential distribution with rate lambda at time t is pexp(q = t, rate = lambda, lower.tail = FALSE). Plot these survival probabilities as a function of age.\nFor at least one estimate from (3) or (4), construct a 95% confidence interval by simulating many draws of \\(\\vec\\beta^*\\) from its estimated Multivariate Normal sampling distribution, translating each draw to a predicted quantity of interest. You can either construct your confidence interval by a Normal approximation to the predicted quantity of interest or by taking the middle 95% of simulated draws.\n\nSubmit either your raw R script or a PDF report (e.g., from .Rmd or .Qmd) that embeds your code.\nFull credit for carrying out estimation with optim. High partial credit for carrying out estimation using the survreg() function in the survival package. Note that with survreg, prediction with type = response will predict a scale parameter \\(\\frac{1}{\\lambda}\\) rather than a rate parameter \\(\\lambda\\).",
+    "crumbs": [
+      "Problem Sets",
+      "Exponential"
+    ]
+  },
+  {
+    "objectID": "kaplanmeier.html",
+    "href": "kaplanmeier.html",
+    "title": "Kaplan-Meier",
+    "section": "",
+    "text": "The Kaplan-Meier estimator is a nonparametric method to estimate a survival curve in the presence of censoring.\nFor each unit \\(i\\) who dies at \\(t_i\\), let\n\n\\(d_i\\) denote the number of units who died simultaneously with unit \\(i\\)\n\\(n_i\\) denote the number of units alive just before unit \\(i\\) died\n\nTo survive to time \\(t\\), one must survive every moment preceding \\(t\\) when someone died. This motivates a survival curve estimate, \\[\nS(t) = \\prod_{i:t_i\\leq t}\\left(1 - \\frac{d_i}{n_i}\\right)\n\\] which at time \\(t\\) takes the product over all death times preceding \\(t\\) where the expression inside the product is the probability of surviving that death time.\nA Kaplan-Meier curve is easy to estimate in R with the survfit function. Here we use the heart recipients data from the Exponential page.\n\nheart_recipients &lt;- read_csv(\"https://ilundberg.github.io/eventhistory/assets/heart_recipients.csv\")\n\nFirst we learn the survival function,\n\nkaplan_meier &lt;- survfit(\n  Surv(t, event = 1 - c) ~ 1,\n  data = heart_recipients\n)\n\nand then we can plot it\n\nplot(kaplan_meier)\n\nor with longer code can make a nice ggplot.\n\n\nCode\ntibble(\n  t = kaplan_meier$time,\n  S = kaplan_meier$surv,\n  lower = kaplan_meier$lower,\n  upper = kaplan_meier$upper\n) |&gt;\n  ggplot(\n    aes(x = t, y = S, ymin = lower, ymax = upper)\n  ) +\n  geom_line() +\n  geom_ribbon(alpha = .4) +\n  labs(\n    x = \"Time\",\n    y = \"Estimated Survival Function\",\n    title = \"Kaplan-Meier estimates\"\n  )\n\n\n\n\n\n\n\n\n\nThe Kaplan-Meier curve is ideal for\n\nsummarizing a marginal survival curve\nestimating survival in a few discrete subgroups\n\nWhen there are many population subgroups defined by a vector of predictor \\(\\vec{X}\\) such that few units are observed in each subgroup, then parametric models may be preferable.",
+    "crumbs": [
+      "Problem Sets",
+      "Kaplan-Meier"
+    ]
   },
   {
     "objectID": "proportional_hazards.html",
@@ -263,6 +337,7 @@
     "section": "",
     "text": "The Exponential and Weibull models we have already learned are examples of proportional hazards models. These models begin with a baseline hazard that applies when \\(\\vec{X} = \\vec{0}\\). For other values of \\(\\vec{X}\\), the hazard equals the baseline hazard multiplied by hazard ratio \\(e^{\\vec{X}'\\vec\\beta}\\).\n\\[\nh(t\\mid\\vec{X}) = \\underbrace{\\lambda(t)}_{\\substack{\\text{baseline}\\\\\\text{hazard}}}\\underbrace{e^{\\vec{X}'\\vec\\beta}}_{\\substack{\\text{hazard}\\\\\\text{ratio}}}\n\\]\nLet’s see proportional hazards in a concrete example. On the Weibull page, we created an object predicted_survival containing the predicted values of a survival curve. Below, we load this object again.\npredicted_survival &lt;- read_csv(\"assets/predicted_survival_weibull.csv\")\nRecall that this object has two units with x = 0 and x = 1, with many rows per unit representing survival probabilities at each time point. We can calculate the hazard at these time points as well.\npredicted_hazard &lt;- predicted_survival |&gt;\n  mutate(\n    # Calculate the PDF at each point\n    f = dweibull(x = time, shape = shape, scale = scale),\n    # Hazard equals PDF over survival\n    h = f / S\n  )\nBelow we visualize these hazard functions. The hazard in population subgroup \\(X = 0\\) is much higher than the hazard in subgroup \\(X = 1\\), at every time point.\nCode\npredicted_hazard |&gt;\n  select(x, time, h) |&gt;\n  ggplot(aes(x = time, y = h, color = factor(x), linetype = factor(x))) +\n  geom_line() +\n  labs(\n    y = \"Hazard Function\", \n    x = \"Time\", \n    color = \"Population\\nSubgroup (X)\",\n    linetype = \"Population\\nSubgroup (X)\"\n  )\nNext, consider the hazard ratio at each time \\(t\\): the hazard in group \\(X = 1\\) divided by the hazard in group \\(X = 0\\).\nCode\npredicted_hazard_ratios &lt;- predicted_hazard |&gt;\n  select(x, time, h) |&gt;\n  pivot_wider(names_from = \"x\", values_from = \"h\", names_prefix = \"hazard_if_x_\") |&gt;\n  mutate(hazard_ratio = hazard_if_x_1 / hazard_if_x_0) |&gt;\n  print(n = 5)\n\n\n# A tibble: 100 × 4\n    time hazard_if_x_0 hazard_if_x_1 hazard_ratio\n   &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;        &lt;dbl&gt;\n1 0.01        0.000347     0.0000176       0.0507\n2 0.0503      0.00832      0.000422        0.0507\n3 0.0906      0.0265       0.00134         0.0507\n4 0.131       0.0546       0.00277         0.0507\n5 0.171       0.0926       0.00470         0.0507\n# ℹ 95 more rows\nNote that the hazard ratio is constant in this model. The hazard ratio is 0.0507 at every time point. A hazard ratio that is constant over time is the hallmark of a proportional hazards model: the hazard function at every \\(\\vec{x}\\) value is proportional to a baseline hazard that exists if \\(\\vec{x} = \\vec{0}\\).",
     "crumbs": [
+      "Problem Sets",
       "Proportional Hazards"
     ]
   },
@@ -273,6 +348,7 @@
     "section": "Math for Exponential and Weibull PH",
     "text": "Math for Exponential and Weibull PH\nHere we use math to see the Exponential and Weibull models as proportional hazards models.\n\nExponential PH in math\nFor the Exponential model \\(T\\sim\\text{Exponential}(\\lambda)\\) with where we model the rate parameter \\(\\lambda = \\exp(\\beta_0 + \\beta_1 X)\\), the hazard function is \\(h(t) = \\lambda = \\exp(\\beta_0 + \\beta_1 X)\\). The baseline hazard when \\(X = 0\\) is \\(\\exp(\\beta_0)\\), and the hazard when \\(X = 1\\) is \\(\\exp(\\beta_0 + \\beta_1)\\). The hazard ratio for \\(X = 1\\) vs \\(X = 0\\) is \\(\\exp(\\beta_1)\\).\n\n\nWeibull PH in math\nFor a Weibull with shape \\(\\alpha\\) and scale \\(\\sigma\\), the probability density function is \\[\nf(t) = \\alpha \\sigma ^ {-\\alpha} t^{\\alpha-1}e^{-(\\frac{1}{\\sigma} t)^\\alpha}\n\\] and the survival function is \\[\nS(t) = e^{-(\\frac{1}{\\sigma} t)^{\\alpha}}\n\\] Taking the ratio, the hazard function is\n\\[\nh(t) = \\alpha \\sigma ^ {-\\alpha} t^{\\alpha-1}\n\\]\nWhen using the survreg function in the survival package, we model \\(\\sigma = \\exp(\\beta_0 + \\beta_1 X)\\). Plugging this in, we can see how the Weibull hazard function is proportional across values of \\(X\\).\n\\[\n\\begin{aligned}\nh(t) &= \\alpha \\left(e^{\\beta_0 + \\beta_1 X}\\right) ^ {-\\alpha} t^{\\alpha-1} \\\\\n&= \\underbrace{\\alpha e^{-\\alpha\\beta_0}t^{\\alpha - 1}}_{\\substack{\\text{baseline}\\\\\\text{hazard}}}\\underbrace{e^{\\beta_1 X}}_{\\substack{\\text{hazard}\\\\\\text{ratio}}} \\\\\n&= \\begin{cases}\n  \\alpha e^{-\\alpha\\beta_0}t^{\\alpha - 1} &\\text{if }x=0 \\\\\n  \\alpha e^{-\\alpha\\beta_0}t^{\\alpha - 1}e^{-\\alpha\\beta_1} &\\text{if }x=1\n\\end{cases}\n\\end{aligned}\n\\]\nWe can confirm that this hazard ratio is correct in the fitted model (see the Weibull page for fitting this model).\n\nmodel &lt;- readRDS(\"https://ilundberg.github.io/eventhistory/assets/weibull_model.RDS\")\n\n\nalpha_hat &lt;- 1 / model$scale\nbeta1_hat &lt;- coef(model)[2]\nhazard_ratio &lt;- exp(- alpha_hat * beta1_hat)\n\nThe resulting hazard ratio 0.0507 is equal to the one we calculated from predicted values 0.0507. Thus, our mathematical understanding of the Weibull proportional hazards model aligns with the predicted values from the canned output.",
     "crumbs": [
+      "Problem Sets",
       "Proportional Hazards"
     ]
   }

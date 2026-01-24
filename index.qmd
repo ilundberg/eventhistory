@@ -2,4 +2,46 @@
 title: "Event History Analysis"
 ---
 
-This website is to share code on event history analysis, for UCLA Soc 213B. Potentially in the future it will be a more outward-facing website!
+## Welcome to Soc 213B!
+
+This course is being offered Winter 2026 at UCLA. See the [syllabus](assets/syllabus.pdf).
+
+## Who should take this course?
+
+The course is a good fit for PhD students in sociology, statistics, political science, economics, and other social sciences.
+
+## Schedule of topics
+
+Below is a tentative schedule of topics. This is my first time teaching the course, and the sequence of topics may change over the course of the quarter.
+
+**Part 1: Survival analysis with events as outcomes.**
+
+* Week 1: Basics of survival analysis and maximum likelihood. [Exponential](exponential.qmd) model in math.
+* Week 2: Review of Maximum Likelihood Estimation with the [Bernoulli](bernoulli.qmd). [Exponential](exponential.qmd) model in software.
+* Week 3: Beyond the Exponential: [Weibull](weibull.qmd) for hazards that vary with time. Generalizing ideas to [proportional hazards](proportional_hazards.qmd) and the [Cox model](cox.qmd). We will contrast with nonparametric survival curve estimation by [Kaplan-Meier](kaplanmeier.qmd).
+* Week 4: Unmodeled heterogeneity, competing risks, non-ignorable censoring, and other complications.
+
+**Part 2: Causal inference with events as treatments.**
+
+* Week 5: Causal inference for survival outcomes
+* Week 6: Event history treatments with non-survival outcomes (longitudinal inverse probability weighting, marginal
+structural models)
+* Week 7: Event history treatments with survival outcomes
+* Week 8: Causal inference in staggered adoption panels
+
+## Learning goals
+
+Students will learn to
+
+- define key components of survival analysis (e.g., censoring)
+- state the assumptions required for a survival model
+- translate from survival models to predicted quantities of interest
+- apply causal inference methods where events are treatments that unfold over time
+
+## Course description
+
+Introduction to regression-like analyses in which outcome is time to event. Topics include logit models for discrete-time event history models; piecewise exponential hazards models; proportional hazards; nonproportional hazards; parametric survival models. We will also cover events that unfold over time as causal treatment variables.
+
+
+
+
