@@ -23,6 +23,7 @@ website:
     style: "docked"
     search: true
     contents:
+      - survival_concepts.qmd
       - kaplanmeier.qmd
       - bernoulli.qmd
       - exponential.qmd
