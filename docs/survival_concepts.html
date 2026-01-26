@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Cox Proportional Hazards – SOCIOL 213B: Applied Event History Analysis</title>
+<title>Survival Analysis: Key Concepts – SOCIOL 213B: Applied Event History Analysis</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,41 +19,6 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
-}
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -175,7 +140,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./cox.html">Cox Proportional Hazards</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Survival Analysis: Key Concepts</li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -227,7 +192,7 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./cox.html" class="sidebar-item-text sidebar-link active">
+  <a href="./cox.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Cox Proportional Hazards</span></a>
   </div>
 </li>
@@ -241,11 +206,15 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#in-math" id="toc-in-math" class="nav-link active" data-scroll-target="#in-math">In math</a></li>
-  <li><a href="#in-code" id="toc-in-code" class="nav-link" data-scroll-target="#in-code">In code</a></li>
-  <li><a href="#drawbacks-of-the-cox-model" id="toc-drawbacks-of-the-cox-model" class="nav-link" data-scroll-target="#drawbacks-of-the-cox-model">Drawbacks of the Cox model</a></li>
-  <li><a href="#overcoming-drawbacks" id="toc-overcoming-drawbacks" class="nav-link" data-scroll-target="#overcoming-drawbacks">Overcoming drawbacks</a></li>
-  <li><a href="#rare-circumstances" id="toc-rare-circumstances" class="nav-link" data-scroll-target="#rare-circumstances">Rare circumstances</a></li>
+  <li><a href="#illustration-with-key-concepts" id="toc-illustration-with-key-concepts" class="nav-link active" data-scroll-target="#illustration-with-key-concepts">Illustration with key concepts</a>
+  <ul class="collapse">
+  <li><a href="#time-to-event" id="toc-time-to-event" class="nav-link" data-scroll-target="#time-to-event">Time to event</a></li>
+  <li><a href="#time-zero" id="toc-time-zero" class="nav-link" data-scroll-target="#time-zero">Time zero</a></li>
+  <li><a href="#an-estimand" id="toc-an-estimand" class="nav-link" data-scroll-target="#an-estimand">An estimand</a></li>
+  <li><a href="#censoring" id="toc-censoring" class="nav-link" data-scroll-target="#censoring">Censoring</a></li>
+  </ul></li>
+  <li><a href="#lower-bound-with-no-assumptions" id="toc-lower-bound-with-no-assumptions" class="nav-link" data-scroll-target="#lower-bound-with-no-assumptions">Lower bound with no assumptions</a></li>
+  <li><a href="#distribution-functions-in-survival-analysis" id="toc-distribution-functions-in-survival-analysis" class="nav-link" data-scroll-target="#distribution-functions-in-survival-analysis">Distribution functions in survival analysis</a></li>
   </ul>
 </nav>
     </div>
@@ -254,7 +223,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Cox Proportional Hazards</h1>
+<h1 class="title">Survival Analysis: Key Concepts</h1>
 </div>
 
 
@@ -271,141 +240,55 @@ window.Quarto = {
 </header>
 
 
-<p>The <strong>Cox proportional hazards model</strong> is a very popular approach to survival analysis which researchers use when they do not want to make assumptions about the shape of the baseline hazard. To understand the Cox model, recall that all proportional hazards models take the form below.</p>
-<p><span class="math display">\[
-h(t\mid\vec{X}) = \underbrace{\lambda(t)}_{\substack{\text{baseline}\\\text{hazard}}}\underbrace{e^{\vec{X}'\vec\beta}}_{\substack{\text{hazard}\\\text{ratio}}}
-\]</span></p>
-<p>In the Exponential model, the baseline hazard is <span class="math inline">\(\lambda(t) = \lambda = \exp(\vec{X}'\vec\beta)\)</span>. In the Weibull model, the baseline hazard has a more complicated form that is a function of time <span class="math inline">\(t\)</span>.</p>
-<p>The Cox proportional hazards model makes no assumptions about <span class="math inline">\(\lambda(t)\)</span>. The insight of this model is to write the likelihood in a way that the baseline hazard <span class="math inline">\(\lambda(t)\)</span> drops out so that we can learn the hazard ratios without learning the baseline hazard.</p>
-<p>Below we introduce the Cox model in math and then in code, before discussing its drawbacks.</p>
-<section id="in-math" class="level2">
-<h2 class="anchored" data-anchor-id="in-math">In math</h2>
-<p>The Cox model says: consider a time <span class="math inline">\(t\)</span> at which some unit in the sample dies. What is the probability that it would be unit <span class="math inline">\(i\)</span> (who is alive up to <span class="math inline">\(t\)</span>), as opposed to some other unit (who is also alive up to <span class="math inline">\(t\)</span>)? This probability equals the ratio of the hazard for unit <span class="math inline">\(i\)</span> to the sum of the hazards for all units at risk at time <span class="math inline">\(t\)</span>.</p>
-<p><span class="math display">\[
-\text{P}(\text{Unit }i\text{ dies at }t\mid \text{Some unit dies at }t) = \frac{h(t\mid \vec{X} = \vec{x}_i)}{\sum_{j:t_j\geq t} h(t\mid \vec{X} = \vec{x}_j)}
-\]</span></p>
-<p>Recall that in a proportional hazards model, the hazard equals the baseline hazard <span class="math inline">\(\lambda(t)\)</span> and the hazard ratio <span class="math inline">\(\exp(\vec{x}'\vec\beta)\)</span>. If we plug these in for <span class="math inline">\(h()\)</span>, the baseline hazard <span class="math inline">\(\lambda(t)\)</span> appears in the numerator and denominator and cancels.</p>
-<p><span class="math display">\[
-\text{P}(\text{Unit }i\text{ dies at }t\mid \text{Some unit dies at }t) = \frac{\exp(\vec{x}_i'\vec\beta)}{\sum_{j:t_j\geq t} \exp(\vec{x}_j'\vec\beta)}
-\]</span></p>
-<p>Multiplying over all time points when a unit dies, this produces a likelihood that is a function of <span class="math inline">\(\vec\beta\)</span> and not a function of the baseline hazard <span class="math inline">\(\lambda(t)\)</span>. By maximizing this likelihood, we can learn the coefficients <span class="math inline">\(\vec\beta\)</span> predicting the log hazard (and thus the hazard ratios) without making any assumptions about the baseline hazard.</p>
+<p><strong>Survival analysis</strong> is a subfield of statistics focused on models where the outcome is the time until an event occurs. This page uses an example of shooting stars to introduce key concepts: the unit of analysis, time to event, censoring, time zero, the survival function, and the hazard function.</p>
+<section id="illustration-with-key-concepts" class="level2">
+<h2 class="anchored" data-anchor-id="illustration-with-key-concepts">Illustration with key concepts</h2>
+<p>A backpacker ventures out on a multi-week trip through the Sierra Nevada Mountains. Every night <span class="math inline">\(i = 1,\dots,n\)</span>, they sit on a rock before bed to look up at the stars. The backpacker starts a stopwatch and begins watching for a shooting star. When they see a shooting star, they record the stopwatch time <span class="math inline">\(t_i\)</span> at which the star occurs. If 10 minutes pass with no stars, they note that they did not see a shooting star during that night’s trial.</p>
+<section id="time-to-event" class="level3">
+<h3 class="anchored" data-anchor-id="time-to-event">Time to event</h3>
+<p>The outcome variable <span class="math inline">\(t_i\)</span> is the time until an event occurs (a shooting star is witnessed). <span class="math display">\[\begin{equation}
+    t_i = \text{time to event for case }i
+\end{equation}\]</span></p>
 </section>
-<section id="in-code" class="level2">
-<h2 class="anchored" data-anchor-id="in-code">In code</h2>
-<p>To practice the Cox model in code, first simulate some data. Here we simulate a binary <span class="math inline">\(X\sim\text{Bernoulli}(0.5)\)</span> and define a rate parameter <span class="math inline">\(\lambda = \exp(\beta_0 + \beta_1 X)\)</span> for <span class="math inline">\(\beta_0 = 0\)</span> and <span class="math inline">\(\beta_1 = 1\)</span>. Then, we simulate Exponential draws from <span class="math inline">\(T\sim \text{Exponential}(\lambda)\)</span>. For illustration, no one is censored (<code>c = 0</code>).</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>beta_0 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>beta_1 <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>simulated <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span><span class="fl">1e4</span>) <span class="sc">|&gt;</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">rbinom</span>(<span class="fu">n</span>(), <span class="dv">1</span>, .<span class="dv">5</span>),</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">lambda =</span> <span class="fu">exp</span>(beta_0 <span class="sc">+</span> beta_1 <span class="sc">*</span> x),</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Simulate from the Exponential for this illustration:</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># can be any hazard function</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">t =</span> <span class="fu">rexp</span>(<span class="fu">n</span>(), <span class="at">rate =</span> lambda),</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">c =</span> <span class="dv">0</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Next, we fit a Cox proportional hazards model.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">coxph</span>(</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Surv</span>(t, <span class="at">event =</span> <span class="dv">1</span> <span class="sc">-</span> c) <span class="sc">~</span> x,</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> simulated</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Extracting the coefficients of this model, we have a coefficient on the predictor <span class="math inline">\(x\)</span>.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>        x 
-0.9785625 </code></pre>
-</div>
-</div>
-<p>This approximately equals the true value of $_1 = $1 in this simulation, and it captures the additive change in the log hazard when moving from <code>x = 0</code> to <code>x = 1</code>.</p>
-<p>Exponentiating the coefficients, we get the hazard ratio <span class="math inline">\(e^{\beta_1}\)</span> for a shift from <code>x = 0</code> to <code>x = 1</code>.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">coef</span>(model))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>       x 
-2.660629 </code></pre>
-</div>
-</div>
+<section id="time-zero" class="level3">
+<h3 class="anchored" data-anchor-id="time-zero">Time zero</h3>
+<p>When defining time to event, an implicit definition is <strong>time zero</strong>: when the trial begins. In the backpacking illustration, time 0 is the time each night when the backpacker starts their stopwatch and begins looking for a star. Note that time zero is not the backpacker’s birth date, nor is it 12:01am the day of looking for stars. Time zero is whatver time marks the beginning of the trial.</p>
 </section>
-<section id="drawbacks-of-the-cox-model" class="level2">
-<h2 class="anchored" data-anchor-id="drawbacks-of-the-cox-model">Drawbacks of the Cox model</h2>
-<p>The Cox model is popular because it does not require assumptions about the baseline hazard. But it comes with a major drawback: one generally cannot simulate any quantities of interest beyond the hazard ratios with a Cox model.</p>
-<p>For example, suppose we wanted to know the survival probability at time <span class="math inline">\(t\)</span>. This would require us to translate our model parameters to a survival function. But because the Cox model parameters are uninformative about the baseline hazard <span class="math inline">\(\lambda(t)\)</span>, they are by extension uninformative about the survival function.</p>
+<section id="an-estimand" class="level3">
+<h3 class="anchored" data-anchor-id="an-estimand">An estimand</h3>
+<p>How long on average does it take for a shooting star to pass the viewing window? Let <span class="math inline">\(T\)</span> be the random variable for the time until a shooting star is observed. If the backpacker wished to estimate <span class="math inline">\(\tau = \text{E}(T)\)</span>, they would not be able to use the empirical mean <span class="math inline">\(\frac{1}{n}\sum_{i=1}^n t_i\)</span> because there are nights <span class="math inline">\(i\)</span> on which no <span class="math inline">\(t_i\)</span> is recorded; no shooting star occur within 10 minutes.</p>
 </section>
-<section id="overcoming-drawbacks" class="level2">
-<h2 class="anchored" data-anchor-id="overcoming-drawbacks">Overcoming drawbacks</h2>
-<p>One way around this problem is to nonparametrically estimate the baseline survival function, and then to update it using the hazard ratios. Let the survival function at <span class="math inline">\(t\)</span> for subgroup <span class="math inline">\(\vec{X} = \vec{x}\)</span> be denoted <span class="math inline">\(S(t,\vec{x})\)</span>. Let the baseline survival function be <span class="math inline">\(S(t,\vec{0})\)</span>. With math that we do not show here, one can derive that the survival function at <span class="math inline">\(\vec{x}\)</span> equals the basline survival function raised to the power of the hazard ratio.</p>
-<p><span class="math display">\[S(t,\vec{x}) = S(t,\vec{0})^{\exp(\vec{x}'\vec\beta)}\]</span></p>
-<p>One can therefore estimate <span class="math inline">\(S(t,\vec{x})\)</span> with two inputs</p>
-<ol type="1">
-<li>A nonparametric estimate of <span class="math inline">\(S(t,\vec{0})\)</span> from Kaplan-Meier</li>
-<li>Cox estimates of <span class="math inline">\(\vec\beta\)</span> for the hazard ratio</li>
-</ol>
-<p>Below, we illustrate this on the simulated data. First, we define the baseline subgroup with <span class="math inline">\(X = 0\)</span>.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>baseline_subgroup <span class="ot">&lt;-</span> simulated <span class="sc">|&gt;</span> <span class="fu">filter</span>(x <span class="sc">==</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Then we estimate the baseline survival by Kaplan-Meier on this subgroup.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>baseline_kaplanmeier <span class="ot">&lt;-</span> <span class="fu">survfit</span>(</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Surv</span>(t, <span class="at">event =</span> <span class="dv">1</span> <span class="sc">-</span> c) <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> baseline_subgroup</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Third, we extract the nonparametric estimate of the baseline survival function among the <span class="math inline">\(X = 0\)</span>.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>baseline_survival <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">t =</span> baseline_kaplanmeier<span class="sc">$</span>time,</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Extract baseline survival among X = 0</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">S0 =</span> baseline_kaplanmeier<span class="sc">$</span>surv</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>To produce an estimate among the <span class="math inline">\(X = 1\)</span> subgroup, we first need the hazard ratio from the Cox model.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>hazard_ratio <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">coef</span>(model))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Finally, we can create the survival curve among <span class="math inline">\(X = 1\)</span> by taking the baseline survival curve and raising it to the power of the hazard ratio.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>both_survival <span class="ot">&lt;-</span> baseline_survival <span class="sc">|&gt;</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">S1 =</span> S0 <span class="sc">^</span> hazard_ratio)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Below we visualize these two estimated curves.</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>both_survival <span class="sc">|&gt;</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">-</span>t, <span class="at">names_to =</span> <span class="st">"X"</span>, <span class="at">values_to =</span> <span class="st">"S"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">X =</span> <span class="fu">str_replace</span>(X,<span class="st">"S"</span>,<span class="st">"X = "</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> t, <span class="at">y =</span> S, <span class="at">color =</span> X, <span class="at">linetype =</span> X)) <span class="sc">+</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Time"</span>, </span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Survival"</span>,</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Population</span><span class="sc">\n</span><span class="st">Subgroup"</span>,</span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="st">"Population</span><span class="sc">\n</span><span class="st">Subgroup"</span></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="cox_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Thus, it is possible to combine Cox estimates with a nonparametric baseline survival estimate to produce survival curves.</p>
+<section id="censoring" class="level3">
+<h3 class="anchored" data-anchor-id="censoring">Censoring</h3>
+<p>Let <span class="math inline">\(c_i\)</span> indicate whether an observation is censored, meaning that data collection ends without the event occurring. <span class="math display">\[\begin{equation}
+    c_i = \begin{cases}
+        1&amp;\text{if event occurs for case }i \\
+        0&amp;\text{if data collection ends with no event for }i
+    \end{cases}
+\end{equation}\]</span></p>
+<p>For an observation with <span class="math inline">\(c_i=1\)</span>, the researcher knows that <span class="math inline">\(t_i&gt;\text{10 minutes}\)</span>. To aid generalization to settings where the backpacker waits varying lengths of time before ending the trial, define an observed outcome value <span class="math display">\[\begin{equation}
+    \tilde{t}_i=\begin{cases}
+        t_i &amp;\text{if }c_i=0 \\
+        \text{length of observation period} &amp;\text{if }c_i=1
+    \end{cases}
+\end{equation}\]</span> where in the example above <span class="math inline">\(\tilde{t}_i=10\)</span> minutes for any day with <span class="math inline">\(c_i=0\)</span>.</p>
 </section>
-<section id="rare-circumstances" class="level2">
-<h2 class="anchored" data-anchor-id="rare-circumstances">Rare circumstances</h2>
-<p>The combination of Kaplan-Meier + Cox is a creative one, but it applies only in a very rare setting (3) and is less useful in more common settings (1 and 2).</p>
-<p><strong>1. Common setting: All <span class="math inline">\(\vec{x}\)</span>-values are well-populated.</strong> If <span class="math inline">\(\vec{X}\)</span> takes on only a few discrete values that are well-populated, you can directly use Kaplan-Meier to nonparametrically estimate the survival curves in each subgroup. There is no need to use a Cox model: you can avoid the proportional hazards assumption entirely. An example of this setting is a randomized experiment with a binary treatment.</p>
-<p><strong>2. Common setting: No <span class="math inline">\(\vec{x}\)</span>-value is well populated.</strong> If <span class="math inline">\(\vec{X}\)</span> takes many values such that there is no value <span class="math inline">\(\vec{x}\)</span> that has many observation, then there is no baseline subgroup with enough cases to estimate a baseline Kaplan-Meier curve. In this setting, you cannot estimate the baseline hazard nonparametrically. You have two choies: (1) estimate a Cox model and only get hazard ratios or (2) assume a parametric distribution (e.g., Weibull) and gain the ability to simulate any quantity of interest.</p>
-<p><strong>3. Rare setting: One well-populated baseline <span class="math inline">\(\vec{x}\)</span>-value.</strong> Suppose a randomized experiment occurs where many people are assigned a control condition (<span class="math inline">\(x = 0\)</span>) and others are distributed over many number-valued treatment conditions (<span class="math inline">\(x &gt; 0\)</span>). In this setting, many cases are available to estimate the baseline hazard by Kaplan-Meier among <span class="math inline">\(x = 0\)</span>. Kaplan-Meier is less useful for any <span class="math inline">\(x&gt;0\)</span> because very few cases are seen at any particular <span class="math inline">\(x\)</span>-value. But a Cox model can impose structure on this space and learn hazard ratios, thereby allowing the baseline hazard (learned on <span class="math inline">\(x = 0\)</span>) to be updated for the other <span class="math inline">\(x\)</span>-values.</p>
-<p>In practice, researchers often default to Cox. But for setting (1) Kaplan-Meier would be better. For setting (2) fully parametric models (e.g., Weibull or Exponential) may be better because they allow simulation of any quantity of interest, at the small cost of assuming a family for the baseline hazard. Setting (3) is an ideal setting for the Cox model, but may correspond to very few actual research situations.</p>
+</section>
+<section id="lower-bound-with-no-assumptions" class="level2">
+<h2 class="anchored" data-anchor-id="lower-bound-with-no-assumptions">Lower bound with no assumptions</h2>
+<p>Suppose the researcher estimated by an average of this pseudo-outcome. <span class="math display">\[\begin{align}
+    \hat{\text{E}}_{\text{SimpleAverage}}(T) = \frac{1}{n}\sum_{i=1}^n \tilde{t}_i
+\end{align}\]</span></p>
+<p>Because <span class="math inline">\(\tilde{t}_i\leq t_i\)</span> for all <span class="math inline">\(i\)</span>, this estimator is downwardly biased and would asymptotically yield a lower bound on the population mean <span class="math inline">\({\text{E}}(T)\)</span>. <span class="math display">\[\begin{equation}
+    \lim_{n\rightarrow\infty} \hat{\text{E}}_{\text{SimpleAverage}}(T) &lt; {\text{E}}(T)
+\end{equation}\]</span></p>
+<p>How could we produce a consistent estimator for <span class="math inline">\({\text{E}}(T)\)</span>? This is a difficult problem because we do not know what happens after censoring. Imagine that when the backpacker sees no stars in 10 minutes, they would have seen one at 11 minutes. Then <span class="math inline">\({\text{E}}(T)\)</span> may be very close to <span class="math inline">\({\text{E}}(\tilde{T})\)</span>. Alternatively, imagine that when the backpacker sees no stars in 10 minutes they would have to wait several hours for a star. Then <span class="math inline">\({\text{E}}(T)&gt;&gt;{\text{E}}(\tilde{T})\)</span>. The data alone cannot provide an answer, because we do not know how long it takes for a star to pass after the backpacker has fallen asleep. Doing so will require a parametric model for the distribution of <span class="math inline">\(T\)</span>, the time until the event occurs.</p>
+</section>
+<section id="distribution-functions-in-survival-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="distribution-functions-in-survival-analysis">Distribution functions in survival analysis</h2>
+<p>When making a parametric model for time to event, there are at least four ways of thinking about the parameterization of the distribution. The first two are familiar. The <strong>cumulative distribution function</strong> <span class="math inline">\(F(t) = P(T&lt;t)\)</span> is the probability of an event occurring before time <span class="math inline">\(t\)</span>. The <strong>probability density function</strong> <span class="math inline">\(f(t) = \frac{\partial}{\partial t} F(t)\)</span> is the density of event occurrence at time <span class="math inline">\(t\)</span>. These two functions are exactly as in any probability distribution for a random variable <span class="math inline">\(T\)</span> that can take a value <span class="math inline">\(t\)</span>. \</p>
+<p>In survival analysis, it is more common to work with two mathematical transformations of the CDF and PDF. The first is the <strong>survival function</strong> <span class="math inline">\(S(t) = P(T &gt; t)\)</span>, which captures the probability that a survival time <span class="math inline">\(T\)</span> is greater than a particular value <span class="math inline">\(t\)</span>. The survival function is the complement of the CDF, <span class="math inline">\(S(t) = 1 - F(t)\)</span>. Medical examples often use survival functions because they are interested in the probability of survival, not the probability of death. \</p>
+<p>We may also want to think about the risk of death given survival up to a particular point. This concept is formalized in the <strong>hazard function</strong> <span class="math inline">\(h(t) = \frac{f(t)}{S(t)}\)</span>, which is the ratio of the PDF to the survival function.</p>
 
 
 </section>

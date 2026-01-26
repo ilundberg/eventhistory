@@ -1,0 +1,70 @@
+---
+title: "Survival Analysis: Key Concepts"
+format:
+  html:
+    toc: true
+    toc-expansion: true
+    fig-height: 3
+---
+
+**Survival analysis** is a subfield of statistics focused on models where the outcome is the time until an event occurs. This page uses an example of shooting stars\footenote{The use of shooting stars as an illustration comes from [William Chen's Probability Cheatsheet](https://www.wzchen.com/probability-cheatsheet/) which was designed for [Stat 110 at Harvard](https://stat110.hsites.harvard.edu/).} to introduce key concepts: the unit of analysis, time to event, censoring, time zero, the survival function, and the hazard function.
+
+## Illustration with key concepts
+
+A backpacker ventures out on a multi-week trip through the Sierra Nevada Mountains. Every night $i = 1,\dots,n$, they sit on a rock before bed to look up at the stars. The backpacker starts a stopwatch and begins watching for a shooting star. When they see a shooting star, they record the stopwatch time $t_i$ at which the star occurs. If 10 minutes pass with no stars, they note that they did not see a shooting star during that night's trial.
+
+### Time to event
+
+The outcome variable $t_i$ is the time until an event occurs (a shooting star is witnessed).
+\begin{equation}
+    t_i = \text{time to event for case }i
+\end{equation}
+
+### Time zero
+
+When defining time to event, an implicit definition is **time zero**: when the trial begins. In the backpacking illustration, time 0 is the time each night when the backpacker starts their stopwatch and begins looking for a star. Note that time zero is not the backpacker's birth date, nor is it 12:01am the day of looking for stars. Time zero is whatver time marks the beginning of the trial.
+
+### An estimand
+
+How long on average does it take for a shooting star to pass the viewing window? Let $T$ be the random variable for the time until a shooting star is observed. If the backpacker wished to estimate $\tau = \text{E}(T)$, they would not be able to use the empirical mean $\frac{1}{n}\sum_{i=1}^n t_i$ because there are nights $i$ on which no $t_i$ is recorded; no shooting star occur within 10 minutes.
+
+### Censoring
+
+Let $c_i$ indicate whether an observation is censored, meaning that data collection ends without the event occurring.
+\begin{equation}
+    c_i = \begin{cases}
+        1&\text{if event occurs for case }i \\
+        0&\text{if data collection ends with no event for }i
+    \end{cases}
+\end{equation}
+
+For an observation with $c_i=1$, the researcher knows that $t_i>\text{10 minutes}$. To aid generalization to settings where the backpacker waits varying lengths of time before ending the trial, define an observed outcome value
+\begin{equation}
+    \tilde{t}_i=\begin{cases}
+        t_i &\text{if }c_i=0 \\
+        \text{length of observation period} &\text{if }c_i=1
+    \end{cases}
+\end{equation}
+where in the example above $\tilde{t}_i=10$ minutes for any day with $c_i=0$.
+
+## Lower bound with no assumptions
+
+Suppose the researcher estimated by an average of this pseudo-outcome.
+\begin{align}
+    \hat{\text{E}}_{\text{SimpleAverage}}(T) = \frac{1}{n}\sum_{i=1}^n \tilde{t}_i
+\end{align}
+
+Because $\tilde{t}_i\leq t_i$ for all $i$, this estimator is downwardly biased and would asymptotically yield a lower bound on the population mean ${\text{E}}(T)$.
+\begin{equation}
+    \lim_{n\rightarrow\infty} \hat{\text{E}}_{\text{SimpleAverage}}(T) < {\text{E}}(T)
+\end{equation}
+
+How could we produce a consistent estimator for ${\text{E}}(T)$? This is a difficult problem because we do not know what happens after censoring. Imagine that when the backpacker sees no stars in 10 minutes, they would have seen one at 11 minutes. Then ${\text{E}}(T)$ may be very close to ${\text{E}}(\tilde{T})$. Alternatively, imagine that when the backpacker sees no stars in 10 minutes they would have to wait several hours for a star. Then ${\text{E}}(T)>>{\text{E}}(\tilde{T})$. The data alone cannot provide an answer, because we do not know how long it takes for a star to pass after the backpacker has fallen asleep. Doing so will require a parametric model for the distribution of $T$, the time until the event occurs.
+
+## Distribution functions in survival analysis
+
+When making a parametric model for time to event, there are at least four ways of thinking about the parameterization of the distribution. The first two are familiar. The **cumulative distribution function** $F(t) = P(T<t)$ is the probability of an event occurring before time $t$. The **probability density function** $f(t) = \frac{\partial}{\partial t} F(t)$ is the density of event occurrence at time $t$. These two functions are exactly as in any probability distribution for a random variable $T$ that can take a value $t$. \\
+
+In survival analysis, it is more common to work with two mathematical transformations of the CDF and PDF. The first is the **survival function** $S(t) = P(T > t)$, which captures the probability that a survival time $T$ is greater than a particular value $t$. The survival function is the complement of the CDF, $S(t) = 1 - F(t)$. Medical examples often use survival functions because they are interested in the probability of survival, not the probability of death. \\
+
+We may also want to think about the risk of death given survival up to a particular point. This concept is formalized in the **hazard function** $h(t) = \frac{f(t)}{S(t)}$, which is the ratio of the PDF to the survival function.

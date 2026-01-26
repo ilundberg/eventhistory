@@ -67,6 +67,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -172,8 +201,16 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#problem-set-1-key-concepts" id="toc-problem-set-1-key-concepts" class="nav-link active" data-scroll-target="#problem-set-1-key-concepts">Problem Set 1: Key Concepts</a></li>
+  <li><a href="#problem-set-2-exponential" id="toc-problem-set-2-exponential" class="nav-link" data-scroll-target="#problem-set-2-exponential">Problem Set 2: Exponential</a></li>
+  <li><a href="#problem-set-3-weibull" id="toc-problem-set-3-weibull" class="nav-link" data-scroll-target="#problem-set-3-weibull">Problem Set 3: Weibull</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -198,8 +235,107 @@ ul.task-list li input[type="checkbox"] {
 
 
 <p>Problem sets are currently posted on Piazza, but I plan to gather them on this page.</p>
+<section id="problem-set-1-key-concepts" class="level2">
+<h2 class="anchored" data-anchor-id="problem-set-1-key-concepts">Problem Set 1: Key Concepts</h2>
+<p>A study enrolls 6 people looking for work. 3 are randomly assigned to a job training intervention and 3 are randomly assigned to no job training. Over a 52-week follow-up period beginning January 1, the study records the time until they are hired in weeks.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Age</th>
+<th>Treatment</th>
+<th>Time until hired</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>53</td>
+<td>Treated</td>
+<td>12 weeks</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>26</td>
+<td>Treated</td>
+<td>10 weeks</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>37</td>
+<td>Treated</td>
+<td>44 weeks</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>25</td>
+<td>Untreated</td>
+<td>7 weeks</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>48</td>
+<td>Untreated</td>
+<td>Never hired in 52 weeks</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>34</td>
+<td>Untreated</td>
+<td>40 weeks</td>
+</tr>
+</tbody>
+</table>
+<ol type="1">
+<li>What is time 0 in this study?</li>
+<li>Which unit(s) were censored?</li>
+<li>Can you point identify the mean time until hired in the treatment condition? If not, can you provide a lower bound? Ignore statistical uncertainty.</li>
+<li>Can you point identify the mean time until hired in the untreated condition? If not, can you provide a lower bound? Ignore statistical uncertainty.</li>
+<li>Does the job training reduce the average time until hired?</li>
+</ol>
+<p>The next questions are about the Exponential distribution, which assumes a constant hazard: <span class="math inline">\(h(t) = \lambda\)</span>.</p>
+<ol start="6" type="1">
+<li>True or False. The CDF <span class="math inline">\(F(t) = P(T &lt; t)\)</span> is an increasing function of <span class="math inline">\(t\)</span>.</li>
+<li>True or False. The survival function <span class="math inline">\(S(t) = P(T &gt; t)\)</span> is an increasing function of <span class="math inline">\(t\)</span>.</li>
+<li>A demographer studies a cohort of people born in 1965 where age is the time variable (with time zero at age zero). They study the time until first marriage. In 1–3 sentences, make an argument that the assumption of a constant hazard is implausible.</li>
+</ol>
+</section>
+<section id="problem-set-2-exponential" class="level2">
+<h2 class="anchored" data-anchor-id="problem-set-2-exponential">Problem Set 2: Exponential</h2>
+<p>See the <a href="./exponential.html#exercise">exercise</a> at the end of the Exponential page.</p>
+</section>
+<section id="problem-set-3-weibull" class="level2">
+<h2 class="anchored" data-anchor-id="problem-set-3-weibull">Problem Set 3: Weibull</h2>
+<p>This problem set practices Kaplan-Meier survival curve estimation and a Weibull model.</p>
+<p>The <code>survival::veteran</code> data contain data from a clinical trial involving cancer patients run by the Veteran’s Administration. These data are described in Kalbfleisch and Prentice (1980) on p.~60. There are 137 patients, and only 9 are censored before death.</p>
+<ul>
+<li><code>status</code> is 1 for death, 0 for censoring</li>
+<li><code>time</code> is days of survival</li>
+<li><code>trt</code> is a randomized chemotherapy test treatment. 1 indicates standard treatment, 2 indicates the test treatment</li>
+</ul>
+<p>For more information on the data see <code>?survival::veteran</code>.</p>
+<ol type="1">
+<li>(10 points) Estimate survival curves by treatment status <code>trt</code>, using the Kaplan-Meier method. Visualize the results in a plot.</li>
+<li>(10 points) Estimate survival curves by treatment status <code>trt</code>, using a Weibull regression with only this predictor. Visualize the results in a plot.</li>
+<li>(10 points) Compare: Plot the Weibull and Kaplan-Meier survival curves on the same plot. How do they differ? For ease of comparison, you might use different panels or different plots for each treatment status so that it is easier to compare across models within treatment status.</li>
+<li>(10 points) Plot the estimated Weibull hazard function. Does it increase or decrease with time?</li>
+<li>(8 points) In your Weibull results, can you reject the null of an Exponential model?</li>
+<li>(2 points, Challenge): Construct a confidence interval on each point of your Weibull survival functions and visualize the result. Note that this is quite challenging; it is only worth 2 points so that you can skip it and still get an A on the problem set. Here are some steps.
+<ul>
+<li>Define the X matrix at which to make predictions</li>
+<li>Loop over simulations. In each iteration,
+<ul>
+<li>Simulate <span class="math inline">\(\vec\beta\)</span> and the <code>log_scale</code> parameter from a Multivariate Normal centered at <code>c(coef(model), log(model$scale))</code> with variance-covariance matrix <code>vcov(model)</code></li>
+<li>Calculate the simulated value of the <code>rweibull</code> parameter <code>scale</code>, which is <span class="math inline">\(e^{\vec{X}'\vec\beta}\)</span> where <span class="math inline">\(\vec\beta\)</span> are coefficients from <code>survreg</code></li>
+<li>Calculate the simulated value of the <code>rweibull</code> parameter <code>shape</code>, which is <code>1 / exp(log_scale)</code> where <code>log_scale</code> is the simulated value of the log of what <code>survreg</code> calls the scale parameter</li>
+<li>Simulate survival functions with those parameters</li>
+</ul></li>
+<li>At each point of the survival curve, calculate the 2.5 and 97.5 percentiles of the empirical distribution of simulated draws.</li>
+</ul></li>
+</ol>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

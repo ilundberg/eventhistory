@@ -165,4 +165,28 @@ The combination of Kaplan-Meier + Cox is a creative one, but it applies only in 
 
 In practice, researchers often default to Cox. But for setting (1) Kaplan-Meier would be better. For setting (2) fully parametric models (e.g., Weibull or Exponential) may be better because they allow simulation of any quantity of interest, at the small cost of assuming a family for the baseline hazard. Setting (3) is an ideal setting for the Cox model, but may correspond to very few actual research situations.
 
+## Exercise
 
+Load the `heart_recipients` data.
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+heart_recipients <- read_csv("assets/heart_recipients.csv")
+```
+```{r, warning = FALSE, message = FALSE, eval = FALSE}
+heart_recipients <- read_csv("https://ilundberg.github.io/eventhistory/assets/heart_recipients.csv")
+```
+
+Estimate a Cox model for survival time `t` since a heart transplant, using `age` at transplant as a predictor.
+
+- How does the log hazard change for each unit change in `age`?
+- What is the hazard ratio for a 1-unit change in `age`?
+- Why can't you combine with a Kaplan-Meier estimate of the baseline hazard in this setting?
+
+```{r, echo = F, eval = F}
+model <- coxph(
+  Surv(t, event = 1 - c) ~ age,
+  data = heart_recipients
+)
+coef(model)
+exp(coef(model))
+```

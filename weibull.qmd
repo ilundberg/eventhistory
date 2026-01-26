@@ -192,3 +192,86 @@ predicted_survival |>
   geom_line()
 ```
 
+## See differences from Exponential
+
+You may wonder how your Weibull model differs from an Exponential model. The hazard may change over time in the Weibull, whereas it would be constant in the Exponential. We can see the Weibull result by predicting the hazard function,
+
+```{r}
+predicted_hazard <- predicted_survival |>
+  mutate(
+    # Calculate the PDF at each point
+    f = dweibull(x = time, shape = shape, scale = scale),
+    # Hazard equals PDF over survival
+    h = f / S
+  )
+```
+
+and plotting it as a function of time.
+
+```{r}
+predicted_hazard |>
+  # Make x a character for easier plotting
+  mutate(x = paste("x =",x)) |>
+  ggplot(aes(x = time, y = S, color = x, linetype = x)) +
+  geom_line()
+```
+
+In this simulated example, the hazard function decreases with time.
+
+To see the difference mathematically, note that the Weibull hazard wtih shape $\alpha$ and scale $\sigma$ is as follows.
+$$
+h(t) = \alpha^{\alpha - 1}\sigma^{-\alpha}t^{\alpha - 1}
+$$
+Think about the particular case when $\alpha = 1$. Two of the exponents become 0 so that $\alpha^{\alpha - 1} = \alpha^0 = 1$ and $t^{\alpha - 1} = t^0 = 1$ and those terms drop out. The hazard becomes a constant function $\sigma^{-1}$.
+$$
+h_{\alpha = 0}(t) = \sigma^{-1}
+$$
+This hazard is equivalent to an Exponential hazard, where $\sigma = \frac{1}{\lambda}$ with $\sigma$ the scale (larger for longer survival times) and $\lambda$ is the rate of events (larger for shorter survival times). Thus, the Weibull with $\alpha = 1$ is an exponential.
+
+We might want to test to reject the null that $\alpha = 1$ in our Weibull model. Note that the shape parameter $\alpha$ is `1 / model$scale` where `model` is a Weibull fitted with `survreg` and `scale` is what `survreg` calls the relevant parameter. The Exponential is thus the special case where `model$scale = 1`, or equivalently the log of the `survreg` `scale` parameter equals zero. There is a statistical test of this in the output of `summary(model)`.
+
+```{r}
+summary(model)
+```
+
+In this case, we can easily reject the null that `Log(scale)` equals 0. There is significant evidence that the Weibull fits the data better than the Exponential.
+
+We might want a confidence interval on the $\alpha$ shape parameter. To do that, we first extract the log scale estimate and standard error from the `survreg` model.
+```{r}
+log_scale_estimate <- log(model$scale)
+log_scale_se <- sqrt(diag(model$var))["Log(scale)"]
+```
+Then, we use the Normal to construct a 95\% confidence interval on the log scale parameter.
+```{r}
+log_scale_ci_lower <- log_scale_estimate - log_scale_se * qnorm(.975)
+log_scale_ci_upper <- log_scale_estimate + log_scale_se * qnorm(.975)
+```
+
+Finally, we convert: the scale parameter is the exponentiated log scale parameter, and the `rweibull` $\alpha$ parameter `shape` is the inverse of the `survreg` parameter `scale`. Thus, we convert everything by the function $1 / \exp(x)$.
+```{r}
+c(
+  shape_estimate = 1 / exp(log_scale_estimate),
+  ci_lower = 1 / exp(log_scale_ci_upper) |> unname(),
+  ci_upper = 1 / exp(log_scale_ci_lower) |> unname()
+)
+```
+
+## Exercise
+
+Load the `heart_recipients` data.
+
+```{r, warning = FALSE, message = FALSE, echo = FALSE}
+heart_recipients <- read_csv("assets/heart_recipients.csv")
+```
+```{r, warning = FALSE, message = FALSE, eval = FALSE}
+heart_recipients <- read_csv("https://ilundberg.github.io/eventhistory/assets/heart_recipients.csv")
+```
+
+Estimate a Weibull model for survival time `t` since a heart transplant, using `age` at transplant as a predictor.
+
+- Pick two ages and plot the estimated survival functions.
+- Pick two ages and plot the estimated hazard functions.
+- Can you reject the null that your model is equivalent to an Exponential?
+
+
+

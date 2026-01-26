@@ -119,3 +119,5 @@ hazard_ratio <- exp(- alpha_hat * beta1_hat)
 
 The resulting hazard ratio `r round(hazard_ratio,4)` is equal to the one we calculated from predicted values `r round(predicted_hazard_ratios$hazard_ratio[1], 4)`. Thus, our mathematical understanding of the Weibull proportional hazards model aligns with the predicted values from the canned output.
 
+
+

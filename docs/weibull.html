@@ -243,6 +243,8 @@ window.Quarto = {
   <ul>
   <li><a href="#weibull-model" id="toc-weibull-model" class="nav-link active" data-scroll-target="#weibull-model">Weibull model</a></li>
   <li><a href="#simulate-quantities-of-interest" id="toc-simulate-quantities-of-interest" class="nav-link" data-scroll-target="#simulate-quantities-of-interest">Simulate quantities of interest</a></li>
+  <li><a href="#see-differences-from-exponential" id="toc-see-differences-from-exponential" class="nav-link" data-scroll-target="#see-differences-from-exponential">See differences from Exponential</a></li>
+  <li><a href="#exercise" id="toc-exercise" class="nav-link" data-scroll-target="#exercise">Exercise</a></li>
   </ul>
 </nav>
     </div>
@@ -384,10 +386,10 @@ T &amp;\sim \text{Weibull}\left(\texttt{shape} = \alpha,\texttt{scale} = \exp(\b
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimate =</span> <span class="fu">c</span>(<span class="at">alpha =</span> alpha_estimate, beta_estimate)</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>      truth     estimate
-alpha     3  2.966910687
-beta0     0 -0.001290743
-beta1     1  1.004828539</code></pre>
+<pre><code>      truth    estimate
+alpha     3 3.004579477
+beta0     0 0.001149056
+beta1     1 1.005972530</code></pre>
 </div>
 </div>
 </section>
@@ -446,6 +448,97 @@ beta1     1  1.004828539</code></pre>
 </div>
 </div>
 </div>
+</section>
+<section id="see-differences-from-exponential" class="level2">
+<h2 class="anchored" data-anchor-id="see-differences-from-exponential">See differences from Exponential</h2>
+<p>You may wonder how your Weibull model differs from an Exponential model. The hazard may change over time in the Weibull, whereas it would be constant in the Exponential. We can see the Weibull result by predicting the hazard function,</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>predicted_hazard <span class="ot">&lt;-</span> predicted_survival <span class="sc">|&gt;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculate the PDF at each point</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">f =</span> <span class="fu">dweibull</span>(<span class="at">x =</span> time, <span class="at">shape =</span> shape, <span class="at">scale =</span> scale),</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Hazard equals PDF over survival</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">h =</span> f <span class="sc">/</span> S</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>and plotting it as a function of time.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>predicted_hazard <span class="sc">|&gt;</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Make x a character for easier plotting</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">x =</span> <span class="fu">paste</span>(<span class="st">"x ="</span>,x)) <span class="sc">|&gt;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> time, <span class="at">y =</span> S, <span class="at">color =</span> x, <span class="at">linetype =</span> x)) <span class="sc">+</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="weibull_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>In this simulated example, the hazard function decreases with time.</p>
+<p>To see the difference mathematically, note that the Weibull hazard wtih shape <span class="math inline">\(\alpha\)</span> and scale <span class="math inline">\(\sigma\)</span> is as follows. <span class="math display">\[
+h(t) = \alpha^{\alpha - 1}\sigma^{-\alpha}t^{\alpha - 1}
+\]</span> Think about the particular case when <span class="math inline">\(\alpha = 1\)</span>. Two of the exponents become 0 so that <span class="math inline">\(\alpha^{\alpha - 1} = \alpha^0 = 1\)</span> and <span class="math inline">\(t^{\alpha - 1} = t^0 = 1\)</span> and those terms drop out. The hazard becomes a constant function <span class="math inline">\(\sigma^{-1}\)</span>. <span class="math display">\[
+h_{\alpha = 0}(t) = \sigma^{-1}
+\]</span> This hazard is equivalent to an Exponential hazard, where <span class="math inline">\(\sigma = \frac{1}{\lambda}\)</span> with <span class="math inline">\(\sigma\)</span> the scale (larger for longer survival times) and <span class="math inline">\(\lambda\)</span> is the rate of events (larger for shorter survival times). Thus, the Weibull with <span class="math inline">\(\alpha = 1\)</span> is an exponential.</p>
+<p>We might want to test to reject the null that <span class="math inline">\(\alpha = 1\)</span> in our Weibull model. Note that the shape parameter <span class="math inline">\(\alpha\)</span> is <code>1 / model$scale</code> where <code>model</code> is a Weibull fitted with <code>survreg</code> and <code>scale</code> is what <code>survreg</code> calls the relevant parameter. The Exponential is thus the special case where <code>model$scale = 1</code>, or equivalently the log of the <code>survreg</code> <code>scale</code> parameter equals zero. There is a statistical test of this in the output of <code>summary(model)</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+survreg(formula = Surv(t, 1 - c) ~ x, data = simulated, dist = "weibull")
+               Value Std. Error       z      p
+(Intercept)  0.00115    0.00481    0.24   0.81
+x            1.00597    0.00666  151.12 &lt;2e-16
+Log(scale)  -1.10014    0.00782 -140.73 &lt;2e-16
+
+Scale= 0.333 
+
+Weibull distribution
+Loglik(model)= -7851.7   Loglik(intercept only)= -13167.8
+    Chisq= 10632.29 on 1 degrees of freedom, p= 0 
+Number of Newton-Raphson Iterations: 6 
+n= 10000 </code></pre>
+</div>
+</div>
+<p>In this case, we can easily reject the null that <code>Log(scale)</code> equals 0. There is significant evidence that the Weibull fits the data better than the Exponential.</p>
+<p>We might want a confidence interval on the <span class="math inline">\(\alpha\)</span> shape parameter. To do that, we first extract the log scale estimate and standard error from the <code>survreg</code> model.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>log_scale_estimate <span class="ot">&lt;-</span> <span class="fu">log</span>(model<span class="sc">$</span>scale)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>log_scale_se <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">diag</span>(model<span class="sc">$</span>var))[<span class="st">"Log(scale)"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Then, we use the Normal to construct a 95% confidence interval on the log scale parameter.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>log_scale_ci_lower <span class="ot">&lt;-</span> log_scale_estimate <span class="sc">-</span> log_scale_se <span class="sc">*</span> <span class="fu">qnorm</span>(.<span class="dv">975</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>log_scale_ci_upper <span class="ot">&lt;-</span> log_scale_estimate <span class="sc">+</span> log_scale_se <span class="sc">*</span> <span class="fu">qnorm</span>(.<span class="dv">975</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Finally, we convert: the scale parameter is the exponentiated log scale parameter, and the <code>rweibull</code> <span class="math inline">\(\alpha\)</span> parameter <code>shape</code> is the inverse of the <code>survreg</code> parameter <code>scale</code>. Thus, we convert everything by the function <span class="math inline">\(1 / \exp(x)\)</span>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">shape_estimate =</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">exp</span>(log_scale_estimate),</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">ci_lower =</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">exp</span>(log_scale_ci_upper) <span class="sc">|&gt;</span> <span class="fu">unname</span>(),</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">ci_upper =</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">exp</span>(log_scale_ci_lower) <span class="sc">|&gt;</span> <span class="fu">unname</span>()</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>shape_estimate       ci_lower       ci_upper 
+      3.004579       2.958896       3.050968 </code></pre>
+</div>
+</div>
+</section>
+<section id="exercise" class="level2">
+<h2 class="anchored" data-anchor-id="exercise">Exercise</h2>
+<p>Load the <code>heart_recipients</code> data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>heart_recipients <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://ilundberg.github.io/eventhistory/assets/heart_recipients.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Estimate a Weibull model for survival time <code>t</code> since a heart transplant, using <code>age</code> at transplant as a predictor.</p>
+<ul>
+<li>Pick two ages and plot the estimated survival functions.</li>
+<li>Pick two ages and plot the estimated hazard functions.</li>
+<li>Can you reject the null that your model is equivalent to an Exponential?</li>
+</ul>
 
 
 </section>

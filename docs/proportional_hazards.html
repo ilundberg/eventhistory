@@ -326,15 +326,15 @@ h(t\mid\vec{X}) = \underbrace{\lambda(t)}_{\substack{\text{baseline}\\\text{haza
 <pre><code># A tibble: 100 × 4
     time hazard_if_x_0 hazard_if_x_1 hazard_ratio
    &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;        &lt;dbl&gt;
-1 0.01        0.000347     0.0000176       0.0507
-2 0.0503      0.00832      0.000422        0.0507
-3 0.0906      0.0265       0.00134         0.0507
-4 0.131       0.0546       0.00277         0.0507
-5 0.171       0.0926       0.00470         0.0507
+1 0.01        0.000293     0.0000143       0.0487
+2 0.0503      0.00747      0.000364        0.0487
+3 0.0906      0.0243       0.00118         0.0487
+4 0.131       0.0508       0.00247         0.0487
+5 0.171       0.0871       0.00424         0.0487
 # ℹ 95 more rows</code></pre>
 </div>
 </div>
-<p>Note that the hazard ratio is <strong>constant</strong> in this model. The hazard ratio is 0.0507 at every time point. A hazard ratio that is constant over time is the hallmark of a proportional hazards model: the hazard function at every <span class="math inline">\(\vec{x}\)</span> value is proportional to a <strong>baseline hazard</strong> that exists if <span class="math inline">\(\vec{x} = \vec{0}\)</span>.</p>
+<p>Note that the hazard ratio is <strong>constant</strong> in this model. The hazard ratio is 0.0487 at every time point. A hazard ratio that is constant over time is the hallmark of a proportional hazards model: the hazard function at every <span class="math inline">\(\vec{x}\)</span> value is proportional to a <strong>baseline hazard</strong> that exists if <span class="math inline">\(\vec{x} = \vec{0}\)</span>.</p>
 <section id="math-for-exponential-and-weibull-ph" class="level2">
 <h2 class="anchored" data-anchor-id="math-for-exponential-and-weibull-ph">Math for Exponential and Weibull PH</h2>
 <p>Here we use math to see the Exponential and Weibull models as proportional hazards models.</p>
@@ -372,7 +372,7 @@ h(t) &amp;= \alpha \left(e^{\beta_0 + \beta_1 X}\right) ^ {-\alpha} t^{\alpha-1}
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>beta1_hat <span class="ot">&lt;-</span> <span class="fu">coef</span>(model)[<span class="dv">2</span>]</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>hazard_ratio <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="sc">-</span> alpha_hat <span class="sc">*</span> beta1_hat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>The resulting hazard ratio 0.0507 is equal to the one we calculated from predicted values 0.0507. Thus, our mathematical understanding of the Weibull proportional hazards model aligns with the predicted values from the canned output.</p>
+<p>The resulting hazard ratio 0.0487 is equal to the one we calculated from predicted values 0.0487. Thus, our mathematical understanding of the Weibull proportional hazards model aligns with the predicted values from the canned output.</p>
 
 
 </section>

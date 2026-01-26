@@ -14,7 +14,7 @@ theme_set(theme_bw())
 library(survival)
 ```
 
-The **Kaplan-Meier** estimator is a nonparametric method to estimate a survival curve in the presence of censoring.
+The **Kaplan-Meier** estimator is a nonparametric method to estimate a survival function in the presence of censoring.
 
 For each unit $i$ who dies at $t_i$, let
 
@@ -50,14 +50,10 @@ plot(kaplan_meier)
 or with longer code can make a nice `ggplot`.
 ```{r}
 #| code-fold: true
-tibble(
-  t = kaplan_meier$time,
-  S = kaplan_meier$surv,
-  lower = kaplan_meier$lower,
-  upper = kaplan_meier$upper
-) |>
+kaplan_meier |>
+  broom::tidy() |>
   ggplot(
-    aes(x = t, y = S, ymin = lower, ymax = upper)
+    aes(x = time, y = estimate, ymin = conf.low, ymax = conf.high)
   ) +
   geom_line() +
   geom_ribbon(alpha = .4) +
@@ -67,6 +63,51 @@ tibble(
     title = "Kaplan-Meier estimates"
   )
 ```
+
+## Kaplan-Meier on subgroups
+
+The `survfit` function makes it easy to fit Kaplan-Meier survival curves for population subgroups.
+
+```{r}
+kaplan_meier_subgroups <- survfit(
+  Surv(t, event = 1 - c) ~ I(age >= 50),
+  data = heart_recipients
+)
+```
+
+This results in two survival curves estimated independently: one on each subgroup.
+```{r}
+#| code-fold: true
+kaplan_meier_subgroups |>
+  broom::tidy() |>
+  ggplot(
+    aes(x = time, y = estimate, ymin = conf.low, ymax = conf.high,
+        color = strata, fill = strata)
+  ) +
+  geom_line() +
+  geom_ribbon(alpha = .4) +
+  labs(
+    x = "Time",
+    y = "Estimated Survival Function",
+    title = "Kaplan-Meier estimates",
+    color = "Population Subgroup",
+    fill = "Population Subgroup"
+  ) +
+  scale_color_discrete(
+    labels = as_labeller(function(x) case_when(
+      x == "I(age >= 50)=FALSE" ~ "Under Age 50",
+      x == "I(age >= 50)=TRUE" ~ "Age 50+",
+    ))
+  ) +
+  scale_fill_discrete(
+    labels = as_labeller(function(x) case_when(
+      x == "I(age >= 50)=FALSE" ~ "Under Age 50",
+      x == "I(age >= 50)=TRUE" ~ "Age 50+",
+    ))
+  )
+```
+
+## When to use Kaplan-Meier
 
 The Kaplan-Meier curve is ideal for
 
