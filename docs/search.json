@@ -55,179 +55,102 @@
     ]
   },
   {
-    "objectID": "problem_sets.html",
-    "href": "problem_sets.html",
-    "title": "Problem Sets",
+    "objectID": "survival_concepts.html",
+    "href": "survival_concepts.html",
+    "title": "Survival Analysis: Key Concepts",
     "section": "",
-    "text": "Problem sets are currently posted on Piazza, but I plan to gather them on this page."
+    "text": "Survival analysis is a subfield of statistics focused on models where the outcome is the time until an event occurs. This page uses an example of shooting stars to introduce key concepts: the unit of analysis, time to event, censoring, time zero, the survival function, and the hazard function.",
+    "crumbs": [
+      "Problem Sets",
+      "Survival Analysis: Key Concepts"
+    ]
   },
   {
-    "objectID": "problem_sets.html#problem-set-1-key-concepts",
-    "href": "problem_sets.html#problem-set-1-key-concepts",
-    "title": "Problem Sets",
-    "section": "Problem Set 1: Key Concepts",
-    "text": "Problem Set 1: Key Concepts\nA study enrolls 6 people looking for work. 3 are randomly assigned to a job training intervention and 3 are randomly assigned to no job training. Over a 52-week follow-up period beginning January 1, the study records the time until they are hired in weeks.\n\n\n\nID\nAge\nTreatment\nTime until hired\n\n\n\n\n1\n53\nTreated\n12 weeks\n\n\n2\n26\nTreated\n10 weeks\n\n\n3\n37\nTreated\n44 weeks\n\n\n4\n25\nUntreated\n7 weeks\n\n\n5\n48\nUntreated\nNever hired in 52 weeks\n\n\n6\n34\nUntreated\n40 weeks\n\n\n\n\nWhat is time 0 in this study?\nWhich unit(s) were censored?\nCan you point identify the mean time until hired in the treatment condition? If not, can you provide a lower bound? Ignore statistical uncertainty.\nCan you point identify the mean time until hired in the untreated condition? If not, can you provide a lower bound? Ignore statistical uncertainty.\nDoes the job training reduce the average time until hired?\n\nThe next questions are about the Exponential distribution, which assumes a constant hazard: \\(h(t) = \\lambda\\).\n\nTrue or False. The CDF \\(F(t) = P(T &lt; t)\\) is an increasing function of \\(t\\).\nTrue or False. The survival function \\(S(t) = P(T &gt; t)\\) is an increasing function of \\(t\\).\nA demographer studies a cohort of people born in 1965 where age is the time variable (with time zero at age zero). They study the time until first marriage. In 1–3 sentences, make an argument that the assumption of a constant hazard is implausible."
+    "objectID": "survival_concepts.html#illustration-with-key-concepts",
+    "href": "survival_concepts.html#illustration-with-key-concepts",
+    "title": "Survival Analysis: Key Concepts",
+    "section": "Illustration with key concepts",
+    "text": "Illustration with key concepts\nA backpacker ventures out on a multi-week trip through the Sierra Nevada Mountains. Every night \\(i = 1,\\dots,n\\), they sit on a rock before bed to look up at the stars. The backpacker starts a stopwatch and begins watching for a shooting star. When they see a shooting star, they record the stopwatch time \\(t_i\\) at which the star occurs. If 10 minutes pass with no stars, they note that they did not see a shooting star during that night’s trial.\n\nTime to event\nThe outcome variable \\(t_i\\) is the time until an event occurs (a shooting star is witnessed). \\[\\begin{equation}\n    t_i = \\text{time to event for case }i\n\\end{equation}\\]\n\n\nTime zero\nWhen defining time to event, an implicit definition is time zero: when the trial begins. In the backpacking illustration, time 0 is the time each night when the backpacker starts their stopwatch and begins looking for a star. Note that time zero is not the backpacker’s birth date, nor is it 12:01am the day of looking for stars. Time zero is whatver time marks the beginning of the trial.\n\n\nAn estimand\nHow long on average does it take for a shooting star to pass the viewing window? Let \\(T\\) be the random variable for the time until a shooting star is observed. If the backpacker wished to estimate \\(\\tau = \\text{E}(T)\\), they would not be able to use the empirical mean \\(\\frac{1}{n}\\sum_{i=1}^n t_i\\) because there are nights \\(i\\) on which no \\(t_i\\) is recorded; no shooting star occur within 10 minutes.\n\n\nCensoring\nLet \\(c_i\\) indicate whether an observation is censored, meaning that data collection ends without the event occurring. \\[\\begin{equation}\n    c_i = \\begin{cases}\n        1&\\text{if event occurs for case }i \\\\\n        0&\\text{if data collection ends with no event for }i\n    \\end{cases}\n\\end{equation}\\]\nFor an observation with \\(c_i=1\\), the researcher knows that \\(t_i&gt;\\text{10 minutes}\\). To aid generalization to settings where the backpacker waits varying lengths of time before ending the trial, define an observed outcome value \\[\\begin{equation}\n    \\tilde{t}_i=\\begin{cases}\n        t_i &\\text{if }c_i=0 \\\\\n        \\text{length of observation period} &\\text{if }c_i=1\n    \\end{cases}\n\\end{equation}\\] where in the example above \\(\\tilde{t}_i=10\\) minutes for any day with \\(c_i=0\\).",
+    "crumbs": [
+      "Problem Sets",
+      "Survival Analysis: Key Concepts"
+    ]
   },
   {
-    "objectID": "problem_sets.html#problem-set-2-exponential",
-    "href": "problem_sets.html#problem-set-2-exponential",
-    "title": "Problem Sets",
-    "section": "Problem Set 2: Exponential",
-    "text": "Problem Set 2: Exponential\nSee the exercise at the end of the Exponential page."
+    "objectID": "survival_concepts.html#lower-bound-with-no-assumptions",
+    "href": "survival_concepts.html#lower-bound-with-no-assumptions",
+    "title": "Survival Analysis: Key Concepts",
+    "section": "Lower bound with no assumptions",
+    "text": "Lower bound with no assumptions\nSuppose the researcher estimated by an average of this pseudo-outcome. \\[\\begin{align}\n    \\hat{\\text{E}}_{\\text{SimpleAverage}}(T) = \\frac{1}{n}\\sum_{i=1}^n \\tilde{t}_i\n\\end{align}\\]\nBecause \\(\\tilde{t}_i\\leq t_i\\) for all \\(i\\), this estimator is downwardly biased and would asymptotically yield a lower bound on the population mean \\({\\text{E}}(T)\\). \\[\\begin{equation}\n    \\lim_{n\\rightarrow\\infty} \\hat{\\text{E}}_{\\text{SimpleAverage}}(T) &lt; {\\text{E}}(T)\n\\end{equation}\\]\nHow could we produce a consistent estimator for \\({\\text{E}}(T)\\)? This is a difficult problem because we do not know what happens after censoring. Imagine that when the backpacker sees no stars in 10 minutes, they would have seen one at 11 minutes. Then \\({\\text{E}}(T)\\) may be very close to \\({\\text{E}}(\\tilde{T})\\). Alternatively, imagine that when the backpacker sees no stars in 10 minutes they would have to wait several hours for a star. Then \\({\\text{E}}(T)&gt;&gt;{\\text{E}}(\\tilde{T})\\). The data alone cannot provide an answer, because we do not know how long it takes for a star to pass after the backpacker has fallen asleep. Doing so will require a parametric model for the distribution of \\(T\\), the time until the event occurs.",
+    "crumbs": [
+      "Problem Sets",
+      "Survival Analysis: Key Concepts"
+    ]
   },
   {
-    "objectID": "problem_sets.html#problem-set-3-weibull",
-    "href": "problem_sets.html#problem-set-3-weibull",
-    "title": "Problem Sets",
-    "section": "Problem Set 3: Weibull",
-    "text": "Problem Set 3: Weibull\nThis problem set practices Kaplan-Meier survival curve estimation and a Weibull model.\nThe survival::veteran data contain data from a clinical trial involving cancer patients run by the Veteran’s Administration. These data are described in Kalbfleisch and Prentice (1980) on p.~60. There are 137 patients, and only 9 are censored before death.\n\nstatus is 1 for death, 0 for censoring\ntime is days of survival\ntrt is a randomized chemotherapy test treatment. 1 indicates standard treatment, 2 indicates the test treatment\n\nFor more information on the data see ?survival::veteran.\n\n(10 points) Estimate survival curves by treatment status trt, using the Kaplan-Meier method. Visualize the results in a plot.\n(10 points) Estimate survival curves by treatment status trt, using a Weibull regression with only this predictor. Visualize the results in a plot.\n(10 points) Compare: Plot the Weibull and Kaplan-Meier survival curves on the same plot. How do they differ? For ease of comparison, you might use different panels or different plots for each treatment status so that it is easier to compare across models within treatment status.\n(10 points) Plot the estimated Weibull hazard function. Does it increase or decrease with time?\n(8 points) In your Weibull results, can you reject the null of an Exponential model?\n(2 points, Challenge): Construct a confidence interval on each point of your Weibull survival functions and visualize the result. Note that this is quite challenging; it is only worth 2 points so that you can skip it and still get an A on the problem set. Here are some steps.\n\nDefine the X matrix at which to make predictions\nLoop over simulations. In each iteration,\n\nSimulate \\(\\vec\\beta\\) and the log_scale parameter from a Multivariate Normal centered at c(coef(model), log(model$scale)) with variance-covariance matrix vcov(model)\nCalculate the simulated value of the rweibull parameter scale, which is \\(e^{\\vec{X}'\\vec\\beta}\\) where \\(\\vec\\beta\\) are coefficients from survreg\nCalculate the simulated value of the rweibull parameter shape, which is 1 / exp(log_scale) where log_scale is the simulated value of the log of what survreg calls the scale parameter\nSimulate survival functions with those parameters\n\nAt each point of the survival curve, calculate the 2.5 and 97.5 percentiles of the empirical distribution of simulated draws."
+    "objectID": "survival_concepts.html#distribution-functions-in-survival-analysis",
+    "href": "survival_concepts.html#distribution-functions-in-survival-analysis",
+    "title": "Survival Analysis: Key Concepts",
+    "section": "Distribution functions in survival analysis",
+    "text": "Distribution functions in survival analysis\nWhen making a parametric model for time to event, there are at least four ways of thinking about the parameterization of the distribution. The first two are familiar. The cumulative distribution function \\(F(t) = P(T&lt;t)\\) is the probability of an event occurring before time \\(t\\). The probability density function \\(f(t) = \\frac{\\partial}{\\partial t} F(t)\\) is the density of event occurrence at time \\(t\\). These two functions are exactly as in any probability distribution for a random variable \\(T\\) that can take a value \\(t\\). \\\nIn survival analysis, it is more common to work with two mathematical transformations of the CDF and PDF. The first is the survival function \\(S(t) = P(T &gt; t)\\), which captures the probability that a survival time \\(T\\) is greater than a particular value \\(t\\). The survival function is the complement of the CDF, \\(S(t) = 1 - F(t)\\). Medical examples often use survival functions because they are interested in the probability of survival, not the probability of death. \\\nWe may also want to think about the risk of death given survival up to a particular point. This concept is formalized in the hazard function \\(h(t) = \\frac{f(t)}{S(t)}\\), which is the ratio of the PDF to the survival function.",
+    "crumbs": [
+      "Problem Sets",
+      "Survival Analysis: Key Concepts"
+    ]
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Event History Analysis",
+    "objectID": "proportional_hazards.html",
+    "href": "proportional_hazards.html",
+    "title": "Proportional Hazards",
     "section": "",
-    "text": "This course is being offered Winter 2026 at UCLA. See the syllabus."
+    "text": "The Exponential and Weibull models we have already learned are examples of proportional hazards models. These models begin with a baseline hazard that applies when \\(\\vec{X} = \\vec{0}\\). For other values of \\(\\vec{X}\\), the hazard equals the baseline hazard multiplied by hazard ratio \\(e^{\\vec{X}'\\vec\\beta}\\).\n\\[\nh(t\\mid\\vec{X}) = \\underbrace{\\lambda(t)}_{\\substack{\\text{baseline}\\\\\\text{hazard}}}\\underbrace{e^{\\vec{X}'\\vec\\beta}}_{\\substack{\\text{hazard}\\\\\\text{ratio}}}\n\\]\nLet’s see proportional hazards in a concrete example. On the Weibull page, we created an object predicted_survival containing the predicted values of a survival curve. Below, we load this object again.\npredicted_survival &lt;- read_csv(\"assets/predicted_survival_weibull.csv\")\nRecall that this object has two units with x = 0 and x = 1, with many rows per unit representing survival probabilities at each time point. We can calculate the hazard at these time points as well.\npredicted_hazard &lt;- predicted_survival |&gt;\n  mutate(\n    # Calculate the PDF at each point\n    f = dweibull(x = time, shape = shape, scale = scale),\n    # Hazard equals PDF over survival\n    h = f / S\n  )\nBelow we visualize these hazard functions. The hazard in population subgroup \\(X = 0\\) is much higher than the hazard in subgroup \\(X = 1\\), at every time point.\nCode\npredicted_hazard |&gt;\n  select(x, time, h) |&gt;\n  ggplot(aes(x = time, y = h, color = factor(x), linetype = factor(x))) +\n  geom_line() +\n  labs(\n    y = \"Hazard Function\", \n    x = \"Time\", \n    color = \"Population\\nSubgroup (X)\",\n    linetype = \"Population\\nSubgroup (X)\"\n  )\nNext, consider the hazard ratio at each time \\(t\\): the hazard in group \\(X = 1\\) divided by the hazard in group \\(X = 0\\).\nCode\npredicted_hazard_ratios &lt;- predicted_hazard |&gt;\n  select(x, time, h) |&gt;\n  pivot_wider(names_from = \"x\", values_from = \"h\", names_prefix = \"hazard_if_x_\") |&gt;\n  mutate(hazard_ratio = hazard_if_x_1 / hazard_if_x_0) |&gt;\n  print(n = 5)\n\n\n# A tibble: 100 × 4\n    time hazard_if_x_0 hazard_if_x_1 hazard_ratio\n   &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;        &lt;dbl&gt;\n1 0.01        0.000293     0.0000143       0.0487\n2 0.0503      0.00747      0.000364        0.0487\n3 0.0906      0.0243       0.00118         0.0487\n4 0.131       0.0508       0.00247         0.0487\n5 0.171       0.0871       0.00424         0.0487\n# ℹ 95 more rows\nNote that the hazard ratio is constant in this model. The hazard ratio is 0.0487 at every time point. A hazard ratio that is constant over time is the hallmark of a proportional hazards model: the hazard function at every \\(\\vec{x}\\) value is proportional to a baseline hazard that exists if \\(\\vec{x} = \\vec{0}\\).",
+    "crumbs": [
+      "Problem Sets",
+      "Proportional Hazards"
+    ]
   },
   {
-    "objectID": "index.html#welcome-to-soc-213b",
-    "href": "index.html#welcome-to-soc-213b",
-    "title": "Event History Analysis",
+    "objectID": "proportional_hazards.html#math-for-exponential-and-weibull-ph",
+    "href": "proportional_hazards.html#math-for-exponential-and-weibull-ph",
+    "title": "Proportional Hazards",
+    "section": "Math for Exponential and Weibull PH",
+    "text": "Math for Exponential and Weibull PH\nHere we use math to see the Exponential and Weibull models as proportional hazards models.\n\nExponential PH in math\nFor the Exponential model \\(T\\sim\\text{Exponential}(\\lambda)\\) with where we model the rate parameter \\(\\lambda = \\exp(\\beta_0 + \\beta_1 X)\\), the hazard function is \\(h(t) = \\lambda = \\exp(\\beta_0 + \\beta_1 X)\\). The baseline hazard when \\(X = 0\\) is \\(\\exp(\\beta_0)\\), and the hazard when \\(X = 1\\) is \\(\\exp(\\beta_0 + \\beta_1)\\). The hazard ratio for \\(X = 1\\) vs \\(X = 0\\) is \\(\\exp(\\beta_1)\\).\n\n\nWeibull PH in math\nFor a Weibull with shape \\(\\alpha\\) and scale \\(\\sigma\\), the probability density function is \\[\nf(t) = \\alpha \\sigma ^ {-\\alpha} t^{\\alpha-1}e^{-(\\frac{1}{\\sigma} t)^\\alpha}\n\\] and the survival function is \\[\nS(t) = e^{-(\\frac{1}{\\sigma} t)^{\\alpha}}\n\\] Taking the ratio, the hazard function is\n\\[\nh(t) = \\alpha \\sigma ^ {-\\alpha} t^{\\alpha-1}\n\\]\nWhen using the survreg function in the survival package, we model \\(\\sigma = \\exp(\\beta_0 + \\beta_1 X)\\). Plugging this in, we can see how the Weibull hazard function is proportional across values of \\(X\\).\n\\[\n\\begin{aligned}\nh(t) &= \\alpha \\left(e^{\\beta_0 + \\beta_1 X}\\right) ^ {-\\alpha} t^{\\alpha-1} \\\\\n&= \\underbrace{\\alpha e^{-\\alpha\\beta_0}t^{\\alpha - 1}}_{\\substack{\\text{baseline}\\\\\\text{hazard}}}\\underbrace{e^{\\beta_1 X}}_{\\substack{\\text{hazard}\\\\\\text{ratio}}} \\\\\n&= \\begin{cases}\n  \\alpha e^{-\\alpha\\beta_0}t^{\\alpha - 1} &\\text{if }x=0 \\\\\n  \\alpha e^{-\\alpha\\beta_0}t^{\\alpha - 1}e^{-\\alpha\\beta_1} &\\text{if }x=1\n\\end{cases}\n\\end{aligned}\n\\]\nWe can confirm that this hazard ratio is correct in the fitted model (see the Weibull page for fitting this model).\n\nmodel &lt;- readRDS(\"https://ilundberg.github.io/eventhistory/assets/weibull_model.RDS\")\n\n\nalpha_hat &lt;- 1 / model$scale\nbeta1_hat &lt;- coef(model)[2]\nhazard_ratio &lt;- exp(- alpha_hat * beta1_hat)\n\nThe resulting hazard ratio 0.0487 is equal to the one we calculated from predicted values 0.0487. Thus, our mathematical understanding of the Weibull proportional hazards model aligns with the predicted values from the canned output.",
+    "crumbs": [
+      "Problem Sets",
+      "Proportional Hazards"
+    ]
+  },
+  {
+    "objectID": "kaplanmeier.html",
+    "href": "kaplanmeier.html",
+    "title": "Kaplan-Meier",
     "section": "",
-    "text": "This course is being offered Winter 2026 at UCLA. See the syllabus."
-  },
-  {
-    "objectID": "index.html#who-should-take-this-course",
-    "href": "index.html#who-should-take-this-course",
-    "title": "Event History Analysis",
-    "section": "Who should take this course?",
-    "text": "Who should take this course?\nThe course is a good fit for PhD students in sociology, statistics, political science, economics, and other social sciences."
-  },
-  {
-    "objectID": "index.html#schedule-of-topics",
-    "href": "index.html#schedule-of-topics",
-    "title": "Event History Analysis",
-    "section": "Schedule of topics",
-    "text": "Schedule of topics\nBelow is a tentative schedule of topics. This is my first time teaching the course, and the sequence of topics may change over the course of the quarter.\nPart 1: Survival analysis with events as outcomes.\n\nWeek 1: Basics of survival analysis and maximum likelihood. Exponential model in math.\nWeek 2: Review of Maximum Likelihood Estimation with the Bernoulli. Exponential model in software.\nWeek 3: Beyond the Exponential: Weibull for hazards that vary with time. Generalizing ideas to proportional hazards and the Cox model. We will contrast with nonparametric survival curve estimation by Kaplan-Meier.\nWeek 4: Unmodeled heterogeneity, competing risks, non-ignorable censoring, and other complications.\n\nPart 2: Causal inference with events as treatments.\n\nWeek 5: Causal inference for survival outcomes\nWeek 6: Event history treatments with non-survival outcomes (longitudinal inverse probability weighting, marginal structural models)\nWeek 7: Event history treatments with survival outcomes\nWeek 8: Causal inference in staggered adoption panels"
-  },
-  {
-    "objectID": "index.html#learning-goals",
-    "href": "index.html#learning-goals",
-    "title": "Event History Analysis",
-    "section": "Learning goals",
-    "text": "Learning goals\nStudents will learn to\n\ndefine key components of survival analysis (e.g., censoring)\nstate the assumptions required for a survival model\ntranslate from survival models to predicted quantities of interest\napply causal inference methods where events are treatments that unfold over time"
-  },
-  {
-    "objectID": "index.html#course-description",
-    "href": "index.html#course-description",
-    "title": "Event History Analysis",
-    "section": "Course description",
-    "text": "Course description\nIntroduction to regression-like analyses in which outcome is time to event. Topics include logit models for discrete-time event history models; piecewise exponential hazards models; proportional hazards; nonproportional hazards; parametric survival models. We will also cover events that unfold over time as causal treatment variables."
-  },
-  {
-    "objectID": "cox.html",
-    "href": "cox.html",
-    "title": "Cox Proportional Hazards",
-    "section": "",
-    "text": "The Cox proportional hazards model is a very popular approach to survival analysis which researchers use when they do not want to make assumptions about the shape of the baseline hazard. To understand the Cox model, recall that all proportional hazards models take the form below.\n\\[\nh(t\\mid\\vec{X}) = \\underbrace{\\lambda(t)}_{\\substack{\\text{baseline}\\\\\\text{hazard}}}\\underbrace{e^{\\vec{X}'\\vec\\beta}}_{\\substack{\\text{hazard}\\\\\\text{ratio}}}\n\\]\nIn the Exponential model, the baseline hazard is \\(\\lambda(t) = \\lambda = \\exp(\\vec{X}'\\vec\\beta)\\). In the Weibull model, the baseline hazard has a more complicated form that is a function of time \\(t\\).\nThe Cox proportional hazards model makes no assumptions about \\(\\lambda(t)\\). The insight of this model is to write the likelihood in a way that the baseline hazard \\(\\lambda(t)\\) drops out so that we can learn the hazard ratios without learning the baseline hazard.\nBelow we introduce the Cox model in math and then in code, before discussing its drawbacks.",
+    "text": "The Kaplan-Meier estimator is a nonparametric method to estimate a survival function in the presence of censoring.\nFor each unit \\(i\\) who dies at \\(t_i\\), let\nTo survive to time \\(t\\), one must survive every moment preceding \\(t\\) when someone died. This motivates a survival curve estimate, \\[\nS(t) = \\prod_{i:t_i\\leq t}\\left(1 - \\frac{d_i}{n_i}\\right)\n\\] which at time \\(t\\) takes the product over all death times preceding \\(t\\) where the expression inside the product is the probability of surviving that death time.\nA Kaplan-Meier curve is easy to estimate in R with the survfit function. Here we use the heart recipients data from the Exponential page.\nheart_recipients &lt;- read_csv(\"https://ilundberg.github.io/eventhistory/assets/heart_recipients.csv\")\nFirst we learn the survival function,\nkaplan_meier &lt;- survfit(\n  Surv(t, event = 1 - c) ~ 1,\n  data = heart_recipients\n)\nand then we can plot it\nplot(kaplan_meier)\nor with longer code can make a nice ggplot.\nCode\nkaplan_meier |&gt;\n  broom::tidy() |&gt;\n  ggplot(\n    aes(x = time, y = estimate, ymin = conf.low, ymax = conf.high)\n  ) +\n  geom_line() +\n  geom_ribbon(alpha = .4) +\n  labs(\n    x = \"Time\",\n    y = \"Estimated Survival Function\",\n    title = \"Kaplan-Meier estimates\"\n  )",
     "crumbs": [
       "Problem Sets",
-      "Cox Proportional Hazards"
+      "Kaplan-Meier"
     ]
   },
   {
-    "objectID": "cox.html#in-math",
-    "href": "cox.html#in-math",
-    "title": "Cox Proportional Hazards",
-    "section": "In math",
-    "text": "In math\nThe Cox model says: consider a time \\(t\\) at which some unit in the sample dies. What is the probability that it would be unit \\(i\\) (who is alive up to \\(t\\)), as opposed to some other unit (who is also alive up to \\(t\\))? This probability equals the ratio of the hazard for unit \\(i\\) to the sum of the hazards for all units at risk at time \\(t\\).\n\\[\n\\text{P}(\\text{Unit }i\\text{ dies at }t\\mid \\text{Some unit dies at }t) = \\frac{h(t\\mid \\vec{X} = \\vec{x}_i)}{\\sum_{j:t_j\\geq t} h(t\\mid \\vec{X} = \\vec{x}_j)}\n\\]\nRecall that in a proportional hazards model, the hazard equals the baseline hazard \\(\\lambda(t)\\) and the hazard ratio \\(\\exp(\\vec{x}'\\vec\\beta)\\). If we plug these in for \\(h()\\), the baseline hazard \\(\\lambda(t)\\) appears in the numerator and denominator and cancels.\n\\[\n\\text{P}(\\text{Unit }i\\text{ dies at }t\\mid \\text{Some unit dies at }t) = \\frac{\\exp(\\vec{x}_i'\\vec\\beta)}{\\sum_{j:t_j\\geq t} \\exp(\\vec{x}_j'\\vec\\beta)}\n\\]\nMultiplying over all time points when a unit dies, this produces a likelihood that is a function of \\(\\vec\\beta\\) and not a function of the baseline hazard \\(\\lambda(t)\\). By maximizing this likelihood, we can learn the coefficients \\(\\vec\\beta\\) predicting the log hazard (and thus the hazard ratios) without making any assumptions about the baseline hazard.",
+    "objectID": "kaplanmeier.html#kaplan-meier-on-subgroups",
+    "href": "kaplanmeier.html#kaplan-meier-on-subgroups",
+    "title": "Kaplan-Meier",
+    "section": "Kaplan-Meier on subgroups",
+    "text": "Kaplan-Meier on subgroups\nThe survfit function makes it easy to fit Kaplan-Meier survival curves for population subgroups.\n\nkaplan_meier_subgroups &lt;- survfit(\n  Surv(t, event = 1 - c) ~ I(age &gt;= 50),\n  data = heart_recipients\n)\n\nThis results in two survival curves estimated independently: one on each subgroup.\n\n\nCode\nkaplan_meier_subgroups |&gt;\n  broom::tidy() |&gt;\n  ggplot(\n    aes(x = time, y = estimate, ymin = conf.low, ymax = conf.high,\n        color = strata, fill = strata)\n  ) +\n  geom_line() +\n  geom_ribbon(alpha = .4) +\n  labs(\n    x = \"Time\",\n    y = \"Estimated Survival Function\",\n    title = \"Kaplan-Meier estimates\",\n    color = \"Population Subgroup\",\n    fill = \"Population Subgroup\"\n  ) +\n  scale_color_discrete(\n    labels = as_labeller(function(x) case_when(\n      x == \"I(age &gt;= 50)=FALSE\" ~ \"Under Age 50\",\n      x == \"I(age &gt;= 50)=TRUE\" ~ \"Age 50+\",\n    ))\n  ) +\n  scale_fill_discrete(\n    labels = as_labeller(function(x) case_when(\n      x == \"I(age &gt;= 50)=FALSE\" ~ \"Under Age 50\",\n      x == \"I(age &gt;= 50)=TRUE\" ~ \"Age 50+\",\n    ))\n  )\n\n\nWarning: Removed 1 row containing missing values or values outside the scale range\n(`geom_ribbon()`).",
     "crumbs": [
       "Problem Sets",
-      "Cox Proportional Hazards"
+      "Kaplan-Meier"
     ]
   },
   {
-    "objectID": "cox.html#in-code",
-    "href": "cox.html#in-code",
-    "title": "Cox Proportional Hazards",
-    "section": "In code",
-    "text": "In code\nTo practice the Cox model in code, first simulate some data. Here we simulate a binary \\(X\\sim\\text{Bernoulli}(0.5)\\) and define a rate parameter \\(\\lambda = \\exp(\\beta_0 + \\beta_1 X)\\) for \\(\\beta_0 = 0\\) and \\(\\beta_1 = 1\\). Then, we simulate Exponential draws from \\(T\\sim \\text{Exponential}(\\lambda)\\). For illustration, no one is censored (c = 0).\n\nbeta_0 &lt;- 0\nbeta_1 &lt;- 1\nsimulated &lt;- tibble(id = 1:1e4) |&gt;\n  mutate(\n    x = rbinom(n(), 1, .5),\n    lambda = exp(beta_0 + beta_1 * x),\n    # Simulate from the Exponential for this illustration:\n    # can be any hazard function\n    t = rexp(n(), rate = lambda),\n    c = 0\n  )\n\nNext, we fit a Cox proportional hazards model.\n\nmodel &lt;- coxph(\n  Surv(t, event = 1 - c) ~ x,\n  data = simulated\n)\n\nExtracting the coefficients of this model, we have a coefficient on the predictor \\(x\\).\n\ncoef(model)\n\n        x \n0.9785625 \n\n\nThis approximately equals the true value of $_1 = $1 in this simulation, and it captures the additive change in the log hazard when moving from x = 0 to x = 1.\nExponentiating the coefficients, we get the hazard ratio \\(e^{\\beta_1}\\) for a shift from x = 0 to x = 1.\n\nexp(coef(model))\n\n       x \n2.660629",
+    "objectID": "kaplanmeier.html#when-to-use-kaplan-meier",
+    "href": "kaplanmeier.html#when-to-use-kaplan-meier",
+    "title": "Kaplan-Meier",
+    "section": "When to use Kaplan-Meier",
+    "text": "When to use Kaplan-Meier\nThe Kaplan-Meier curve is ideal for\n\nsummarizing a marginal survival curve\nestimating survival in a few discrete subgroups\n\nWhen there are many population subgroups defined by a vector of predictor \\(\\vec{X}\\) such that few units are observed in each subgroup, then parametric models may be preferable.",
     "crumbs": [
       "Problem Sets",
-      "Cox Proportional Hazards"
-    ]
-  },
-  {
-    "objectID": "cox.html#drawbacks-of-the-cox-model",
-    "href": "cox.html#drawbacks-of-the-cox-model",
-    "title": "Cox Proportional Hazards",
-    "section": "Drawbacks of the Cox model",
-    "text": "Drawbacks of the Cox model\nThe Cox model is popular because it does not require assumptions about the baseline hazard. But it comes with a major drawback: one generally cannot simulate any quantities of interest beyond the hazard ratios with a Cox model.\nFor example, suppose we wanted to know the survival probability at time \\(t\\). This would require us to translate our model parameters to a survival function. But because the Cox model parameters are uninformative about the baseline hazard \\(\\lambda(t)\\), they are by extension uninformative about the survival function.",
-    "crumbs": [
-      "Problem Sets",
-      "Cox Proportional Hazards"
-    ]
-  },
-  {
-    "objectID": "cox.html#overcoming-drawbacks",
-    "href": "cox.html#overcoming-drawbacks",
-    "title": "Cox Proportional Hazards",
-    "section": "Overcoming drawbacks",
-    "text": "Overcoming drawbacks\nOne way around this problem is to nonparametrically estimate the baseline survival function, and then to update it using the hazard ratios. Let the survival function at \\(t\\) for subgroup \\(\\vec{X} = \\vec{x}\\) be denoted \\(S(t,\\vec{x})\\). Let the baseline survival function be \\(S(t,\\vec{0})\\). With math that we do not show here, one can derive that the survival function at \\(\\vec{x}\\) equals the basline survival function raised to the power of the hazard ratio.\n\\[S(t,\\vec{x}) = S(t,\\vec{0})^{\\exp(\\vec{x}'\\vec\\beta)}\\]\nOne can therefore estimate \\(S(t,\\vec{x})\\) with two inputs\n\nA nonparametric estimate of \\(S(t,\\vec{0})\\) from Kaplan-Meier\nCox estimates of \\(\\vec\\beta\\) for the hazard ratio\n\nBelow, we illustrate this on the simulated data. First, we define the baseline subgroup with \\(X = 0\\).\n\nbaseline_subgroup &lt;- simulated |&gt; filter(x == 0)\n\nThen we estimate the baseline survival by Kaplan-Meier on this subgroup.\n\nbaseline_kaplanmeier &lt;- survfit(\n  Surv(t, event = 1 - c) ~ 1,\n  data = baseline_subgroup\n)\n\nThird, we extract the nonparametric estimate of the baseline survival function among the \\(X = 0\\).\n\nbaseline_survival &lt;- tibble(\n  t = baseline_kaplanmeier$time,\n  # Extract baseline survival among X = 0\n  S0 = baseline_kaplanmeier$surv\n)\n\nTo produce an estimate among the \\(X = 1\\) subgroup, we first need the hazard ratio from the Cox model.\n\nhazard_ratio &lt;- exp(coef(model))\n\nFinally, we can create the survival curve among \\(X = 1\\) by taking the baseline survival curve and raising it to the power of the hazard ratio.\n\nboth_survival &lt;- baseline_survival |&gt;\n  mutate(S1 = S0 ^ hazard_ratio)\n\nBelow we visualize these two estimated curves.\n\n\nCode\nboth_survival |&gt;\n  pivot_longer(cols = -t, names_to = \"X\", values_to = \"S\") |&gt;\n  mutate(X = str_replace(X,\"S\",\"X = \")) |&gt;\n  ggplot(aes(x = t, y = S, color = X, linetype = X)) +\n  geom_line() +\n  labs(\n    x = \"Time\", \n    y = \"Survival\",\n    color = \"Population\\nSubgroup\",\n    linetype = \"Population\\nSubgroup\"\n  )\n\n\n\n\n\n\n\n\n\nThus, it is possible to combine Cox estimates with a nonparametric baseline survival estimate to produce survival curves.",
-    "crumbs": [
-      "Problem Sets",
-      "Cox Proportional Hazards"
-    ]
-  },
-  {
-    "objectID": "cox.html#rare-circumstances",
-    "href": "cox.html#rare-circumstances",
-    "title": "Cox Proportional Hazards",
-    "section": "Rare circumstances",
-    "text": "Rare circumstances\nThe combination of Kaplan-Meier + Cox is a creative one, but it applies only in a very rare setting (3) and is less useful in more common settings (1 and 2).\n1. Common setting: All \\(\\vec{x}\\)-values are well-populated. If \\(\\vec{X}\\) takes on only a few discrete values that are well-populated, you can directly use Kaplan-Meier to nonparametrically estimate the survival curves in each subgroup. There is no need to use a Cox model: you can avoid the proportional hazards assumption entirely. An example of this setting is a randomized experiment with a binary treatment.\n2. Common setting: No \\(\\vec{x}\\)-value is well populated. If \\(\\vec{X}\\) takes many values such that there is no value \\(\\vec{x}\\) that has many observation, then there is no baseline subgroup with enough cases to estimate a baseline Kaplan-Meier curve. In this setting, you cannot estimate the baseline hazard nonparametrically. You have two choies: (1) estimate a Cox model and only get hazard ratios or (2) assume a parametric distribution (e.g., Weibull) and gain the ability to simulate any quantity of interest.\n3. Rare setting: One well-populated baseline \\(\\vec{x}\\)-value. Suppose a randomized experiment occurs where many people are assigned a control condition (\\(x = 0\\)) and others are distributed over many number-valued treatment conditions (\\(x &gt; 0\\)). In this setting, many cases are available to estimate the baseline hazard by Kaplan-Meier among \\(x = 0\\). Kaplan-Meier is less useful for any \\(x&gt;0\\) because very few cases are seen at any particular \\(x\\)-value. But a Cox model can impose structure on this space and learn hazard ratios, thereby allowing the baseline hazard (learned on \\(x = 0\\)) to be updated for the other \\(x\\)-values.\nIn practice, researchers often default to Cox. But for setting (1) Kaplan-Meier would be better. For setting (2) fully parametric models (e.g., Weibull or Exponential) may be better because they allow simulation of any quantity of interest, at the small cost of assuming a family for the baseline hazard. Setting (3) is an ideal setting for the Cox model, but may correspond to very few actual research situations.",
-    "crumbs": [
-      "Problem Sets",
-      "Cox Proportional Hazards"
-    ]
-  },
-  {
-    "objectID": "about_me.html",
-    "href": "about_me.html",
-    "title": "About Me",
-    "section": "",
-    "text": "Ian Lundberg\nianlundberg@ucla.edu\n(he / him)\nI am a sociologist and demographer working on developing quantitative methods to understand inequality. Survival analysis is a topic where you can quickly learn how to develop new models using Maximum Likelihood Estimation, so I hope this course will be a chance to think like a methodologist and develop new approaches tailored to your setting. Outside of work I enjoy hiking, surfing, and oatmeal with blueberries.\nI learned survival analysis in a course taught by Germán Rodriguez. Some of my materials are inspired by those materials available here."
-  },
-  {
-    "objectID": "bernoulli.html",
-    "href": "bernoulli.html",
-    "title": "MLE Review: Bernoulli",
-    "section": "",
-    "text": "Let \\(y_1,\\dots,y_n \\stackrel{\\text{iid}}{\\sim} \\text{Bernoulli}(\\pi)\\) be \\(n\\) independent flips of a weighted coin with probability \\(\\pi\\) of heads. In basic statistics, you already learned a common estimator \\(\\hat\\pi = \\frac{1}{n}\\sum_i y_i\\). You also learned that this estimator is asymptotically Normally distributed, with estimated variance \\(\\hat{\\text{V}}(\\hat\\pi) = \\frac{\\hat\\pi(1 - \\hat\\pi)}{n}\\).\nThis page will derive those same properties via Maximum Likelihood Estimation.",
-    "crumbs": [
-      "Problem Sets",
-      "MLE Review: Bernoulli"
-    ]
-  },
-  {
-    "objectID": "bernoulli.html#derivations-in-math",
-    "href": "bernoulli.html#derivations-in-math",
-    "title": "MLE Review: Bernoulli",
-    "section": "Derivations in math",
-    "text": "Derivations in math\n\nWithout predictors\nThe likelihood function is the probability of the data given the parameter \\(\\pi\\).\n\\[\\begin{aligned}\n        L(\\pi\\mid \\vec{y}) &= \\text{P}(\\vec{Y} = \\vec{y}\\mid \\pi) &\\text{by definition of likelihood} \\\\\n        &= \\prod_{i=1}^n \\text{P}(Y_i = y_i) &\\text{by independence} \\\\\n        &= \\prod_{i=1}^n \\pi^{y_i}(1-\\pi)^{1-y_i} &\\text{by Bernoulli probability mass function}\n\\end{aligned}\\]\nThe log likelihood is often easier to optimize. Taking the log,\n\\[\\begin{aligned}\n\\ell(\\pi\\mid\\vec{y}) &= \\log(L(\\pi\\mid\\vec{y})) \\\\\n        &= \\log\\left(\\prod_i \\pi^{y_i}(1-\\pi)^{1-y_i}\\right) \\\\\n        &= \\sum_i\\log\\left(\\pi^{y_i}(1-\\pi)^{1-y_i}\\right) &\\text{since }\\log(AB) = \\log(A) + \\log(B) \\\\\n        &= \\sum_i\\left(\\log(\\pi^{y_i}) + \\log((1-\\pi)^{1-y_i})\\right) &\\text{since }\\log(AB) = \\log(A) + \\log(B) \\\\\n        &= \\sum_i \\left(y_i\\log(\\pi) + (1 - y_i)\\log(1 - \\pi)\\right) &\\text{since}\\log(A^B)=B\\log(A)\n\\end{aligned}\\]\nWe want to find the estimate \\(\\hat\\pi\\) that maximizes \\(L(\\pi\\mid\\vec{y})\\). This is at a place where the derivative (slope) is zero. To find it, take the derivative.\n\\[\n\\begin{aligned}\n        \\frac{\\partial}{\\partial \\pi} \\ell(\\pi)\n        &= \\frac{\\sum_i y_i}{\\pi} - \\frac{n - \\sum_i y_i}{1 - \\pi}\n\\end{aligned}\n\\] Set equal to zero and solve. Let \\(\\tilde\\pi\\) be a point where the derivative equals zero.\n\\[\n\\begin{aligned}\n        0 &= \\frac{\\partial}{\\partial \\pi} \\ell(\\pi\\mid \\vec{y})\\rvert_{\\pi = \\tilde{\\pi}} \\\\\n        0 &= \\frac{\\sum_i y_i}{\\tilde\\pi} - \\frac{n - \\sum_i y_i}{1 - \\tilde\\pi} \\\\\n        \\tilde\\pi &= \\frac{1}{n} \\sum_i y_i\n\\end{aligned}\n\\]\nThe likelihood function is flat at the point where \\(\\tilde\\pi\\) equals the sample mean of \\(Y\\). Next, check the second derivative to see if this is a maximum.\n\\[\\begin{aligned}\n\\frac{\\partial^2}{\\partial \\pi^2} \\ell(\\pi\\mid \\vec{y}) &= -\\frac{\\sum_i y_i}{\\pi^2} - \\frac{n - \\sum_i y_i}{(1 - \\pi)^2} \\\\\n&= -\\frac{\\text{positive}}{\\text{positive}} - \\frac{\\text{positive}}{\\text{positive}} \\\\\n        & &lt; 0\n\\end{aligned}\\]\nSo it is a maximum! The second derivative of the log likelihood at the value that maximizes the function is called the Hessian. It is useful for deriving the standard error. Next we derive the Hessian. \\[\\begin{aligned}\nH(\\pi) &= \\frac{\\partial^2}{\\partial \\pi^2} \\ell(\\pi\\mid \\vec{y})\\rvert_{\\pi = \\hat\\pi_\\text{MLE}} &\\text{definition of Hessian} \\\\\n&= -\\frac{\\sum_i y_i}{\\hat\\pi^2} - \\frac{n - \\sum_i y_i}{(1 - \\hat\\pi)^2} \\\\\n&= -\\frac{n\\hat\\pi}{\\hat\\pi^2} - \\frac{n - n\\hat\\pi}{(1 - \\hat\\pi)^2} &\\text{by replacing }\\sum_i y_i\\text{ with }n\\hat\\pi \\\\\n&= -\\frac{n}{\\hat\\pi}-\\frac{n}{1 - \\hat\\pi} \\\\\n&= -\\frac{n}{\\hat\\pi(1 - \\hat\\pi)}\n\\end{aligned}\\]\nFrom the statistical theory of Maximum Likelihood Estimation, the asymptotic variance of an MLE estimate is the negative inverse Hessian (also called the Fisher Information).\n\\[\\begin{aligned}\nV(\\hat\\pi) &= -\\left[H(\\hat\\pi)\\right]^{-1} \\\\\n&= \\frac{\\hat\\pi(1 - \\hat\\pi)}{n}\n\\end{aligned}\\]\nwhich is a formulat that may be familiar! Because of the Central Limit Theorem, \\(\\hat\\pi\\) is asymptotically Normally distributed with this mean and variance. Thus we can construct a 95% confidence interval by a Normal approximation.\n\\[\\begin{aligned}\n\\hat\\pi_\\text{Lower} &= \\hat\\pi - \\Phi^{-1}(.975) \\sqrt{\\frac{\\hat\\pi(1 - \\hat\\pi)}{n}} \\\\\n\\hat\\pi_\\text{Upper} &= \\hat\\pi + \\Phi^{-1}(.975) \\sqrt{\\frac{\\hat\\pi(1 - \\hat\\pi)}{n}}\n\\end{aligned}\\]\nRecap: The exercise used the theory of Maximum Likelihood Estimation to produce familiar formulas:\n\nestimator of a proportion is the sample mean\nvariance of that estimated proportion\nconfidence intervals by asymptotic Normality\n\n\n\nWith predictors: Logistic regression\nWhat if every person \\(i\\) flips their own coin with probability \\(\\pi_i\\), as in logistic regression? Suppose for simplicity that each person has covariates \\(\\vec{x}_i\\) and the probability follows the functional form of logistic regression.\n\\[\n\\log\\left(\\frac{\\pi_i}{1 - \\pi_i}\\right) = \\vec{X}_i\\vec\\beta\n\\]\nWe will refer to this function as the logit function and will use it and its inverse.\n\\[\n\\begin{align}\n&\\text{Logit function:} & \\text{logit}(x) &= \\log\\left(\\frac{x}{1 - x}\\right) \\\\\n&\\text{Inverse logit function:} & \\text{logit}^{-1}(x) &= \\frac{1}{1 + e^{-x}} \\\\\n\\end{align}\n\\]\nThese functions are useful because in logistic regression \\(\\text{logit}(\\pi_i) = \\vec{X}_i\\vec\\beta\\) and \\(\\text{logit}^{-1}(\\vec{X}_i\\vec\\beta) = \\pi\\). This is helpful because:\n\nany likelihood in terms of \\(\\pi_i\\) is equivalently a likelihood in terms of \\(\\vec\\beta\\)\nthese functions are available in R: qlogis is logit and plogis is the inverse logit\n\nMaximum likelihood for logistic regression becomes the task: what parameter vector \\(\\vec\\beta\\) produces a probability vector \\(\\vec\\pi\\) under which the data \\(\\vec{y}\\) are most likely?\nAppealing to the marginal case above, the log likelihood is\n\\[\\begin{aligned}\n\\ell(\\vec\\pi\\mid\\vec{y}) &= \\sum_i\\left(y_i\\log\\pi_i + (1 - y_i)\\log(1 - \\pi_i)\\right)\n\\end{aligned}\\]\nUsing the inverse logit function, we express this in terms of \\(\\vec\\beta\\). \\[\\begin{aligned}\n\\ell(\\vec\\beta\\mid\\vec{y})\n&= \\sum_i\\left(y_i\\log(\\text{logit}^{-1}(\\vec{X}_i\\vec\\beta)) + (1 - y_i)\\log(1 - \\text{logit}^{-1}(\\vec{X}_i\\vec\\beta))\\right)\n\\end{aligned}\\] Rather than solve this analytically, we will work with it by numerically optimizing the log likelihood.",
-    "crumbs": [
-      "Problem Sets",
-      "MLE Review: Bernoulli"
-    ]
-  },
-  {
-    "objectID": "bernoulli.html#numerical-optimization",
-    "href": "bernoulli.html#numerical-optimization",
-    "title": "MLE Review: Bernoulli",
-    "section": "Numerical optimization",
-    "text": "Numerical optimization\nHere we will numerically optimize the log likelihood.\n\nlibrary(tidyverse)\nlibrary(mvtnorm)\n\n\nWithout predictors\nWe first illustrate for the marginal case: estimating a constant \\(\\pi\\) that applies to all cases with no predictors. We know from math that the MLE is the sample mean, \\(\\hat\\pi_\\text{MLE} = \\frac{1}{n}\\sum_i y_i\\). But what if we only knew the likelihood function? We could optimize numerically, as we illustrate with simulated data with \\(\\pi = 0.4\\).\n\ny &lt;- rbinom(n = 1000, size = 1, prob = .4)\n\nIn the marginal case, we saw above that the log likelihood is \\[\n\\ell(\\pi\\mid\\vec{y}) = \\sum_i \\left(y_i\\log(\\pi) + (1 - y_i)\\log(1 - \\pi)\\right)\n\\]\nWe can code this in a function.\n\nlog_likelihood &lt;- function(pi, y) {\n  sum(y * log(pi) + (1 - y) * log(1 - pi))\n}\n\nThen we can use optimize to find the maximum of the function.\n\noptimize.out &lt;- optimize(\n  log_likelihood,  # function to optimize\n  lower = 0,       # lower limit of pi candidates\n  upper = 1,       # upper limit of pi candidates\n  maximum = TRUE,  # search for maximum\n  tol = .01,       # get within tol of truth\n  y = y            # other argument to log_likelihood\n)\n\nOur estimate is stored in the maximum list item of the resulting object.\n\noptimize.out$maximum\n\n[1] 0.4020969\n\n\nWe can note that this is approximately equal to the analytical result that we know is the maximum: the sample mean. Thus, optimize computationally re-created a result we knew from math.\n\nmean(y)\n\n[1] 0.403\n\n\n\n\nWith predictors\nNumerical optimization is often most helpful for generalized linear models that include predictors. For practice, the code below generates data with numeric predictors x1 and x2 and binary outcome y.\n\nsimulated &lt;- tibble(id = 1:100) |&gt;\n  mutate(\n    x1 = rnorm(n()),\n    x2 = rnorm(n()),\n    pi = plogis(x1 + x2),\n    y = rbinom(n(), 1, pi)\n  )\n\nThe optim function in R carries out numerical optimization. To use it, we first need to write down a function for our log likelihood.\n\nlog_likelihood &lt;- function(parameters, data, formula) {\n  # Create the beta vector given the parameters\n  beta &lt;- parameters\n  X &lt;- model.matrix(formula, data = data)\n  y &lt;- data$y\n  log_likelihood &lt;- sum(\n    y * log(plogis(X %*% beta)) + \n      (1 - y) * log(1 - plogis(X %*% beta))\n  )\n  return(log_likelihood)\n}\n\nWe optimize this with a call to the optim function.\n\noptim.out &lt;- optim(\n  par = c(0,0,0), # initial values of the parameters\n  fn = log_likelihood,\n  control = list(fnscale = -1),\n  hessian = TRUE,   # multiplies by -1 to find maximum instead of minimum\n  # Other arguments to be passed to log_likelihood\n  data = simulated,\n  formula = formula(y ~ x1 + x2)\n)\n\nWe can extract the coefficient estimates.\n\nbeta_hat &lt;- optim.out$par |&gt; print()\n\n[1] 0.4642444 1.3269376 1.4215027\n\n\nWe can extract the Hessian.\n\nhessian &lt;- optim.out$hessian\n\nWe can solve for the variance-covariance matrix \\(\\hat{\\text{V}}(\\hat{\\vec\\beta})\\): the negative inverse Hessian. In R, the solve function finds the inverse of a matrix.\n\nbeta_hat_vcov &lt;- -solve(hessian)\n\nThis can give us our coefficients and standard errors (the square root of the diagonal of the variance covariance matrix).\n\ntibble(\n  variable = c(\"Intercept\",\"x1\",\"x2\"),\n  beta = beta_hat,\n  se = sqrt(diag(beta_hat_vcov))\n)\n\n# A tibble: 3 × 3\n  variable   beta    se\n  &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;\n1 Intercept 0.464 0.256\n2 x1        1.33  0.336\n3 x2        1.42  0.360\n\n\nWe can compare that to the output from logistic regression.\n\ncanned_fit &lt;- glm(y ~ x1 + x2, data = simulated, family = binomial)\nsummary(canned_fit)\n\n\nCall:\nglm(formula = y ~ x1 + x2, family = binomial, data = simulated)\n\nCoefficients:\n            Estimate Std. Error z value Pr(&gt;|z|)    \n(Intercept)   0.4642     0.2565   1.810   0.0703 .  \nx1            1.3270     0.3363   3.947 7.93e-05 ***\nx2            1.4217     0.3598   3.951 7.77e-05 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n(Dispersion parameter for binomial family taken to be 1)\n\n    Null deviance: 137.628  on 99  degrees of freedom\nResidual deviance:  97.723  on 97  degrees of freedom\nAIC: 103.72\n\nNumber of Fisher Scoring iterations: 5\n\n\n\nSimulating predicted probabilities\nWe can simulate predicted probabilities. Suppose we are interested in the prediction at \\((X_1,X_2) = (1,1)\\). Define these data to predict,\n\nto_predict &lt;- tibble(x1 = 0, x2 = 1)\n\ncreate an \\(X\\) matrix at those values\n\nX_new &lt;- model.matrix(~ x1 + x2, data = to_predict)\n\nand make predictions from that \\(X\\) matrix.\n\npi_hat &lt;- plogis(X_new %*% beta_hat) |&gt; print()\n\n       [,1]\n1 0.8682699\n\n\nTo get a standard error on the predictions, we can use simulation. We know that \\(\\hat{\\vec\\beta}\\) is asymptotically multivariate normal. We can simulate many coefficient vectors \\(\\vec\\beta^*\\) from that distribution,\n\nbeta_star &lt;- mvtnorm::rmvnorm(n = 1000, mean = beta_hat, sigma = beta_hat_vcov)\n\nand we can generate a predicted probability from each simulated value.\n\npi_star &lt;- plogis(X_new %*% t(beta_star))\n\nThe standard error is the standard deviation of these simulated draws.\n\nse_pi_hat &lt;- sd(pi_star)\n\nWe can likewise predict with the canned version of the model,\n\ncanned_prediction &lt;- predict(canned_fit, type = \"response\", newdata = to_predict, se = T)\n\nand compare to see that they are approximately the same.\n\ntibble(method = c(\"diy\",\"canned\")) |&gt;\n  mutate(\n    pi_hat = c(pi_hat, canned_prediction$fit),\n    se = c(se_pi_hat, canned_prediction$se.fit)\n  )\n\n# A tibble: 2 × 3\n  method pi_hat     se\n  &lt;chr&gt;   &lt;dbl&gt;  &lt;dbl&gt;\n1 diy     0.868 0.0546\n2 canned  0.868 0.0535",
-    "crumbs": [
-      "Problem Sets",
-      "MLE Review: Bernoulli"
+      "Kaplan-Meier"
     ]
   },
   {
@@ -363,102 +286,186 @@
     ]
   },
   {
-    "objectID": "kaplanmeier.html",
-    "href": "kaplanmeier.html",
-    "title": "Kaplan-Meier",
+    "objectID": "bernoulli.html",
+    "href": "bernoulli.html",
+    "title": "MLE Review: Bernoulli",
     "section": "",
-    "text": "The Kaplan-Meier estimator is a nonparametric method to estimate a survival function in the presence of censoring.\nFor each unit \\(i\\) who dies at \\(t_i\\), let\nTo survive to time \\(t\\), one must survive every moment preceding \\(t\\) when someone died. This motivates a survival curve estimate, \\[\nS(t) = \\prod_{i:t_i\\leq t}\\left(1 - \\frac{d_i}{n_i}\\right)\n\\] which at time \\(t\\) takes the product over all death times preceding \\(t\\) where the expression inside the product is the probability of surviving that death time.\nA Kaplan-Meier curve is easy to estimate in R with the survfit function. Here we use the heart recipients data from the Exponential page.\nheart_recipients &lt;- read_csv(\"https://ilundberg.github.io/eventhistory/assets/heart_recipients.csv\")\nFirst we learn the survival function,\nkaplan_meier &lt;- survfit(\n  Surv(t, event = 1 - c) ~ 1,\n  data = heart_recipients\n)\nand then we can plot it\nplot(kaplan_meier)\nor with longer code can make a nice ggplot.\nCode\nkaplan_meier |&gt;\n  broom::tidy() |&gt;\n  ggplot(\n    aes(x = time, y = estimate, ymin = conf.low, ymax = conf.high)\n  ) +\n  geom_line() +\n  geom_ribbon(alpha = .4) +\n  labs(\n    x = \"Time\",\n    y = \"Estimated Survival Function\",\n    title = \"Kaplan-Meier estimates\"\n  )",
+    "text": "Let \\(y_1,\\dots,y_n \\stackrel{\\text{iid}}{\\sim} \\text{Bernoulli}(\\pi)\\) be \\(n\\) independent flips of a weighted coin with probability \\(\\pi\\) of heads. In basic statistics, you already learned a common estimator \\(\\hat\\pi = \\frac{1}{n}\\sum_i y_i\\). You also learned that this estimator is asymptotically Normally distributed, with estimated variance \\(\\hat{\\text{V}}(\\hat\\pi) = \\frac{\\hat\\pi(1 - \\hat\\pi)}{n}\\).\nThis page will derive those same properties via Maximum Likelihood Estimation.",
     "crumbs": [
       "Problem Sets",
-      "Kaplan-Meier"
+      "MLE Review: Bernoulli"
     ]
   },
   {
-    "objectID": "kaplanmeier.html#kaplan-meier-on-subgroups",
-    "href": "kaplanmeier.html#kaplan-meier-on-subgroups",
-    "title": "Kaplan-Meier",
-    "section": "Kaplan-Meier on subgroups",
-    "text": "Kaplan-Meier on subgroups\nThe survfit function makes it easy to fit Kaplan-Meier survival curves for population subgroups.\n\nkaplan_meier_subgroups &lt;- survfit(\n  Surv(t, event = 1 - c) ~ I(age &gt;= 50),\n  data = heart_recipients\n)\n\nThis results in two survival curves estimated independently: one on each subgroup.\n\n\nCode\nkaplan_meier_subgroups |&gt;\n  broom::tidy() |&gt;\n  ggplot(\n    aes(x = time, y = estimate, ymin = conf.low, ymax = conf.high,\n        color = strata, fill = strata)\n  ) +\n  geom_line() +\n  geom_ribbon(alpha = .4) +\n  labs(\n    x = \"Time\",\n    y = \"Estimated Survival Function\",\n    title = \"Kaplan-Meier estimates\",\n    color = \"Population Subgroup\",\n    fill = \"Population Subgroup\"\n  ) +\n  scale_color_discrete(\n    labels = as_labeller(function(x) case_when(\n      x == \"I(age &gt;= 50)=FALSE\" ~ \"Under Age 50\",\n      x == \"I(age &gt;= 50)=TRUE\" ~ \"Age 50+\",\n    ))\n  ) +\n  scale_fill_discrete(\n    labels = as_labeller(function(x) case_when(\n      x == \"I(age &gt;= 50)=FALSE\" ~ \"Under Age 50\",\n      x == \"I(age &gt;= 50)=TRUE\" ~ \"Age 50+\",\n    ))\n  )\n\n\nWarning: Removed 1 row containing missing values or values outside the scale range\n(`geom_ribbon()`).",
+    "objectID": "bernoulli.html#derivations-in-math",
+    "href": "bernoulli.html#derivations-in-math",
+    "title": "MLE Review: Bernoulli",
+    "section": "Derivations in math",
+    "text": "Derivations in math\n\nWithout predictors\nThe likelihood function is the probability of the data given the parameter \\(\\pi\\).\n\\[\\begin{aligned}\n        L(\\pi\\mid \\vec{y}) &= \\text{P}(\\vec{Y} = \\vec{y}\\mid \\pi) &\\text{by definition of likelihood} \\\\\n        &= \\prod_{i=1}^n \\text{P}(Y_i = y_i) &\\text{by independence} \\\\\n        &= \\prod_{i=1}^n \\pi^{y_i}(1-\\pi)^{1-y_i} &\\text{by Bernoulli probability mass function}\n\\end{aligned}\\]\nThe log likelihood is often easier to optimize. Taking the log,\n\\[\\begin{aligned}\n\\ell(\\pi\\mid\\vec{y}) &= \\log(L(\\pi\\mid\\vec{y})) \\\\\n        &= \\log\\left(\\prod_i \\pi^{y_i}(1-\\pi)^{1-y_i}\\right) \\\\\n        &= \\sum_i\\log\\left(\\pi^{y_i}(1-\\pi)^{1-y_i}\\right) &\\text{since }\\log(AB) = \\log(A) + \\log(B) \\\\\n        &= \\sum_i\\left(\\log(\\pi^{y_i}) + \\log((1-\\pi)^{1-y_i})\\right) &\\text{since }\\log(AB) = \\log(A) + \\log(B) \\\\\n        &= \\sum_i \\left(y_i\\log(\\pi) + (1 - y_i)\\log(1 - \\pi)\\right) &\\text{since}\\log(A^B)=B\\log(A)\n\\end{aligned}\\]\nWe want to find the estimate \\(\\hat\\pi\\) that maximizes \\(L(\\pi\\mid\\vec{y})\\). This is at a place where the derivative (slope) is zero. To find it, take the derivative.\n\\[\n\\begin{aligned}\n        \\frac{\\partial}{\\partial \\pi} \\ell(\\pi)\n        &= \\frac{\\sum_i y_i}{\\pi} - \\frac{n - \\sum_i y_i}{1 - \\pi}\n\\end{aligned}\n\\] Set equal to zero and solve. Let \\(\\tilde\\pi\\) be a point where the derivative equals zero.\n\\[\n\\begin{aligned}\n        0 &= \\frac{\\partial}{\\partial \\pi} \\ell(\\pi\\mid \\vec{y})\\rvert_{\\pi = \\tilde{\\pi}} \\\\\n        0 &= \\frac{\\sum_i y_i}{\\tilde\\pi} - \\frac{n - \\sum_i y_i}{1 - \\tilde\\pi} \\\\\n        \\tilde\\pi &= \\frac{1}{n} \\sum_i y_i\n\\end{aligned}\n\\]\nThe likelihood function is flat at the point where \\(\\tilde\\pi\\) equals the sample mean of \\(Y\\). Next, check the second derivative to see if this is a maximum.\n\\[\\begin{aligned}\n\\frac{\\partial^2}{\\partial \\pi^2} \\ell(\\pi\\mid \\vec{y}) &= -\\frac{\\sum_i y_i}{\\pi^2} - \\frac{n - \\sum_i y_i}{(1 - \\pi)^2} \\\\\n&= -\\frac{\\text{positive}}{\\text{positive}} - \\frac{\\text{positive}}{\\text{positive}} \\\\\n        & &lt; 0\n\\end{aligned}\\]\nSo it is a maximum! The second derivative of the log likelihood at the value that maximizes the function is called the Hessian. It is useful for deriving the standard error. Next we derive the Hessian. \\[\\begin{aligned}\nH(\\pi) &= \\frac{\\partial^2}{\\partial \\pi^2} \\ell(\\pi\\mid \\vec{y})\\rvert_{\\pi = \\hat\\pi_\\text{MLE}} &\\text{definition of Hessian} \\\\\n&= -\\frac{\\sum_i y_i}{\\hat\\pi^2} - \\frac{n - \\sum_i y_i}{(1 - \\hat\\pi)^2} \\\\\n&= -\\frac{n\\hat\\pi}{\\hat\\pi^2} - \\frac{n - n\\hat\\pi}{(1 - \\hat\\pi)^2} &\\text{by replacing }\\sum_i y_i\\text{ with }n\\hat\\pi \\\\\n&= -\\frac{n}{\\hat\\pi}-\\frac{n}{1 - \\hat\\pi} \\\\\n&= -\\frac{n}{\\hat\\pi(1 - \\hat\\pi)}\n\\end{aligned}\\]\nFrom the statistical theory of Maximum Likelihood Estimation, the asymptotic variance of an MLE estimate is the negative inverse Hessian (also called the Fisher Information).\n\\[\\begin{aligned}\nV(\\hat\\pi) &= -\\left[H(\\hat\\pi)\\right]^{-1} \\\\\n&= \\frac{\\hat\\pi(1 - \\hat\\pi)}{n}\n\\end{aligned}\\]\nwhich is a formulat that may be familiar! Because of the Central Limit Theorem, \\(\\hat\\pi\\) is asymptotically Normally distributed with this mean and variance. Thus we can construct a 95% confidence interval by a Normal approximation.\n\\[\\begin{aligned}\n\\hat\\pi_\\text{Lower} &= \\hat\\pi - \\Phi^{-1}(.975) \\sqrt{\\frac{\\hat\\pi(1 - \\hat\\pi)}{n}} \\\\\n\\hat\\pi_\\text{Upper} &= \\hat\\pi + \\Phi^{-1}(.975) \\sqrt{\\frac{\\hat\\pi(1 - \\hat\\pi)}{n}}\n\\end{aligned}\\]\nRecap: The exercise used the theory of Maximum Likelihood Estimation to produce familiar formulas:\n\nestimator of a proportion is the sample mean\nvariance of that estimated proportion\nconfidence intervals by asymptotic Normality\n\n\n\nWith predictors: Logistic regression\nWhat if every person \\(i\\) flips their own coin with probability \\(\\pi_i\\), as in logistic regression? Suppose for simplicity that each person has covariates \\(\\vec{x}_i\\) and the probability follows the functional form of logistic regression.\n\\[\n\\log\\left(\\frac{\\pi_i}{1 - \\pi_i}\\right) = \\vec{X}_i\\vec\\beta\n\\]\nWe will refer to this function as the logit function and will use it and its inverse.\n\\[\n\\begin{align}\n&\\text{Logit function:} & \\text{logit}(x) &= \\log\\left(\\frac{x}{1 - x}\\right) \\\\\n&\\text{Inverse logit function:} & \\text{logit}^{-1}(x) &= \\frac{1}{1 + e^{-x}} \\\\\n\\end{align}\n\\]\nThese functions are useful because in logistic regression \\(\\text{logit}(\\pi_i) = \\vec{X}_i\\vec\\beta\\) and \\(\\text{logit}^{-1}(\\vec{X}_i\\vec\\beta) = \\pi\\). This is helpful because:\n\nany likelihood in terms of \\(\\pi_i\\) is equivalently a likelihood in terms of \\(\\vec\\beta\\)\nthese functions are available in R: qlogis is logit and plogis is the inverse logit\n\nMaximum likelihood for logistic regression becomes the task: what parameter vector \\(\\vec\\beta\\) produces a probability vector \\(\\vec\\pi\\) under which the data \\(\\vec{y}\\) are most likely?\nAppealing to the marginal case above, the log likelihood is\n\\[\\begin{aligned}\n\\ell(\\vec\\pi\\mid\\vec{y}) &= \\sum_i\\left(y_i\\log\\pi_i + (1 - y_i)\\log(1 - \\pi_i)\\right)\n\\end{aligned}\\]\nUsing the inverse logit function, we express this in terms of \\(\\vec\\beta\\). \\[\\begin{aligned}\n\\ell(\\vec\\beta\\mid\\vec{y})\n&= \\sum_i\\left(y_i\\log(\\text{logit}^{-1}(\\vec{X}_i\\vec\\beta)) + (1 - y_i)\\log(1 - \\text{logit}^{-1}(\\vec{X}_i\\vec\\beta))\\right)\n\\end{aligned}\\] Rather than solve this analytically, we will work with it by numerically optimizing the log likelihood.",
     "crumbs": [
       "Problem Sets",
-      "Kaplan-Meier"
+      "MLE Review: Bernoulli"
     ]
   },
   {
-    "objectID": "kaplanmeier.html#when-to-use-kaplan-meier",
-    "href": "kaplanmeier.html#when-to-use-kaplan-meier",
-    "title": "Kaplan-Meier",
-    "section": "When to use Kaplan-Meier",
-    "text": "When to use Kaplan-Meier\nThe Kaplan-Meier curve is ideal for\n\nsummarizing a marginal survival curve\nestimating survival in a few discrete subgroups\n\nWhen there are many population subgroups defined by a vector of predictor \\(\\vec{X}\\) such that few units are observed in each subgroup, then parametric models may be preferable.",
+    "objectID": "bernoulli.html#numerical-optimization",
+    "href": "bernoulli.html#numerical-optimization",
+    "title": "MLE Review: Bernoulli",
+    "section": "Numerical optimization",
+    "text": "Numerical optimization\nHere we will numerically optimize the log likelihood.\n\nlibrary(tidyverse)\nlibrary(mvtnorm)\n\n\nWithout predictors\nWe first illustrate for the marginal case: estimating a constant \\(\\pi\\) that applies to all cases with no predictors. We know from math that the MLE is the sample mean, \\(\\hat\\pi_\\text{MLE} = \\frac{1}{n}\\sum_i y_i\\). But what if we only knew the likelihood function? We could optimize numerically, as we illustrate with simulated data with \\(\\pi = 0.4\\).\n\ny &lt;- rbinom(n = 1000, size = 1, prob = .4)\n\nIn the marginal case, we saw above that the log likelihood is \\[\n\\ell(\\pi\\mid\\vec{y}) = \\sum_i \\left(y_i\\log(\\pi) + (1 - y_i)\\log(1 - \\pi)\\right)\n\\]\nWe can code this in a function.\n\nlog_likelihood &lt;- function(pi, y) {\n  sum(y * log(pi) + (1 - y) * log(1 - pi))\n}\n\nThen we can use optimize to find the maximum of the function.\n\noptimize.out &lt;- optimize(\n  log_likelihood,  # function to optimize\n  lower = 0,       # lower limit of pi candidates\n  upper = 1,       # upper limit of pi candidates\n  maximum = TRUE,  # search for maximum\n  tol = .01,       # get within tol of truth\n  y = y            # other argument to log_likelihood\n)\n\nOur estimate is stored in the maximum list item of the resulting object.\n\noptimize.out$maximum\n\n[1] 0.4020969\n\n\nWe can note that this is approximately equal to the analytical result that we know is the maximum: the sample mean. Thus, optimize computationally re-created a result we knew from math.\n\nmean(y)\n\n[1] 0.403\n\n\n\n\nWith predictors\nNumerical optimization is often most helpful for generalized linear models that include predictors. For practice, the code below generates data with numeric predictors x1 and x2 and binary outcome y.\n\nsimulated &lt;- tibble(id = 1:100) |&gt;\n  mutate(\n    x1 = rnorm(n()),\n    x2 = rnorm(n()),\n    pi = plogis(x1 + x2),\n    y = rbinom(n(), 1, pi)\n  )\n\nThe optim function in R carries out numerical optimization. To use it, we first need to write down a function for our log likelihood.\n\nlog_likelihood &lt;- function(parameters, data, formula) {\n  # Create the beta vector given the parameters\n  beta &lt;- parameters\n  X &lt;- model.matrix(formula, data = data)\n  y &lt;- data$y\n  log_likelihood &lt;- sum(\n    y * log(plogis(X %*% beta)) + \n      (1 - y) * log(1 - plogis(X %*% beta))\n  )\n  return(log_likelihood)\n}\n\nWe optimize this with a call to the optim function.\n\noptim.out &lt;- optim(\n  par = c(0,0,0), # initial values of the parameters\n  fn = log_likelihood,\n  control = list(fnscale = -1),\n  hessian = TRUE,   # multiplies by -1 to find maximum instead of minimum\n  # Other arguments to be passed to log_likelihood\n  data = simulated,\n  formula = formula(y ~ x1 + x2)\n)\n\nWe can extract the coefficient estimates.\n\nbeta_hat &lt;- optim.out$par |&gt; print()\n\n[1] 0.4642444 1.3269376 1.4215027\n\n\nWe can extract the Hessian.\n\nhessian &lt;- optim.out$hessian\n\nWe can solve for the variance-covariance matrix \\(\\hat{\\text{V}}(\\hat{\\vec\\beta})\\): the negative inverse Hessian. In R, the solve function finds the inverse of a matrix.\n\nbeta_hat_vcov &lt;- -solve(hessian)\n\nThis can give us our coefficients and standard errors (the square root of the diagonal of the variance covariance matrix).\n\ntibble(\n  variable = c(\"Intercept\",\"x1\",\"x2\"),\n  beta = beta_hat,\n  se = sqrt(diag(beta_hat_vcov))\n)\n\n# A tibble: 3 × 3\n  variable   beta    se\n  &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;\n1 Intercept 0.464 0.256\n2 x1        1.33  0.336\n3 x2        1.42  0.360\n\n\nWe can compare that to the output from logistic regression.\n\ncanned_fit &lt;- glm(y ~ x1 + x2, data = simulated, family = binomial)\nsummary(canned_fit)\n\n\nCall:\nglm(formula = y ~ x1 + x2, family = binomial, data = simulated)\n\nCoefficients:\n            Estimate Std. Error z value Pr(&gt;|z|)    \n(Intercept)   0.4642     0.2565   1.810   0.0703 .  \nx1            1.3270     0.3363   3.947 7.93e-05 ***\nx2            1.4217     0.3598   3.951 7.77e-05 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n(Dispersion parameter for binomial family taken to be 1)\n\n    Null deviance: 137.628  on 99  degrees of freedom\nResidual deviance:  97.723  on 97  degrees of freedom\nAIC: 103.72\n\nNumber of Fisher Scoring iterations: 5\n\n\n\nSimulating predicted probabilities\nWe can simulate predicted probabilities. Suppose we are interested in the prediction at \\((X_1,X_2) = (1,1)\\). Define these data to predict,\n\nto_predict &lt;- tibble(x1 = 0, x2 = 1)\n\ncreate an \\(X\\) matrix at those values\n\nX_new &lt;- model.matrix(~ x1 + x2, data = to_predict)\n\nand make predictions from that \\(X\\) matrix.\n\npi_hat &lt;- plogis(X_new %*% beta_hat) |&gt; print()\n\n       [,1]\n1 0.8682699\n\n\nTo get a standard error on the predictions, we can use simulation. We know that \\(\\hat{\\vec\\beta}\\) is asymptotically multivariate normal. We can simulate many coefficient vectors \\(\\vec\\beta^*\\) from that distribution,\n\nbeta_star &lt;- mvtnorm::rmvnorm(n = 1000, mean = beta_hat, sigma = beta_hat_vcov)\n\nand we can generate a predicted probability from each simulated value.\n\npi_star &lt;- plogis(X_new %*% t(beta_star))\n\nThe standard error is the standard deviation of these simulated draws.\n\nse_pi_hat &lt;- sd(pi_star)\n\nWe can likewise predict with the canned version of the model,\n\ncanned_prediction &lt;- predict(canned_fit, type = \"response\", newdata = to_predict, se = T)\n\nand compare to see that they are approximately the same.\n\ntibble(method = c(\"diy\",\"canned\")) |&gt;\n  mutate(\n    pi_hat = c(pi_hat, canned_prediction$fit),\n    se = c(se_pi_hat, canned_prediction$se.fit)\n  )\n\n# A tibble: 2 × 3\n  method pi_hat     se\n  &lt;chr&gt;   &lt;dbl&gt;  &lt;dbl&gt;\n1 diy     0.868 0.0546\n2 canned  0.868 0.0535",
     "crumbs": [
       "Problem Sets",
-      "Kaplan-Meier"
+      "MLE Review: Bernoulli"
     ]
   },
   {
-    "objectID": "proportional_hazards.html",
-    "href": "proportional_hazards.html",
-    "title": "Proportional Hazards",
+    "objectID": "about_me.html",
+    "href": "about_me.html",
+    "title": "About Me",
     "section": "",
-    "text": "The Exponential and Weibull models we have already learned are examples of proportional hazards models. These models begin with a baseline hazard that applies when \\(\\vec{X} = \\vec{0}\\). For other values of \\(\\vec{X}\\), the hazard equals the baseline hazard multiplied by hazard ratio \\(e^{\\vec{X}'\\vec\\beta}\\).\n\\[\nh(t\\mid\\vec{X}) = \\underbrace{\\lambda(t)}_{\\substack{\\text{baseline}\\\\\\text{hazard}}}\\underbrace{e^{\\vec{X}'\\vec\\beta}}_{\\substack{\\text{hazard}\\\\\\text{ratio}}}\n\\]\nLet’s see proportional hazards in a concrete example. On the Weibull page, we created an object predicted_survival containing the predicted values of a survival curve. Below, we load this object again.\npredicted_survival &lt;- read_csv(\"assets/predicted_survival_weibull.csv\")\nRecall that this object has two units with x = 0 and x = 1, with many rows per unit representing survival probabilities at each time point. We can calculate the hazard at these time points as well.\npredicted_hazard &lt;- predicted_survival |&gt;\n  mutate(\n    # Calculate the PDF at each point\n    f = dweibull(x = time, shape = shape, scale = scale),\n    # Hazard equals PDF over survival\n    h = f / S\n  )\nBelow we visualize these hazard functions. The hazard in population subgroup \\(X = 0\\) is much higher than the hazard in subgroup \\(X = 1\\), at every time point.\nCode\npredicted_hazard |&gt;\n  select(x, time, h) |&gt;\n  ggplot(aes(x = time, y = h, color = factor(x), linetype = factor(x))) +\n  geom_line() +\n  labs(\n    y = \"Hazard Function\", \n    x = \"Time\", \n    color = \"Population\\nSubgroup (X)\",\n    linetype = \"Population\\nSubgroup (X)\"\n  )\nNext, consider the hazard ratio at each time \\(t\\): the hazard in group \\(X = 1\\) divided by the hazard in group \\(X = 0\\).\nCode\npredicted_hazard_ratios &lt;- predicted_hazard |&gt;\n  select(x, time, h) |&gt;\n  pivot_wider(names_from = \"x\", values_from = \"h\", names_prefix = \"hazard_if_x_\") |&gt;\n  mutate(hazard_ratio = hazard_if_x_1 / hazard_if_x_0) |&gt;\n  print(n = 5)\n\n\n# A tibble: 100 × 4\n    time hazard_if_x_0 hazard_if_x_1 hazard_ratio\n   &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;        &lt;dbl&gt;\n1 0.01        0.000293     0.0000143       0.0487\n2 0.0503      0.00747      0.000364        0.0487\n3 0.0906      0.0243       0.00118         0.0487\n4 0.131       0.0508       0.00247         0.0487\n5 0.171       0.0871       0.00424         0.0487\n# ℹ 95 more rows\nNote that the hazard ratio is constant in this model. The hazard ratio is 0.0487 at every time point. A hazard ratio that is constant over time is the hallmark of a proportional hazards model: the hazard function at every \\(\\vec{x}\\) value is proportional to a baseline hazard that exists if \\(\\vec{x} = \\vec{0}\\).",
-    "crumbs": [
-      "Problem Sets",
-      "Proportional Hazards"
-    ]
+    "text": "Ian Lundberg\nianlundberg@ucla.edu\n(he / him)\nI am a sociologist and demographer working on developing quantitative methods to understand inequality. Survival analysis is a topic where you can quickly learn how to develop new models using Maximum Likelihood Estimation, so I hope this course will be a chance to think like a methodologist and develop new approaches tailored to your setting. Outside of work I enjoy hiking, surfing, and oatmeal with blueberries.\nI learned survival analysis in a course taught by Germán Rodriguez. Some of my materials are inspired by those materials available here."
   },
   {
-    "objectID": "proportional_hazards.html#math-for-exponential-and-weibull-ph",
-    "href": "proportional_hazards.html#math-for-exponential-and-weibull-ph",
-    "title": "Proportional Hazards",
-    "section": "Math for Exponential and Weibull PH",
-    "text": "Math for Exponential and Weibull PH\nHere we use math to see the Exponential and Weibull models as proportional hazards models.\n\nExponential PH in math\nFor the Exponential model \\(T\\sim\\text{Exponential}(\\lambda)\\) with where we model the rate parameter \\(\\lambda = \\exp(\\beta_0 + \\beta_1 X)\\), the hazard function is \\(h(t) = \\lambda = \\exp(\\beta_0 + \\beta_1 X)\\). The baseline hazard when \\(X = 0\\) is \\(\\exp(\\beta_0)\\), and the hazard when \\(X = 1\\) is \\(\\exp(\\beta_0 + \\beta_1)\\). The hazard ratio for \\(X = 1\\) vs \\(X = 0\\) is \\(\\exp(\\beta_1)\\).\n\n\nWeibull PH in math\nFor a Weibull with shape \\(\\alpha\\) and scale \\(\\sigma\\), the probability density function is \\[\nf(t) = \\alpha \\sigma ^ {-\\alpha} t^{\\alpha-1}e^{-(\\frac{1}{\\sigma} t)^\\alpha}\n\\] and the survival function is \\[\nS(t) = e^{-(\\frac{1}{\\sigma} t)^{\\alpha}}\n\\] Taking the ratio, the hazard function is\n\\[\nh(t) = \\alpha \\sigma ^ {-\\alpha} t^{\\alpha-1}\n\\]\nWhen using the survreg function in the survival package, we model \\(\\sigma = \\exp(\\beta_0 + \\beta_1 X)\\). Plugging this in, we can see how the Weibull hazard function is proportional across values of \\(X\\).\n\\[\n\\begin{aligned}\nh(t) &= \\alpha \\left(e^{\\beta_0 + \\beta_1 X}\\right) ^ {-\\alpha} t^{\\alpha-1} \\\\\n&= \\underbrace{\\alpha e^{-\\alpha\\beta_0}t^{\\alpha - 1}}_{\\substack{\\text{baseline}\\\\\\text{hazard}}}\\underbrace{e^{\\beta_1 X}}_{\\substack{\\text{hazard}\\\\\\text{ratio}}} \\\\\n&= \\begin{cases}\n  \\alpha e^{-\\alpha\\beta_0}t^{\\alpha - 1} &\\text{if }x=0 \\\\\n  \\alpha e^{-\\alpha\\beta_0}t^{\\alpha - 1}e^{-\\alpha\\beta_1} &\\text{if }x=1\n\\end{cases}\n\\end{aligned}\n\\]\nWe can confirm that this hazard ratio is correct in the fitted model (see the Weibull page for fitting this model).\n\nmodel &lt;- readRDS(\"https://ilundberg.github.io/eventhistory/assets/weibull_model.RDS\")\n\n\nalpha_hat &lt;- 1 / model$scale\nbeta1_hat &lt;- coef(model)[2]\nhazard_ratio &lt;- exp(- alpha_hat * beta1_hat)\n\nThe resulting hazard ratio 0.0487 is equal to the one we calculated from predicted values 0.0487. Thus, our mathematical understanding of the Weibull proportional hazards model aligns with the predicted values from the canned output.",
-    "crumbs": [
-      "Problem Sets",
-      "Proportional Hazards"
-    ]
-  },
-  {
-    "objectID": "survival_concepts.html",
-    "href": "survival_concepts.html",
-    "title": "Survival Analysis: Key Concepts",
+    "objectID": "cox.html",
+    "href": "cox.html",
+    "title": "Cox Proportional Hazards",
     "section": "",
-    "text": "Survival analysis is a subfield of statistics focused on models where the outcome is the time until an event occurs. This page uses an example of shooting stars to introduce key concepts: the unit of analysis, time to event, censoring, time zero, the survival function, and the hazard function.",
+    "text": "The Cox proportional hazards model is a very popular approach to survival analysis which researchers use when they do not want to make assumptions about the shape of the baseline hazard. To understand the Cox model, recall that all proportional hazards models take the form below.\n\\[\nh(t\\mid\\vec{X}) = \\underbrace{\\lambda(t)}_{\\substack{\\text{baseline}\\\\\\text{hazard}}}\\underbrace{e^{\\vec{X}'\\vec\\beta}}_{\\substack{\\text{hazard}\\\\\\text{ratio}}}\n\\]\nIn the Exponential model, the baseline hazard is \\(\\lambda(t) = \\lambda = \\exp(\\vec{X}'\\vec\\beta)\\). In the Weibull model, the baseline hazard has a more complicated form that is a function of time \\(t\\).\nThe Cox proportional hazards model makes no assumptions about \\(\\lambda(t)\\). The insight of this model is to write the likelihood in a way that the baseline hazard \\(\\lambda(t)\\) drops out so that we can learn the hazard ratios without learning the baseline hazard.\nBelow we introduce the Cox model in math and then in code, before discussing its drawbacks.",
     "crumbs": [
       "Problem Sets",
-      "Survival Analysis: Key Concepts"
+      "Cox Proportional Hazards"
     ]
   },
   {
-    "objectID": "survival_concepts.html#illustration-with-key-concepts",
-    "href": "survival_concepts.html#illustration-with-key-concepts",
-    "title": "Survival Analysis: Key Concepts",
-    "section": "Illustration with key concepts",
-    "text": "Illustration with key concepts\nA backpacker ventures out on a multi-week trip through the Sierra Nevada Mountains. Every night \\(i = 1,\\dots,n\\), they sit on a rock before bed to look up at the stars. The backpacker starts a stopwatch and begins watching for a shooting star. When they see a shooting star, they record the stopwatch time \\(t_i\\) at which the star occurs. If 10 minutes pass with no stars, they note that they did not see a shooting star during that night’s trial.\n\nTime to event\nThe outcome variable \\(t_i\\) is the time until an event occurs (a shooting star is witnessed). \\[\\begin{equation}\n    t_i = \\text{time to event for case }i\n\\end{equation}\\]\n\n\nTime zero\nWhen defining time to event, an implicit definition is time zero: when the trial begins. In the backpacking illustration, time 0 is the time each night when the backpacker starts their stopwatch and begins looking for a star. Note that time zero is not the backpacker’s birth date, nor is it 12:01am the day of looking for stars. Time zero is whatver time marks the beginning of the trial.\n\n\nAn estimand\nHow long on average does it take for a shooting star to pass the viewing window? Let \\(T\\) be the random variable for the time until a shooting star is observed. If the backpacker wished to estimate \\(\\tau = \\text{E}(T)\\), they would not be able to use the empirical mean \\(\\frac{1}{n}\\sum_{i=1}^n t_i\\) because there are nights \\(i\\) on which no \\(t_i\\) is recorded; no shooting star occur within 10 minutes.\n\n\nCensoring\nLet \\(c_i\\) indicate whether an observation is censored, meaning that data collection ends without the event occurring. \\[\\begin{equation}\n    c_i = \\begin{cases}\n        1&\\text{if event occurs for case }i \\\\\n        0&\\text{if data collection ends with no event for }i\n    \\end{cases}\n\\end{equation}\\]\nFor an observation with \\(c_i=1\\), the researcher knows that \\(t_i&gt;\\text{10 minutes}\\). To aid generalization to settings where the backpacker waits varying lengths of time before ending the trial, define an observed outcome value \\[\\begin{equation}\n    \\tilde{t}_i=\\begin{cases}\n        t_i &\\text{if }c_i=0 \\\\\n        \\text{length of observation period} &\\text{if }c_i=1\n    \\end{cases}\n\\end{equation}\\] where in the example above \\(\\tilde{t}_i=10\\) minutes for any day with \\(c_i=0\\).",
+    "objectID": "cox.html#in-math",
+    "href": "cox.html#in-math",
+    "title": "Cox Proportional Hazards",
+    "section": "In math",
+    "text": "In math\nThe Cox model says: consider a time \\(t\\) at which some unit in the sample dies. What is the probability that it would be unit \\(i\\) (who is alive up to \\(t\\)), as opposed to some other unit (who is also alive up to \\(t\\))? This probability equals the ratio of the hazard for unit \\(i\\) to the sum of the hazards for all units at risk at time \\(t\\).\n\\[\n\\text{P}(\\text{Unit }i\\text{ dies at }t\\mid \\text{Some unit dies at }t) = \\frac{h(t\\mid \\vec{X} = \\vec{x}_i)}{\\sum_{j:t_j\\geq t} h(t\\mid \\vec{X} = \\vec{x}_j)}\n\\]\nRecall that in a proportional hazards model, the hazard equals the baseline hazard \\(\\lambda(t)\\) and the hazard ratio \\(\\exp(\\vec{x}'\\vec\\beta)\\). If we plug these in for \\(h()\\), the baseline hazard \\(\\lambda(t)\\) appears in the numerator and denominator and cancels.\n\\[\n\\text{P}(\\text{Unit }i\\text{ dies at }t\\mid \\text{Some unit dies at }t) = \\frac{\\exp(\\vec{x}_i'\\vec\\beta)}{\\sum_{j:t_j\\geq t} \\exp(\\vec{x}_j'\\vec\\beta)}\n\\]\nMultiplying over all time points when a unit dies, this produces a likelihood that is a function of \\(\\vec\\beta\\) and not a function of the baseline hazard \\(\\lambda(t)\\). By maximizing this likelihood, we can learn the coefficients \\(\\vec\\beta\\) predicting the log hazard (and thus the hazard ratios) without making any assumptions about the baseline hazard.",
     "crumbs": [
       "Problem Sets",
-      "Survival Analysis: Key Concepts"
+      "Cox Proportional Hazards"
     ]
   },
   {
-    "objectID": "survival_concepts.html#lower-bound-with-no-assumptions",
-    "href": "survival_concepts.html#lower-bound-with-no-assumptions",
-    "title": "Survival Analysis: Key Concepts",
-    "section": "Lower bound with no assumptions",
-    "text": "Lower bound with no assumptions\nSuppose the researcher estimated by an average of this pseudo-outcome. \\[\\begin{align}\n    \\hat{\\text{E}}_{\\text{SimpleAverage}}(T) = \\frac{1}{n}\\sum_{i=1}^n \\tilde{t}_i\n\\end{align}\\]\nBecause \\(\\tilde{t}_i\\leq t_i\\) for all \\(i\\), this estimator is downwardly biased and would asymptotically yield a lower bound on the population mean \\({\\text{E}}(T)\\). \\[\\begin{equation}\n    \\lim_{n\\rightarrow\\infty} \\hat{\\text{E}}_{\\text{SimpleAverage}}(T) &lt; {\\text{E}}(T)\n\\end{equation}\\]\nHow could we produce a consistent estimator for \\({\\text{E}}(T)\\)? This is a difficult problem because we do not know what happens after censoring. Imagine that when the backpacker sees no stars in 10 minutes, they would have seen one at 11 minutes. Then \\({\\text{E}}(T)\\) may be very close to \\({\\text{E}}(\\tilde{T})\\). Alternatively, imagine that when the backpacker sees no stars in 10 minutes they would have to wait several hours for a star. Then \\({\\text{E}}(T)&gt;&gt;{\\text{E}}(\\tilde{T})\\). The data alone cannot provide an answer, because we do not know how long it takes for a star to pass after the backpacker has fallen asleep. Doing so will require a parametric model for the distribution of \\(T\\), the time until the event occurs.",
+    "objectID": "cox.html#in-code",
+    "href": "cox.html#in-code",
+    "title": "Cox Proportional Hazards",
+    "section": "In code",
+    "text": "In code\nTo practice the Cox model in code, first simulate some data. Here we simulate a binary \\(X\\sim\\text{Bernoulli}(0.5)\\) and define a rate parameter \\(\\lambda = \\exp(\\beta_0 + \\beta_1 X)\\) for \\(\\beta_0 = 0\\) and \\(\\beta_1 = 1\\). Then, we simulate Exponential draws from \\(T\\sim \\text{Exponential}(\\lambda)\\). For illustration, no one is censored (c = 0).\n\nbeta_0 &lt;- 0\nbeta_1 &lt;- 1\nsimulated &lt;- tibble(id = 1:1e4) |&gt;\n  mutate(\n    x = rbinom(n(), 1, .5),\n    lambda = exp(beta_0 + beta_1 * x),\n    # Simulate from the Exponential for this illustration:\n    # can be any hazard function\n    t = rexp(n(), rate = lambda),\n    c = 0\n  )\n\nNext, we fit a Cox proportional hazards model.\n\nmodel &lt;- coxph(\n  Surv(t, event = 1 - c) ~ x,\n  data = simulated\n)\n\nExtracting the coefficients of this model, we have a coefficient on the predictor \\(x\\).\n\ncoef(model)\n\n        x \n0.9785625 \n\n\nThis approximately equals the true value of $_1 = $1 in this simulation, and it captures the additive change in the log hazard when moving from x = 0 to x = 1.\nExponentiating the coefficients, we get the hazard ratio \\(e^{\\beta_1}\\) for a shift from x = 0 to x = 1.\n\nexp(coef(model))\n\n       x \n2.660629",
     "crumbs": [
       "Problem Sets",
-      "Survival Analysis: Key Concepts"
+      "Cox Proportional Hazards"
     ]
   },
   {
-    "objectID": "survival_concepts.html#distribution-functions-in-survival-analysis",
-    "href": "survival_concepts.html#distribution-functions-in-survival-analysis",
-    "title": "Survival Analysis: Key Concepts",
-    "section": "Distribution functions in survival analysis",
-    "text": "Distribution functions in survival analysis\nWhen making a parametric model for time to event, there are at least four ways of thinking about the parameterization of the distribution. The first two are familiar. The cumulative distribution function \\(F(t) = P(T&lt;t)\\) is the probability of an event occurring before time \\(t\\). The probability density function \\(f(t) = \\frac{\\partial}{\\partial t} F(t)\\) is the density of event occurrence at time \\(t\\). These two functions are exactly as in any probability distribution for a random variable \\(T\\) that can take a value \\(t\\). \\\nIn survival analysis, it is more common to work with two mathematical transformations of the CDF and PDF. The first is the survival function \\(S(t) = P(T &gt; t)\\), which captures the probability that a survival time \\(T\\) is greater than a particular value \\(t\\). The survival function is the complement of the CDF, \\(S(t) = 1 - F(t)\\). Medical examples often use survival functions because they are interested in the probability of survival, not the probability of death. \\\nWe may also want to think about the risk of death given survival up to a particular point. This concept is formalized in the hazard function \\(h(t) = \\frac{f(t)}{S(t)}\\), which is the ratio of the PDF to the survival function.",
+    "objectID": "cox.html#drawbacks-of-the-cox-model",
+    "href": "cox.html#drawbacks-of-the-cox-model",
+    "title": "Cox Proportional Hazards",
+    "section": "Drawbacks of the Cox model",
+    "text": "Drawbacks of the Cox model\nThe Cox model is popular because it does not require assumptions about the baseline hazard. But it comes with a major drawback: one generally cannot simulate any quantities of interest beyond the hazard ratios with a Cox model.\nFor example, suppose we wanted to know the survival probability at time \\(t\\). This would require us to translate our model parameters to a survival function. But because the Cox model parameters are uninformative about the baseline hazard \\(\\lambda(t)\\), they are by extension uninformative about the survival function.",
     "crumbs": [
       "Problem Sets",
-      "Survival Analysis: Key Concepts"
+      "Cox Proportional Hazards"
     ]
+  },
+  {
+    "objectID": "cox.html#overcoming-drawbacks",
+    "href": "cox.html#overcoming-drawbacks",
+    "title": "Cox Proportional Hazards",
+    "section": "Overcoming drawbacks",
+    "text": "Overcoming drawbacks\nOne way around this problem is to nonparametrically estimate the baseline survival function, and then to update it using the hazard ratios. Let the survival function at \\(t\\) for subgroup \\(\\vec{X} = \\vec{x}\\) be denoted \\(S(t,\\vec{x})\\). Let the baseline survival function be \\(S(t,\\vec{0})\\). With math that we do not show here, one can derive that the survival function at \\(\\vec{x}\\) equals the basline survival function raised to the power of the hazard ratio.\n\\[S(t,\\vec{x}) = S(t,\\vec{0})^{\\exp(\\vec{x}'\\vec\\beta)}\\]\nOne can therefore estimate \\(S(t,\\vec{x})\\) with two inputs\n\nA nonparametric estimate of \\(S(t,\\vec{0})\\) from Kaplan-Meier\nCox estimates of \\(\\vec\\beta\\) for the hazard ratio\n\nBelow, we illustrate this on the simulated data. First, we define the baseline subgroup with \\(X = 0\\).\n\nbaseline_subgroup &lt;- simulated |&gt; filter(x == 0)\n\nThen we estimate the baseline survival by Kaplan-Meier on this subgroup.\n\nbaseline_kaplanmeier &lt;- survfit(\n  Surv(t, event = 1 - c) ~ 1,\n  data = baseline_subgroup\n)\n\nThird, we extract the nonparametric estimate of the baseline survival function among the \\(X = 0\\).\n\nbaseline_survival &lt;- tibble(\n  t = baseline_kaplanmeier$time,\n  # Extract baseline survival among X = 0\n  S0 = baseline_kaplanmeier$surv\n)\n\nTo produce an estimate among the \\(X = 1\\) subgroup, we first need the hazard ratio from the Cox model.\n\nhazard_ratio &lt;- exp(coef(model))\n\nFinally, we can create the survival curve among \\(X = 1\\) by taking the baseline survival curve and raising it to the power of the hazard ratio.\n\nboth_survival &lt;- baseline_survival |&gt;\n  mutate(S1 = S0 ^ hazard_ratio)\n\nBelow we visualize these two estimated curves.\n\n\nCode\nboth_survival |&gt;\n  pivot_longer(cols = -t, names_to = \"X\", values_to = \"S\") |&gt;\n  mutate(X = str_replace(X,\"S\",\"X = \")) |&gt;\n  ggplot(aes(x = t, y = S, color = X, linetype = X)) +\n  geom_line() +\n  labs(\n    x = \"Time\", \n    y = \"Survival\",\n    color = \"Population\\nSubgroup\",\n    linetype = \"Population\\nSubgroup\"\n  )\n\n\n\n\n\n\n\n\n\nThus, it is possible to combine Cox estimates with a nonparametric baseline survival estimate to produce survival curves.",
+    "crumbs": [
+      "Problem Sets",
+      "Cox Proportional Hazards"
+    ]
+  },
+  {
+    "objectID": "cox.html#rare-circumstances",
+    "href": "cox.html#rare-circumstances",
+    "title": "Cox Proportional Hazards",
+    "section": "Rare circumstances",
+    "text": "Rare circumstances\nThe combination of Kaplan-Meier + Cox is a creative one, but it applies only in a very rare setting (3) and is less useful in more common settings (1 and 2).\n1. Common setting: All \\(\\vec{x}\\)-values are well-populated. If \\(\\vec{X}\\) takes on only a few discrete values that are well-populated, you can directly use Kaplan-Meier to nonparametrically estimate the survival curves in each subgroup. There is no need to use a Cox model: you can avoid the proportional hazards assumption entirely. An example of this setting is a randomized experiment with a binary treatment.\n2. Common setting: No \\(\\vec{x}\\)-value is well populated. If \\(\\vec{X}\\) takes many values such that there is no value \\(\\vec{x}\\) that has many observation, then there is no baseline subgroup with enough cases to estimate a baseline Kaplan-Meier curve. In this setting, you cannot estimate the baseline hazard nonparametrically. You have two choies: (1) estimate a Cox model and only get hazard ratios or (2) assume a parametric distribution (e.g., Weibull) and gain the ability to simulate any quantity of interest.\n3. Rare setting: One well-populated baseline \\(\\vec{x}\\)-value. Suppose a randomized experiment occurs where many people are assigned a control condition (\\(x = 0\\)) and others are distributed over many number-valued treatment conditions (\\(x &gt; 0\\)). In this setting, many cases are available to estimate the baseline hazard by Kaplan-Meier among \\(x = 0\\). Kaplan-Meier is less useful for any \\(x&gt;0\\) because very few cases are seen at any particular \\(x\\)-value. But a Cox model can impose structure on this space and learn hazard ratios, thereby allowing the baseline hazard (learned on \\(x = 0\\)) to be updated for the other \\(x\\)-values.\nIn practice, researchers often default to Cox. But for setting (1) Kaplan-Meier would be better. For setting (2) fully parametric models (e.g., Weibull or Exponential) may be better because they allow simulation of any quantity of interest, at the small cost of assuming a family for the baseline hazard. Setting (3) is an ideal setting for the Cox model, but may correspond to very few actual research situations.",
+    "crumbs": [
+      "Problem Sets",
+      "Cox Proportional Hazards"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Event History Analysis",
+    "section": "",
+    "text": "This course is being offered Winter 2026 at UCLA. See the syllabus."
+  },
+  {
+    "objectID": "index.html#welcome-to-soc-213b",
+    "href": "index.html#welcome-to-soc-213b",
+    "title": "Event History Analysis",
+    "section": "",
+    "text": "This course is being offered Winter 2026 at UCLA. See the syllabus."
+  },
+  {
+    "objectID": "index.html#who-should-take-this-course",
+    "href": "index.html#who-should-take-this-course",
+    "title": "Event History Analysis",
+    "section": "Who should take this course?",
+    "text": "Who should take this course?\nThe course is a good fit for PhD students in sociology, statistics, political science, economics, and other social sciences."
+  },
+  {
+    "objectID": "index.html#schedule-of-topics",
+    "href": "index.html#schedule-of-topics",
+    "title": "Event History Analysis",
+    "section": "Schedule of topics",
+    "text": "Schedule of topics\nBelow is a tentative schedule of topics. This is my first time teaching the course, and the sequence of topics may change over the course of the quarter.\nPart 1: Survival analysis with events as outcomes.\n\nWeek 1: Basics of survival analysis and maximum likelihood. Exponential model in math.\nWeek 2: Review of Maximum Likelihood Estimation with the Bernoulli. Exponential model in software.\nWeek 3: Beyond the Exponential: Weibull for hazards that vary with time. Generalizing ideas to proportional hazards and the Cox model. We will contrast with nonparametric survival curve estimation by Kaplan-Meier.\nWeek 4: Unmodeled heterogeneity, competing risks, non-ignorable censoring, and other complications.\n\nPart 2: Causal inference with events as treatments.\n\nWeek 5: Causal inference for survival outcomes\nWeek 6: Event history treatments with non-survival outcomes (longitudinal inverse probability weighting, marginal structural models)\nWeek 7: Event history treatments with survival outcomes\nWeek 8: Causal inference in staggered adoption panels"
+  },
+  {
+    "objectID": "index.html#learning-goals",
+    "href": "index.html#learning-goals",
+    "title": "Event History Analysis",
+    "section": "Learning goals",
+    "text": "Learning goals\nStudents will learn to\n\ndefine key components of survival analysis (e.g., censoring)\nstate the assumptions required for a survival model\ntranslate from survival models to predicted quantities of interest\napply causal inference methods where events are treatments that unfold over time"
+  },
+  {
+    "objectID": "index.html#course-description",
+    "href": "index.html#course-description",
+    "title": "Event History Analysis",
+    "section": "Course description",
+    "text": "Course description\nIntroduction to regression-like analyses in which outcome is time to event. Topics include logit models for discrete-time event history models; piecewise exponential hazards models; proportional hazards; nonproportional hazards; parametric survival models. We will also cover events that unfold over time as causal treatment variables."
+  },
+  {
+    "objectID": "problem_sets.html",
+    "href": "problem_sets.html",
+    "title": "Problem Sets",
+    "section": "",
+    "text": "Problem sets are currently posted on Piazza, but I plan to gather them on this page."
+  },
+  {
+    "objectID": "problem_sets.html#problem-set-1-key-concepts",
+    "href": "problem_sets.html#problem-set-1-key-concepts",
+    "title": "Problem Sets",
+    "section": "Problem Set 1: Key Concepts",
+    "text": "Problem Set 1: Key Concepts\nA study enrolls 6 people looking for work. 3 are randomly assigned to a job training intervention and 3 are randomly assigned to no job training. Over a 52-week follow-up period beginning January 1, the study records the time until they are hired in weeks.\n\n\n\nID\nAge\nTreatment\nTime until hired\n\n\n\n\n1\n53\nTreated\n12 weeks\n\n\n2\n26\nTreated\n10 weeks\n\n\n3\n37\nTreated\n44 weeks\n\n\n4\n25\nUntreated\n7 weeks\n\n\n5\n48\nUntreated\nNever hired in 52 weeks\n\n\n6\n34\nUntreated\n40 weeks\n\n\n\n\nWhat is time 0 in this study?\nWhich unit(s) were censored?\nCan you point identify the mean time until hired in the treatment condition? If not, can you provide a lower bound? Ignore statistical uncertainty.\nCan you point identify the mean time until hired in the untreated condition? If not, can you provide a lower bound? Ignore statistical uncertainty.\nDoes the job training reduce the average time until hired?\n\nThe next questions are about the Exponential distribution, which assumes a constant hazard: \\(h(t) = \\lambda\\).\n\nTrue or False. The CDF \\(F(t) = P(T &lt; t)\\) is an increasing function of \\(t\\).\nTrue or False. The survival function \\(S(t) = P(T &gt; t)\\) is an increasing function of \\(t\\).\nA demographer studies a cohort of people born in 1965 where age is the time variable (with time zero at age zero). They study the time until first marriage. In 1–3 sentences, make an argument that the assumption of a constant hazard is implausible."
+  },
+  {
+    "objectID": "problem_sets.html#problem-set-2-exponential",
+    "href": "problem_sets.html#problem-set-2-exponential",
+    "title": "Problem Sets",
+    "section": "Problem Set 2: Exponential",
+    "text": "Problem Set 2: Exponential\nSee the exercise at the end of the Exponential page."
+  },
+  {
+    "objectID": "problem_sets.html#problem-set-3-weibull",
+    "href": "problem_sets.html#problem-set-3-weibull",
+    "title": "Problem Sets",
+    "section": "Problem Set 3: Weibull",
+    "text": "Problem Set 3: Weibull\nThis problem set practices Kaplan-Meier survival curve estimation and a Weibull model.\nThe survival::veteran data contain data from a clinical trial involving cancer patients run by the Veteran’s Administration. These data are described in Kalbfleisch and Prentice (1980) on p.~60. There are 137 patients, and only 9 are censored before death.\n\nstatus is 1 for death, 0 for censoring\ntime is days of survival\ntrt is a randomized chemotherapy test treatment. 1 indicates standard treatment, 2 indicates the test treatment\n\nFor more information on the data see ?survival::veteran.\n\n(10 points) Estimate survival curves by treatment status trt, using the Kaplan-Meier method. Visualize the results in a plot.\n(10 points) Estimate survival curves by treatment status trt, using a Weibull regression with only this predictor. Visualize the results in a plot.\n(10 points) Compare: Plot the Weibull and Kaplan-Meier survival curves on the same plot. How do they differ? For ease of comparison, you might use different panels or different plots for each treatment status so that it is easier to compare across models within treatment status.\n(10 points) Plot the estimated Weibull hazard function. Does it increase or decrease with time?\n(8 points) In your Weibull results, can you reject the null of an Exponential model?\n(2 points, Challenge): Construct a confidence interval on each point of your Weibull survival functions and visualize the result. Note that this is quite challenging; it is only worth 2 points so that you can skip it and still get an A on the problem set. Here are some steps.\n\nDefine the X matrix at which to make predictions\nLoop over simulations. In each iteration,\n\nSimulate \\(\\vec\\beta\\) and the log_scale parameter from a Multivariate Normal centered at c(coef(model), log(model$scale)) with variance-covariance matrix vcov(model)\nCalculate the simulated value of the rweibull parameter scale, which is \\(e^{\\vec{X}'\\vec\\beta}\\) where \\(\\vec\\beta\\) are coefficients from survreg\nCalculate the simulated value of the rweibull parameter shape, which is 1 / exp(log_scale) where log_scale is the simulated value of the log of what survreg calls the scale parameter\nSimulate survival functions with those parameters\n\nAt each point of the survival curve, calculate the 2.5 and 97.5 percentiles of the empirical distribution of simulated draws."
+  },
+  {
+    "objectID": "unmodeled_heterogeneity.html",
+    "href": "unmodeled_heterogeneity.html",
+    "title": "Unmodeled Heterogeneity",
+    "section": "",
+    "text": "This is for Week 4.\nSimulate data with unmeasured heterogeneity. Plot Kaplan-Meier. Estimate piecewise exponential. See how estimated hazard changes over time.\nDiscuss problem."
   }
 ]

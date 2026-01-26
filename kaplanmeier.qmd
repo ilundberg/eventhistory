@@ -27,7 +27,7 @@ S(t) = \prod_{i:t_i\leq t}\left(1 - \frac{d_i}{n_i}\right)
 $$
 which at time $t$ takes the product over all death times preceding $t$ where the expression inside the product is the probability of surviving that death time.
 
-A Kaplan-Meier curve is easy to estimate in R with the `survfit` function. Here we use the heart recipients data from the Exponential page.
+A Kaplan-Meier curve is easy to estimate in R with the `survfit` function. Here we use the [heart recipients](assets/heart_recipients.csv) data from the Exponential page.
 
 ```{r, warning = FALSE, message = FALSE, echo = FALSE}
 heart_recipients <- read_csv("assets/heart_recipients.csv")
