@@ -7,6 +7,13 @@ format:
     fig-height: 3
 ---
 
+```{r, echo = F}
+# Package wish list:
+# - convert survreg to predicted values
+# - convert survfit and survreg to ggplot
+# - test survreg survival compared to Kaplan Meier
+```
+
 ```{r, echo = F, warning = F, message = F}
 library(tidyverse)
 library(foreach)

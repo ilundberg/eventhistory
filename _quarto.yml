@@ -28,8 +28,11 @@ website:
       - bernoulli.qmd
       - exponential.qmd
       - weibull.qmd
+      - piecewise_exponential.qmd
       - proportional_hazards.qmd
       - cox.qmd
+      - unmeasured_heterogeneity.qmd
+      - competing_risks.qmd
 
 format:
   html:

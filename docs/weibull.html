@@ -227,6 +227,12 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./piecewise_exponential.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Piecewise Exponential</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./proportional_hazards.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Proportional Hazards</span></a>
   </div>
@@ -235,6 +241,18 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="./cox.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Cox Proportional Hazards</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./unmeasured_heterogeneity.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unmeasured Heterogeneity</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./competing_risks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Competing Risks</span></a>
   </div>
 </li>
     </ul>
@@ -304,7 +322,7 @@ window.Quarto = {
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="weibull_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="weibull_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -335,7 +353,7 @@ window.Quarto = {
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="weibull_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="weibull_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -392,10 +410,10 @@ T &amp;\sim \text{Weibull}\left(\texttt{shape} = \alpha,\texttt{scale} = \exp(\b
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimate =</span> <span class="fu">c</span>(<span class="at">alpha =</span> alpha_estimate, beta_estimate)</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>      truth    estimate
-alpha     3 3.004579477
-beta0     0 0.001149056
-beta1     1 1.005972530</code></pre>
+<pre><code>      truth     estimate
+alpha     3  2.993837614
+beta0     0 -0.001182682
+beta1     1  1.003114561</code></pre>
 </div>
 </div>
 </section>
@@ -449,7 +467,7 @@ beta1     1 1.005972530</code></pre>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="weibull_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="weibull_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -477,7 +495,7 @@ beta1     1 1.005972530</code></pre>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="weibull_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="weibull_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -496,15 +514,15 @@ h_{\alpha = 0}(t) = \sigma^{-1}
 Call:
 survreg(formula = Surv(t, 1 - c) ~ x, data = simulated, dist = "weibull")
                Value Std. Error       z      p
-(Intercept)  0.00115    0.00481    0.24   0.81
-x            1.00597    0.00666  151.12 &lt;2e-16
-Log(scale)  -1.10014    0.00782 -140.73 &lt;2e-16
+(Intercept) -0.00118    0.00485   -0.24   0.81
+x            1.00311    0.00668  150.16 &lt;2e-16
+Log(scale)  -1.09656    0.00782 -140.22 &lt;2e-16
 
-Scale= 0.333 
+Scale= 0.334 
 
 Weibull distribution
-Loglik(model)= -7851.7   Loglik(intercept only)= -13167.8
-    Chisq= 10632.29 on 1 degrees of freedom, p= 0 
+Loglik(model)= -7894   Loglik(intercept only)= -13147.3
+    Chisq= 10506.57 on 1 degrees of freedom, p= 0 
 Number of Newton-Raphson Iterations: 6 
 n= 10000 </code></pre>
 </div>
@@ -529,7 +547,7 @@ n= 10000 </code></pre>
 <span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>shape_estimate       ci_lower       ci_upper 
-      3.004579       2.958896       3.050968 </code></pre>
+      2.993838       2.948300       3.040079 </code></pre>
 </div>
 </div>
 </section>

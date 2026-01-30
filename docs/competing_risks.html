@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Unmodeled Heterogeneity – SOCIOL 213B: Applied Event History Analysis</title>
+<title>Competing Risks – SOCIOL 213B: Applied Event History Analysis</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,6 +19,41 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -67,6 +102,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -111,7 +175,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Unmodeled Heterogeneity</li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./competing_risks.html">Competing Risks</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -163,6 +227,12 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./piecewise_exponential.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Piecewise Exponential</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./proportional_hazards.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Proportional Hazards</span></a>
   </div>
@@ -173,20 +243,41 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Cox Proportional Hazards</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./unmeasured_heterogeneity.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unmeasured Heterogeneity</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./competing_risks.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Competing Risks</span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#illustration-retirement-and-death" id="toc-illustration-retirement-and-death" class="nav-link active" data-scroll-target="#illustration-retirement-and-death">Illustration: Retirement and death</a></li>
+  <li><a href="#a-kaplan-meier-estimate-of-survival" id="toc-a-kaplan-meier-estimate-of-survival" class="nav-link" data-scroll-target="#a-kaplan-meier-estimate-of-survival">A Kaplan-Meier estimate of survival</a></li>
+  <li><a href="#what-has-gone-wrong" id="toc-what-has-gone-wrong" class="nav-link" data-scroll-target="#what-has-gone-wrong">What has gone wrong</a></li>
+  <li><a href="#what-to-do" id="toc-what-to-do" class="nav-link" data-scroll-target="#what-to-do">What to do</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Unmodeled Heterogeneity</h1>
+<h1 class="title">Competing Risks</h1>
 </div>
 
 
@@ -203,11 +294,95 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>This is for Week 4.</p>
-<p>Simulate data with unmeasured heterogeneity. Plot Kaplan-Meier. Estimate piecewise exponential. See how estimated hazard changes over time.</p>
-<p>Discuss problem.</p>
+<p>We have generally assumed <strong>ignorable censoring</strong>: at any time point <span class="math inline">\(t\)</span>, the probability of becoming censored is the same for all units who are alive at that time point, regardless of their future time until death.</p>
+<p>Another way to think about ignorable censoring is to let <span class="math inline">\(C\)</span> be the time until censoring and <span class="math inline">\(T\)</span> be the time until the event of interest. Then we assume <span class="math inline">\(C\)</span> is independent of <span class="math inline">\(T\)</span>. A unit is censored if it happens that <span class="math inline">\(C &lt; T\)</span>, and a unit has the event if <span class="math inline">\(T \leq C\)</span>.</p>
+<p><strong>Competing risks</strong> are a common setting that violates the assumption of ignorable censoring. We will consider competing risks through a concrete example.</p>
+<section id="illustration-retirement-and-death" class="level3">
+<h3 class="anchored" data-anchor-id="illustration-retirement-and-death">Illustration: Retirement and death</h3>
+<p>This example comes from an example that German Rodriguez developed about the retirments and deaths of Supreme Court justices. Here is the <a href="https://grodri.github.io/survival/justices">original source</a>. He used Wikipedia and the Supreme Court website to create a dataset on the time that Supreme Court justices were in office, and how their time ended (retirement, resignation, death, still an incumbent). The code at the button below takes his data and simplifies them for our analysis.</p>
+<div class="cell" data-waring="false">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>retirement <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://grodri.github.io/datasets/justices.csv"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">start =</span> <span class="fu">parse_date</span>(startstr, <span class="at">format =</span> <span class="st">"%B %d, %Y"</span>),</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">stop =</span> <span class="fu">parse_date</span>(stopstr, <span class="at">format =</span> <span class="st">"%B %d, %Y"</span>),</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Make t time on the bench in days</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">t =</span> <span class="fu">difftime</span>(stop, start, <span class="at">units =</span> <span class="st">"days"</span>),</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert to years</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">t =</span> <span class="fu">as.numeric</span>(t) <span class="sc">/</span> <span class="fl">365.25</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">age_appointed =</span> <span class="fu">as.numeric</span>(<span class="fu">difftime</span>(</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>      stop,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>      <span class="fu">parse_date</span>(birthstr, <span class="at">format =</span> <span class="st">"%B %d, %Y"</span>),</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">units =</span> <span class="st">"days"</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    )) <span class="sc">/</span> <span class="fl">365.25</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Keep only those who died or resigned</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(status <span class="sc">!=</span> <span class="st">"Incumbent"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(number, name, state, age_appointed, status, t) <span class="sc">|&gt;</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write_csv</span>(<span class="st">"assets/retirement.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>You can load the simplified data <a href="assets/retirement.csv">retirement.csv</a> directly with the line below.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>retirement <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://ilundberg.github.io/eventhistory/assets/retirement.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Initially, the justices are all active. Over time since appointment, they gradually move into one of two final states: either death (<code>status = "Died"</code>) or retirement (<code>status = "Resigned"</code> or <code>status = "Retired"</code>).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="competing_risks_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Death and retirement happen at remarkably similar rates over time!</p>
+</section>
+<section id="a-kaplan-meier-estimate-of-survival" class="level3">
+<h3 class="anchored" data-anchor-id="a-kaplan-meier-estimate-of-survival">A Kaplan-Meier estimate of survival</h3>
+<p>Suppose death is the event of interest. The data only contain death dates for those who died in office; otherwise we only know that the justice was alive until they retired. We might estimate survival as a function of time since appointment by Kaplan-Meier, where censoring is retirment and the event is death.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>km <span class="ot">&lt;-</span> <span class="fu">survfit</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Surv</span>(t, <span class="at">event =</span> status <span class="sc">==</span> <span class="st">"Died"</span>) <span class="sc">~</span> <span class="dv">1</span>, </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> retirement</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The figure below visualizes the resulting survival curve.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>km <span class="sc">|&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  broom<span class="sc">::</span><span class="fu">tidy</span>() <span class="sc">|&gt;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> time, <span class="at">y =</span> estimate)) <span class="sc">+</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Survival Curve</span><span class="sc">\n</span><span class="st">(Event = Death)"</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Time Since Appointment to Supreme Court"</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="competing_risks_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Notice the right end of this curve. The Kaplan-Meier estimates show that justices have a 12.5% chance of living for 35 years after appointment! Given that the median age at appointment is 71, this means that the median justice has a 12.5% chance of surviving past the age of 106. Surely this is misleading!</p>
+</section>
+<section id="what-has-gone-wrong" class="level3">
+<h3 class="anchored" data-anchor-id="what-has-gone-wrong">What has gone wrong</h3>
+<p>The problem here is that censoring (retirement) is not independent of the event of interest (death). Supreme Court justices often serve on the bench until their health is poor. If we imagine a justice who has served 20 years on the bench and then retires, that justice’s hazard of death is likely higher than the hazard for another justice who has served 20 years on the bench and continues to serve. But Kaplan-Meier (and all survival models) has assumed that censoring is independent of the hazard of death.</p>
+</section>
+<section id="what-to-do" class="level3">
+<h3 class="anchored" data-anchor-id="what-to-do">What to do</h3>
+<p>Non-ignorable censoring is a deep problem, and easy answers are elusive. There exist multivariate survival models that assume a correlation between the latent risks of multiple distinct hazards. But these models come with their own assumptions and can be difficult to explain to a reader.</p>
+<p>In the presence of competing risks, one simple solution is to visualize all the competing risks, as in the figure at the top of this page. This may be a good practice in applied research.</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
