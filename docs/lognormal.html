@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Kaplan-Meier – SOCIOL 213B: Applied Event History Analysis</title>
+<title>Lognormal – SOCIOL 213B: Applied Event History Analysis</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -175,7 +175,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./kaplanmeier.html">Kaplan-Meier</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./lognormal.html">Lognormal</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -203,7 +203,7 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./kaplanmeier.html" class="sidebar-item-text sidebar-link active">
+  <a href="./kaplanmeier.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Kaplan-Meier</span></a>
   </div>
 </li>
@@ -227,7 +227,7 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./lognormal.html" class="sidebar-item-text sidebar-link">
+  <a href="./lognormal.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Lognormal</span></a>
   </div>
 </li>
@@ -271,8 +271,10 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#kaplan-meier-on-subgroups" id="toc-kaplan-meier-on-subgroups" class="nav-link active" data-scroll-target="#kaplan-meier-on-subgroups">Kaplan-Meier on subgroups</a></li>
-  <li><a href="#when-to-use-kaplan-meier" id="toc-when-to-use-kaplan-meier" class="nav-link" data-scroll-target="#when-to-use-kaplan-meier">When to use Kaplan-Meier</a></li>
+  <li><a href="#data" id="toc-data" class="nav-link active" data-scroll-target="#data">Data</a></li>
+  <li><a href="#estimate" id="toc-estimate" class="nav-link" data-scroll-target="#estimate">Estimate</a></li>
+  <li><a href="#predict-parameters" id="toc-predict-parameters" class="nav-link" data-scroll-target="#predict-parameters">Predict parameters</a></li>
+  <li><a href="#predict-hazard-and-survival" id="toc-predict-hazard-and-survival" class="nav-link" data-scroll-target="#predict-hazard-and-survival">Predict hazard and survival</a></li>
   </ul>
 </nav>
     </div>
@@ -281,7 +283,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Kaplan-Meier</h1>
+<h1 class="title">Lognormal</h1>
 </div>
 
 
@@ -298,117 +300,76 @@ window.Quarto = {
 </header>
 
 
-<p>The <strong>Kaplan-Meier</strong> estimator is a nonparametric method to estimate a survival function in the presence of censoring.</p>
-<p>For each unit <span class="math inline">\(i\)</span> who dies at <span class="math inline">\(t_i\)</span>, let</p>
-<ul>
-<li><span class="math inline">\(d_i\)</span> denote the number of units who died simultaneously with unit <span class="math inline">\(i\)</span></li>
-<li><span class="math inline">\(n_i\)</span> denote the number of units alive just before unit <span class="math inline">\(i\)</span> died</li>
-</ul>
-<p>To survive to time <span class="math inline">\(t\)</span>, one must survive every moment preceding <span class="math inline">\(t\)</span> when someone died. This motivates a survival curve estimate, <span class="math display">\[
-S(t) = \prod_{i:t_i\leq t}\left(1 - \frac{d_i}{n_i}\right)
-\]</span> which at time <span class="math inline">\(t\)</span> takes the product over all death times preceding <span class="math inline">\(t\)</span> where the expression inside the product is the probability of surviving that death time.</p>
-<p>A Kaplan-Meier curve is easy to estimate in R with the <code>survfit</code> function. Here we use the <a href="assets/heart_recipients.csv">heart recipients</a> data from the Exponential page.</p>
+<p>If <span class="math inline">\(Z\)</span> follows a Normal distribution, then <span class="math inline">\(Y \sim \exp(Z)\)</span> follows a Lognormal distribution (since then <span class="math inline">\(\log(Y)\)</span> follows a Normal distribution). The Lognormal can be used in survival analysis because it is defined on non-negative numbers. In fact, it is a common choice for modeling human mortality.</p>
+<p>The Lognormal distribution is characterized by two parameters: <code>meanlog</code> and <code>sdlog</code>, which correspond to the mean and standard deviation of the log survival time. These two parameters can define many possible curves.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>heart_recipients <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://ilundberg.github.io/eventhistory/assets/heart_recipients.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>First we learn the survival function,</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>kaplan_meier <span class="ot">&lt;-</span> <span class="fu">survfit</span>(</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Surv</span>(t, <span class="at">event =</span> <span class="dv">1</span> <span class="sc">-</span> c) <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> heart_recipients</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>and then we can plot it</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(kaplan_meier)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>or with longer code can make a nice <code>ggplot</code>.</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>kaplan_meier <span class="sc">|&gt;</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  broom<span class="sc">::</span><span class="fu">tidy</span>() <span class="sc">|&gt;</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x =</span> time, <span class="at">y =</span> estimate, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">alpha =</span> .<span class="dv">4</span>) <span class="sc">+</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Time"</span>,</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Estimated Survival Function"</span>,</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Kaplan-Meier estimates"</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="kaplanmeier_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="lognormal_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-<section id="kaplan-meier-on-subgroups" class="level2">
-<h2 class="anchored" data-anchor-id="kaplan-meier-on-subgroups">Kaplan-Meier on subgroups</h2>
-<p>The <code>survfit</code> function makes it easy to fit Kaplan-Meier survival curves for population subgroups.</p>
+<section id="data" class="level3">
+<h3 class="anchored" data-anchor-id="data">Data</h3>
+<p>On this page, we will explore the lognormal to model mortality in the <a href="assets/deaths.csv">deaths.csv</a> data, which I simulated from 2023 age-specific mortality rates.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>kaplan_meier_subgroups <span class="ot">&lt;-</span> <span class="fu">survfit</span>(</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Surv</span>(t, <span class="at">event =</span> <span class="dv">1</span> <span class="sc">-</span> c) <span class="sc">~</span> <span class="fu">I</span>(age <span class="sc">&gt;=</span> <span class="dv">50</span>),</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> heart_recipients</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>deaths <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://ilundberg.github.io/eventhistory/assets/deaths.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>This results in two survival curves estimated independently: one on each subgroup.</p>
+<p>The time variable is <code>age</code> and in these data every unit experiences the event (<code>died = 1</code> in every row).</p>
+</section>
+<section id="estimate" class="level3">
+<h3 class="anchored" data-anchor-id="estimate">Estimate</h3>
+<p>We can fit a Lognormal model using the <code>survreg</code> function, as with other distributions.</p>
 <div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>kaplan_meier_subgroups <span class="sc">|&gt;</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  broom<span class="sc">::</span><span class="fu">tidy</span>() <span class="sc">|&gt;</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x =</span> time, <span class="at">y =</span> estimate, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high,</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">color =</span> strata, <span class="at">fill =</span> strata)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_ribbon</span>(<span class="at">alpha =</span> .<span class="dv">4</span>) <span class="sc">+</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Time"</span>,</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Estimated Survival Function"</span>,</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Kaplan-Meier estimates"</span>,</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Population Subgroup"</span>,</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Population Subgroup"</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_discrete</span>(</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">as_labeller</span>(<span class="cf">function</span>(x) <span class="fu">case_when</span>(</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>      x <span class="sc">==</span> <span class="st">"I(age &gt;= 50)=FALSE"</span> <span class="sc">~</span> <span class="st">"Under Age 50"</span>,</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>      x <span class="sc">==</span> <span class="st">"I(age &gt;= 50)=TRUE"</span> <span class="sc">~</span> <span class="st">"Age 50+"</span>,</span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    ))</span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_discrete</span>(</span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">as_labeller</span>(<span class="cf">function</span>(x) <span class="fu">case_when</span>(</span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>      x <span class="sc">==</span> <span class="st">"I(age &gt;= 50)=FALSE"</span> <span class="sc">~</span> <span class="st">"Under Age 50"</span>,</span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>      x <span class="sc">==</span> <span class="st">"I(age &gt;= 50)=TRUE"</span> <span class="sc">~</span> <span class="st">"Age 50+"</span>,</span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    ))</span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
-(`geom_ribbon()`).</code></pre>
-</div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="kaplanmeier_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>lognormal_model <span class="ot">&lt;-</span> <span class="fu">survreg</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Surv</span>(age, <span class="at">event =</span> died) <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> deaths,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">dist =</span> <span class="st">"lognormal"</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="when-to-use-kaplan-meier" class="level2">
-<h2 class="anchored" data-anchor-id="when-to-use-kaplan-meier">When to use Kaplan-Meier</h2>
-<p>The Kaplan-Meier curve is ideal for</p>
-<ul>
-<li>summarizing a marginal survival curve</li>
-<li>estimating survival in a few discrete subgroups</li>
-</ul>
-<p>When there are many population subgroups defined by a vector of predictor <span class="math inline">\(\vec{X}\)</span> such that few units are observed in each subgroup, then parametric models may be preferable.</p>
+<section id="predict-parameters" class="level3">
+<h3 class="anchored" data-anchor-id="predict-parameters">Predict parameters</h3>
+<p>In this model, the mean of the log of <span class="math inline">\(Y\)</span> is modeled by the linear predictor <span class="math inline">\(\text{E}(\log(Y)\mid\vec{X} = \vec{x}) = \vec{x}'\vec\beta\)</span> and the standard deviation of the log of <span class="math inline">\(Y\)</span>, <span class="math inline">\(\text{SD}(\log(Y)\mid\vec{X})\)</span> is the scale parameter <code>lognormal_model$scale</code> which is assumed by the model to be the same at all values of <span class="math inline">\(\vec{X}\)</span> (as in homoskedastic linear regression).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>meanlog <span class="ot">&lt;-</span> <span class="fu">predict</span>(lognormal_model, <span class="at">type =</span> <span class="st">"linear"</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>sdlog <span class="ot">&lt;-</span> lognormal_model<span class="sc">$</span>scale</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="predict-hazard-and-survival" class="level3">
+<h3 class="anchored" data-anchor-id="predict-hazard-and-survival">Predict hazard and survival</h3>
+<p>You can use the <code>plnorm</code>, <code>dlnorm</code>, and <code>qlnorm</code> functions to simulate quantities of interest given <code>meanlog</code> and <code>sdlog</code>. The process is analogous to previous models we have learned. For simplicity, here we use the <a href="assets/viz_survreg.R"><code>viz_survreg()</code></a> function that I wrote.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"https://ilundberg.github.io/eventhistory/assets/viz_survreg.R"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>lognormal_model <span class="sc">|&gt;</span> <span class="fu">viz_survreg</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lognormal_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Nearly everyone survives at younger ages, and then people gradually die at older ages.</p>
+<p>We can also compare the fit to a Kaplan-Meier curve to assess the validity of the parametric assumptions.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"https://ilundberg.github.io/eventhistory/assets/km_compare.R"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>lognormal_model <span class="sc">|&gt;</span> <span class="fu">km_compare</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lognormal_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>In this case the fit is not that perfect: the model underestimates survival at roughly ages 50–80 and overestimates survival after age 80. On the next page, we will get a closer fit with a piecewise Exponential model.</p>
 
 
 </section>

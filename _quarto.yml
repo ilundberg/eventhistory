@@ -28,6 +28,7 @@ website:
       - bernoulli.qmd
       - exponential.qmd
       - weibull.qmd
+      - lognormal.qmd
       - piecewise_exponential.qmd
       - proportional_hazards.qmd
       - cox.qmd

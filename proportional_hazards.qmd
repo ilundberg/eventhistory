@@ -14,7 +14,7 @@ theme_set(theme_bw())
 library(survival)
 ```
 
-The Exponential and Weibull models we have already learned are examples of **proportional hazards models**. These models begin with a **baseline hazard** that applies when $\vec{X} = \vec{0}$. For other values of $\vec{X}$, the hazard equals the baseline hazard multiplied by **hazard ratio** $e^{\vec{X}'\vec\beta}$.
+Many models we have already learned are examples of a broader model class called **proportional hazards models**. These models begin with a **baseline hazard** that applies when $\vec{X} = \vec{0}$. For other values of $\vec{X}$, the hazard equals the baseline hazard multiplied by **hazard ratio** $e^{\vec{X}'\vec\beta}$.
 
 $$
 h(t\mid\vec{X}) = \underbrace{\lambda(t)}_{\substack{\text{baseline}\\\text{hazard}}}\underbrace{e^{\vec{X}'\vec\beta}}_{\substack{\text{hazard}\\\text{ratio}}}

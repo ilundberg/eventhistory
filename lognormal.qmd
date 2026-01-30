@@ -1,0 +1,158 @@
+---
+title: "Lognormal"
+format:
+  html:
+    toc: true
+    toc-expansion: true
+    fig-height: 3
+---
+
+If $Z$ follows a Normal distribution, then $Y \sim \exp(Z)$ follows a Lognormal distribution (since then $\log(Y)$ follows a Normal distribution). The Lognormal can be used in survival analysis because it is defined on non-negative numbers. In fact, it is a common choice for modeling human mortality.
+
+The Lognormal distribution is characterized by two parameters: `meanlog` and `sdlog`, which correspond to the mean and standard deviation of the log survival time. These two parameters can define many possible curves.
+
+```{r, echo = F, message = F, warning = F}
+library(tidyverse)
+library(survival)
+```
+
+```{r, echo = F, warning = F}
+tibble(p = c(.001,seq(.01,.99,.01))) |>
+  mutate(
+    x = qlnorm(p, meanlog = 4.3, sdlog = .35),
+    f = dlnorm(x, meanlog = 4.3, sdlog = .35),
+    S = plnorm(x, meanlog = 4.3, sdlog = .35, lower.tail = F),
+    h = f / S,
+    group = 1,
+    set = "Varying sdlog"
+  ) |>
+  bind_rows(
+    tibble(p = c(.001,seq(.01,.99,.01))) |>
+      mutate(
+        x = qlnorm(p, meanlog = 4.3, sdlog = .6),
+        f = dlnorm(x, meanlog = 4.3, sdlog = .6),
+        S = plnorm(x, meanlog = 4.3, sdlog = .6, lower.tail = F),
+        h = f / S,
+        group = 2,
+    set = "Varying sdlog"
+      )
+  ) |>
+  bind_rows(
+    tibble(p = c(.001,seq(.01,.99,.01))) |>
+      mutate(
+        x = qlnorm(p, meanlog = 4.3, sdlog = .1),
+        f = dlnorm(x, meanlog = 4.3, sdlog = .1),
+        S = plnorm(x, meanlog = 4.3, sdlog = .1, lower.tail = F),
+        h = f / S,
+        group = 3,
+    set = "Varying sdlog"
+      )
+  ) |>
+  bind_rows(
+    tibble(p = c(.001,seq(.01,.99,.01))) |>
+  mutate(
+    x = qlnorm(p, meanlog = 4, sdlog = .35),
+    f = dlnorm(x, meanlog = 4, sdlog = .35),
+    S = plnorm(x, meanlog = 4, sdlog = .35, lower.tail = F),
+    h = f / S,
+    group = 1,
+    set = "Varying meanlog"
+  )
+  )|>
+  bind_rows(
+    tibble(p = c(.001,seq(.01,.99,.01))) |>
+      mutate(
+        x = qlnorm(p, meanlog = 4.3, sdlog = .35),
+        f = dlnorm(x, meanlog = 4.3, sdlog = .35),
+        S = plnorm(x, meanlog = 4.3, sdlog = .35, lower.tail = F),
+        h = f / S,
+        group = 2,
+    set = "Varying meanlog"
+      )
+  ) |>
+  bind_rows(
+    tibble(p = c(.001,seq(.01,.99,.01))) |>
+      mutate(
+        x = qlnorm(p, meanlog = 4.5, sdlog = .34),
+        f = dlnorm(x, meanlog = 4.5, sdlog = .35),
+        S = plnorm(x, meanlog = 4.5, sdlog = .35, lower.tail = F),
+        h = f / S,
+        group = 3,
+    set = "Varying meanlog"
+      )
+  ) |>
+  select(x, h, S, group, set) |>
+  #pivot_longer(cols = c("h","S")) |>
+  ggplot(aes(x = x, y = S, group = group)) +
+  geom_line() +
+  facet_wrap(~set, scales = "free_y", ncol = 2) +
+  labs(
+    y = "Survival", x = "Age", title = "Example Lognormal Survival Curves"
+  ) +
+  xlim(c(0,120))
+```
+
+### Data
+
+On this page, we will explore the lognormal to model mortality in the [deaths.csv](assets/deaths.csv) data, which I simulated from 2023 age-specific mortality rates.
+
+```{r, eval = F}
+deaths <- read_csv("https://ilundberg.github.io/eventhistory/assets/deaths.csv")
+```
+
+```{r, echo = F, message = F, warning = F}
+deaths <- read_csv("assets/deaths.csv")
+```
+
+The time variable is `age` and in these data every unit experiences the event (`died = 1` in every row).
+
+### Estimate
+
+We can fit a Lognormal model using the `survreg` function, as with other distributions.
+
+```{r}
+lognormal_model <- survreg(
+  Surv(age, event = died) ~ 1,
+  data = deaths,
+  dist = "lognormal"
+)
+```
+
+### Predict parameters
+
+In this model, the mean of the log of $Y$ is modeled by the linear predictor $\text{E}(\log(Y)\mid\vec{X} = \vec{x}) = \vec{x}'\vec\beta$ and the standard deviation of the log of $Y$, $\text{SD}(\log(Y)\mid\vec{X})$ is the scale parameter `lognormal_model$scale` which is assumed by the model to be the same at all values of $\vec{X}$ (as in homoskedastic linear regression).
+
+```{r}
+meanlog <- predict(lognormal_model, type = "linear")
+sdlog <- lognormal_model$scale
+```
+
+### Predict hazard and survival
+
+You can use the `plnorm`, `dlnorm`, and `qlnorm` functions to simulate quantities of interest given `meanlog` and `sdlog`. The process is analogous to previous models we have learned. For simplicity, here we use the [`viz_survreg()`](assets/viz_survreg.R) function that I wrote.
+
+```{r, eval = F}
+source("https://ilundberg.github.io/eventhistory/assets/viz_survreg.R")
+```
+```{r, echo = F}
+source("assets/viz_survreg.R")
+```
+```{r}
+lognormal_model |> viz_survreg()
+```
+
+Nearly everyone survives at younger ages, and then people gradually die at older ages.
+
+We can also compare the fit to a Kaplan-Meier curve to assess the validity of the parametric assumptions.
+
+```{r, eval = F}
+source("https://ilundberg.github.io/eventhistory/assets/km_compare.R")
+```
+```{r, echo = F}
+source("assets/km_compare.R")
+```
+```{r, message = F}
+lognormal_model |> km_compare()
+```
+
+In this case the fit is not that perfect: the model underestimates survival at roughly ages 50--80 and overestimates survival after age 80. On the next page, we will get a closer fit with a piecewise Exponential model.
