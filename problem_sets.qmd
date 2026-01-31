@@ -66,3 +66,22 @@ For more information on the data see `?survival::veteran`.
           - Calculate the simulated value of the `rweibull` parameter `shape`, which is `1 / exp(log_scale)` where `log_scale` is the simulated value of the log of what `survreg` calls the scale parameter
           - Simulate survival functions with those parameters
      - At each point of the survival curve, calculate the 2.5 and 97.5 percentiles of the empirical distribution of simulated draws.
+
+<!-- ## Problem Set 4: Unmeasured Heterogeneity and Competing Risks -->
+
+<!-- A researcher analyzes a setting where many subjects have cause-specific hazards (e.g., die from cancer or from heart disease). If $J = j$ is a particula cause of death, one can define a cause-specific hazard function -->
+
+<!-- $$h_j(t) = \frac{f(T = t, J = j)}{S(t)}$$ -->
+<!-- where the numerator is the probability density of death at $T = t$ from hazard $J = j$ and the denominator is the probability of survival to time $t$ without dying from any cause. -->
+
+<!-- A researcher might estimate $h_j(t)$ by treating death by $J = j$ as the event and death by any other cause as censoring. -->
+
+<!-- 1. Consider two settings. In which setting is ignorable censoring more credible, and why? -->
+<!--      a. The event is death, the cause of interest is death by COVID-19, and the other causes are other diseases. -->
+<!--      b. The event is  -->
+
+<!-- Would be nice to have a credible competing risks setting for the problem set, then ask them to apply in a less credible setting. -->
+
+<!-- Would be nice to have a setting with one large group and then subgroups (for Cox model). -->
+
+

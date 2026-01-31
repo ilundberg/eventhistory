@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>About Me – SOCIOL 213B: Applied Event History Analysis</title>
+<title>Data – SOCIOL 213B: Applied Event History Analysis</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,6 +19,41 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -67,11 +102,40 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="nav-sidebar docked nav-fixed fullcontent quarto-light">
+<body class="nav-sidebar docked nav-fixed quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -93,15 +157,15 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Problem Sets</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./datasets.html"> 
-<span class="menu-text">Data Sets</span></a>
+    <a class="nav-link active" href="./datasets.html" aria-current="page"> 
+<span class="menu-text">Data</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./assets/syllabus.pdf"> 
 <span class="menu-text">Syllabus</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./about_me.html" aria-current="page"> 
+    <a class="nav-link" href="./about_me.html"> 
 <span class="menu-text">About Me</span></a>
   </li>  
 </ul>
@@ -115,7 +179,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">About Me</li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Data</li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -206,13 +270,23 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#nlsy-many-outcomes" id="toc-nlsy-many-outcomes" class="nav-link active" data-scroll-target="#nlsy-many-outcomes">NLSY: Many outcomes</a></li>
+  <li><a href="#employment-duration" id="toc-employment-duration" class="nav-link" data-scroll-target="#employment-duration">Employment duration</a></li>
+  <li><a href="#first-marriage-duration" id="toc-first-marriage-duration" class="nav-link" data-scroll-target="#first-marriage-duration">First marriage duration</a></li>
+  </ul>
+</nav>
+    </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">About Me</h1>
+<h1 class="title">Data</h1>
 </div>
 
 
@@ -229,23 +303,85 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<div class="grid">
-<div class="g-col-12">
+<p>This page is a reference for several datasets that we use in the course.</p>
+<section id="nlsy-many-outcomes" class="level2">
+<h2 class="anchored" data-anchor-id="nlsy-many-outcomes">NLSY: Many outcomes</h2>
+<p>The file <a href="nlsy_outcomes.csv">assets/nlsy_outcomes.csv</a> contains data from the <a href="https://www.bls.gov/nls/nlsy97.htm">NLSY97</a> cross-sectional sample (excluding oversamples). Each person (indexed by <code>id</code>) has four rows corresponding to four outcomes: high school completion, BA completion, marriage, and first birth.</p>
+<ul>
+<li><code>id</code> is the person identifier</li>
+<li><code>sex</code> is a covariate from the baseline interview</li>
+<li><code>race</code> is a covariate from the baseline interview</li>
+<li><code>outcome</code> is the outcome that the row summarizes: <code>educ_hs</code> for high school completion, <code>educ_ba</code> for college, <code>married</code> for first marriage, and <code>parent</code> for first birth</li>
+<li><code>time</code> is the age in years at which the outcome occurs, or the unit is censored</li>
+<li><code>censored</code> is an indicator variable coded <code>FALSE</code> if the outcome occurs and <code>TRUE</code> if the unit was censored: the last interview happened without the event occurring. For units with <code>censored = TRUE</code>, the <code>time</code> variable is the age at the last interview.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>nlsy_outcomes <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://ilundberg.github.io/eventhistory/assets/nlsy_outcomes.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>When analyzing these data, you should first filter the data to a single value of <code>outcome</code> that you plan to study. The figure below shows Kaplan-Meier survival curves for these four outcomes.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="datasets_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="employment-duration" class="level2">
+<h2 class="anchored" data-anchor-id="employment-duration">Employment duration</h2>
+<p>This dataset can be used to model the duration of an employment spell as a function of covariates defined at the beginning of the spell.</p>
+<p>The file <a href="employment_duration.csv">assets/employment_duration.csv</a> contains data from the <a href="https://www.bls.gov/nls/nlsy97.htm">NLSY97</a> cross-sectional sample (excluding oversamples). Each row is a (person <span class="math inline">\(\times\)</span> employment spell). Variables are defined as follows:</p>
+<ul>
+<li><code>id</code> is a person identifier</li>
+<li><code>time</code> is the duration of the employment spell in years. It begins with the month a respondent moves from being non-employed to being employed at least one week. It ends with the month a respondent becomes non-employed again for an entire month.</li>
+<li><code>censored</code> is an indicator for being censored, coded <code>TRUE</code> if the last interview occurred during this employment spell and <code>FALSE</code> if the end of the employment spell was observed</li>
+<li>Two covariates are defined at the baseline survey: <code>sex</code> and <code>race</code></li>
+<li>Four covariates are defined at the start of the employment spell: <code>age</code>, <code>education</code>, <code>marital</code>, and <code>parent</code> (whether the respondent is a parent)</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>employment_duration <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://ilundberg.github.io/eventhistory/assets/employment_duration.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The figure below shows a Kaplan-Meier survival curve for first marriage duration in these data.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="datasets_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="first-marriage-duration" class="level2">
+<h2 class="anchored" data-anchor-id="first-marriage-duration">First marriage duration</h2>
+<p>This dataset can be used to model the duration of a first marriage as a function of covariates defined at the beginning of the marriage. It can also be used to reason about competing risks, because marriages end for several reasons recorded in the <code>how_end</code> variable.</p>
+<p>The file <a href="first_marriage_duration.csv">assets/first_marriage_duration.csv</a> contains data from the <a href="https://www.bls.gov/nls/nlsy97.htm">NLSY97</a> cross-sectional sample (excluding oversamples). Each row is a person who reports the start of a first marriage.</p>
+<ul>
+<li><code>id</code> is a person identifier</li>
+<li><code>censored</code> is an indicator for being censored, coded <code>TRUE</code> if the last interview occurred while the respondent was still married and <code>FALSE</code> if otherwise (i.e., end of marriage was observed)</li>
+<li><code>time</code> is the duration of the first marriage in years, until either the end of the marriage or censoring</li>
+<li><code>how_end</code> is how the marriage ended: <code>Censored</code>, <code>Divorced</code>, <code>Legally Separated</code>, or <code>Widowed</code></li>
+<li>Two covariates are defined at the baseline survey: <code>sex</code> and <code>race</code></li>
+<li>Three covariates are defined at the start of the first marriage: <code>age</code>, <code>education</code>, and <code>parent</code> (whether the respondent is a parent)</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>first_marriage_duration <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://ilundberg.github.io/eventhistory/assets/first_marriage_duration.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The figure below shows a Kaplan-Meier survival curve for first marriage duration in these data.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="datasets_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 
-</div>
-<div class="g-col-2">
-<p><img src="assets/profiles/ian.png" style="width:100%;"></p>
-</div>
-<div class="g-col-10">
-<p><a href="https://www.ianlundberg.org/"><strong>Ian Lundberg</strong></a><br>
-<a href="mailto:ianlundberg@ucla.edu"><strong>ianlundberg@ucla.edu</strong></a><br>
-(<em>he / him</em>)</p>
-<p>I am a sociologist and demographer working on developing quantitative methods to understand inequality. Survival analysis is a topic where you can quickly learn how to develop new models using Maximum Likelihood Estimation, so I hope this course will be a chance to think like a methodologist and develop new approaches tailored to your setting. Outside of work I enjoy hiking, surfing, and oatmeal with blueberries.</p>
-<p>I learned survival analysis in a course taught by Germán Rodriguez. Some of my materials are inspired by those materials available <a href="https://grodri.github.io/survival/">here</a>.</p>
-</div>
 
-
-</div>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

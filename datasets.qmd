@@ -1,0 +1,122 @@
+---
+title: "Data"
+---
+
+```{r, echo = F, message = F, warning = F}
+library(tidyverse)
+library(survival)
+library(foreach)
+```
+
+This page is a reference for several datasets that we use in the course.
+
+## NLSY: Many outcomes
+
+The file [assets/nlsy_outcomes.csv](nlsy_outcomes.csv) contains data from the [NLSY97](https://www.bls.gov/nls/nlsy97.htm) cross-sectional sample (excluding oversamples). Each person (indexed by `id`) has four rows corresponding to four outcomes: high school completion, BA completion, marriage, and first birth.
+
+-   `id` is the person identifier
+-   `sex` is a covariate from the baseline interview
+-   `race` is a covariate from the baseline interview
+-   `outcome` is the outcome that the row summarizes: `educ_hs` for high school completion, `educ_ba` for college, `married` for first marriage, and `parent` for first birth
+-   `time` is the age in years at which the outcome occurs, or the unit is censored
+-   `censored` is an indicator variable coded `FALSE` if the outcome occurs and `TRUE` if the unit was censored: the last interview happened without the event occurring. For units with `censored = TRUE`, the `time` variable is the age at the last interview.
+
+```{r, eval = F}
+nlsy_outcomes <- read_csv("https://ilundberg.github.io/eventhistory/assets/nlsy_outcomes.csv")
+```
+
+```{r, echo = F, message = F, warning = F}
+nlsy_outcomes <- read_csv("assets/nlsy_outcomes.csv")
+```
+
+When analyzing these data, you should first filter the data to a single value of `outcome` that you plan to study. The figure below shows Kaplan-Meier survival curves for these four outcomes.
+
+```{r, echo = FALSE}
+foreach(outcome_value = c("educ_hs","educ_ba","married","parent"), .combine = "rbind") %do% {
+  survfit(
+    Surv(time, event = 1 - censored) ~ 1, 
+    data = nlsy_outcomes |> filter(outcome == outcome_value)
+  ) |>
+    broom::tidy() |>
+    mutate(outcome = outcome_value)
+} |>
+  ggplot(aes(x = time, y = estimate)) +
+  geom_line() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  facet_wrap(~outcome, labeller = as_labeller(\(x) case_when(
+    x == "educ_hs" ~ "High School Degree\n(educ_hs)",
+    x == "educ_ba" ~ "4-Year College Degree\n(educ_ba)",
+    x == "married" ~ "First Marriage\n(married)",
+    x == "parent" ~ "First Birth\n(parent)"
+  ))) +
+  labs(y = "Survival: Probability of\nNot Yet Having Event", x = "Time (Age in Years)")
+```
+
+## Employment duration
+
+This dataset can be used to model the duration of an employment spell as a function of covariates defined at the beginning of the spell.
+
+The file [assets/employment_duration.csv](employment_duration.csv) contains data from the [NLSY97](https://www.bls.gov/nls/nlsy97.htm) cross-sectional sample (excluding oversamples). Each row is a (person $\times$ employment spell). Variables are defined as follows:
+
+-   `id` is a person identifier
+-   `time` is the duration of the employment spell in years. It begins with the month a respondent moves from being non-employed to being employed at least one week. It ends with the month a respondent becomes non-employed again for an entire month.
+-   `censored` is an indicator for being censored, coded `TRUE` if the last interview occurred during this employment spell and `FALSE` if the end of the employment spell was observed
+-   Two covariates are defined at the baseline survey: `sex` and `race`
+-   Four covariates are defined at the start of the employment spell: `age`, `education`, `marital`, and `parent` (whether the respondent is a parent)
+
+```{r, eval = F}
+employment_duration <- read_csv("https://ilundberg.github.io/eventhistory/assets/employment_duration.csv")
+```
+
+```{r, echo = F, message = F, warning = F}
+employment_duration <- read_csv("assets/employment_duration.csv")
+```
+
+The figure below shows a Kaplan-Meier survival curve for first marriage duration in these data.
+
+```{r, echo = F}
+survfit(
+  Surv(time, event = 1 - censored) ~ 1, 
+  data = employment_duration
+) |>
+  broom::tidy() |>
+  ggplot(aes(x = time, y = estimate)) +
+  geom_line() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(y = "Survival: Probability of\nRemaining Employed", x = "Time (Age in Years)")
+```
+
+## First marriage duration
+
+This dataset can be used to model the duration of a first marriage as a function of covariates defined at the beginning of the marriage. It can also be used to reason about competing risks, because marriages end for several reasons recorded in the `how_end` variable.
+
+The file [assets/first_marriage_duration.csv](first_marriage_duration.csv) contains data from the [NLSY97](https://www.bls.gov/nls/nlsy97.htm) cross-sectional sample (excluding oversamples). Each row is a person who reports the start of a first marriage.
+
+-   `id` is a person identifier
+-   `censored` is an indicator for being censored, coded `TRUE` if the last interview occurred while the respondent was still married and `FALSE` if otherwise (i.e., end of marriage was observed)
+-   `time` is the duration of the first marriage in years, until either the end of the marriage or censoring
+-   `how_end` is how the marriage ended: `Censored`, `Divorced`, `Legally Separated`, or `Widowed`
+-   Two covariates are defined at the baseline survey: `sex` and `race`
+-   Three covariates are defined at the start of the first marriage: `age`, `education`, and `parent` (whether the respondent is a parent)
+
+```{r, eval = F}
+first_marriage_duration <- read_csv("https://ilundberg.github.io/eventhistory/assets/first_marriage_duration.csv")
+```
+
+```{r, echo = F, message = F, warning = F}
+first_marriage_duration <- read_csv("assets/first_marriage_duration.csv")
+```
+
+The figure below shows a Kaplan-Meier survival curve for first marriage duration in these data.
+
+```{r, echo = F}
+survfit(
+  Surv(time, event = 1 - censored) ~ 1, 
+  data = first_marriage_duration
+) |>
+  broom::tidy() |>
+  ggplot(aes(x = time, y = estimate)) +
+  geom_line() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(y = "Survival: Probability of\nRemaining Married", x = "Time (Age in Years)")
+```
