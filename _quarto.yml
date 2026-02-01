@@ -16,8 +16,10 @@ website:
     right:
       - href: problem_sets.qmd
         text: Problem Sets
-      - href: datasets.qmd
+      - href: data.qmd
         text: Data
+      - href: helper_functions.qmd
+        text: Helper Functions
       - href: assets/syllabus.pdf
         text: Syllabus
       - about_me.qmd

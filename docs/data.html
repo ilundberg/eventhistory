@@ -157,8 +157,12 @@ window.Quarto = {
 <span class="menu-text">Problem Sets</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./datasets.html" aria-current="page"> 
+    <a class="nav-link active" href="./data.html" aria-current="page"> 
 <span class="menu-text">Data</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./helper_functions.html"> 
+<span class="menu-text">Helper Functions</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./assets/syllabus.pdf"> 
@@ -275,9 +279,12 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#nlsy-many-outcomes" id="toc-nlsy-many-outcomes" class="nav-link active" data-scroll-target="#nlsy-many-outcomes">NLSY: Many outcomes</a></li>
+  <li><a href="#four-life-outcomes" id="toc-four-life-outcomes" class="nav-link active" data-scroll-target="#four-life-outcomes">Four life outcomes</a></li>
   <li><a href="#employment-duration" id="toc-employment-duration" class="nav-link" data-scroll-target="#employment-duration">Employment duration</a></li>
   <li><a href="#first-marriage-duration" id="toc-first-marriage-duration" class="nav-link" data-scroll-target="#first-marriage-duration">First marriage duration</a></li>
+  <li><a href="#u.s.-life-table-deaths" id="toc-u.s.-life-table-deaths" class="nav-link" data-scroll-target="#u.s.-life-table-deaths">U.S. life table deaths</a></li>
+  <li><a href="#heart-recipients" id="toc-heart-recipients" class="nav-link" data-scroll-target="#heart-recipients">Heart recipients</a></li>
+  <li><a href="#justice-retirement" id="toc-justice-retirement" class="nav-link" data-scroll-target="#justice-retirement">Justice retirement</a></li>
   </ul>
 </nav>
     </div>
@@ -304,8 +311,8 @@ window.Quarto = {
 
 
 <p>This page is a reference for several datasets that we use in the course.</p>
-<section id="nlsy-many-outcomes" class="level2">
-<h2 class="anchored" data-anchor-id="nlsy-many-outcomes">NLSY: Many outcomes</h2>
+<section id="four-life-outcomes" class="level2">
+<h2 class="anchored" data-anchor-id="four-life-outcomes">Four life outcomes</h2>
 <p>The file <a href="nlsy_outcomes.csv">assets/nlsy_outcomes.csv</a> contains data from the <a href="https://www.bls.gov/nls/nlsy97.htm">NLSY97</a> cross-sectional sample (excluding oversamples). Each person (indexed by <code>id</code>) has four rows corresponding to four outcomes: high school completion, BA completion, marriage, and first birth.</p>
 <ul>
 <li><code>id</code> is the person identifier</li>
@@ -323,7 +330,7 @@ window.Quarto = {
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="datasets_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="data_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -348,7 +355,7 @@ window.Quarto = {
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="datasets_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="data_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -374,7 +381,84 @@ window.Quarto = {
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="datasets_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="data_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="u.s.-life-table-deaths" class="level2">
+<h2 class="anchored" data-anchor-id="u.s.-life-table-deaths">U.S. life table deaths</h2>
+<p>Using 2023 U.S. age-specific mortality data from an <a href="https://www.cdc.gov/nchs/products/databriefs/db548.htm">NCHS report</a>, I generated deaths for a hypothetical population that experiences these rates, available in <a href="assets/deaths.csv">deaths.csv</a>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>deaths <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://ilundberg.github.io/eventhistory/assets/deaths.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>These data include</p>
+<ul>
+<li><code>id</code> indexes simulated persons</li>
+<li><code>age</code> is the time variable</li>
+<li><code>died</code> is whether the person died (<code>died = 1</code>) or was censored (<code>died = 0</code>)</li>
+</ul>
+<p>The figure below visualizes Kaplan-Meier survival estimates in these data.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="data_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="heart-recipients" class="level2">
+<h2 class="anchored" data-anchor-id="heart-recipients">Heart recipients</h2>
+<p>These data come from a medical trial that tracked survival outcomes of patients receiving heart transplants.</p>
+<blockquote class="blockquote">
+<p>Crowley, J., &amp; Hu, M. (1977). Covariance analysis of heart transplant survival data. Journal of the American Statistical Association, 72(357), 27-36.</p>
+</blockquote>
+<p>The trail enrolled people eligible for heart transplants, some of whom later received transplants and some did not. The full data are available in the <code>jasa</code> data object of the <code>survival</code> package. A simplified version of the data focuses on survival outcomes post-transplant for transplant recipients. This simplified file is <a href="assets/heart_recipients.csv">heart_recipients.csv</a>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>heart_recipients <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://ilundberg.github.io/eventhistory/assets/heart_recipients.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>In the <code>heart_recipients</code> data,</p>
+<ul>
+<li><code>t</code> is time in years from transplant until either death or censoring</li>
+<li><code>c</code> is censoring, coded <code>TRUE</code> for censoring and <code>FALSE</code> for death</li>
+<li><code>age</code> is the patient’s age at the time of transplant</li>
+</ul>
+<p>Below is a Kaplan-Meier survival curve with these data.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="data_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="justice-retirement" class="level2">
+<h2 class="anchored" data-anchor-id="justice-retirement">Justice retirement</h2>
+<p>These data were originally collected by German Rodriguez (<a href="https://grodri.github.io/survival/justices">original source</a>). He used Wikipedia and the Supreme Court website to create a dataset on the time that Supreme Court justices were in office, and how their time ended (retirement, resignation, death, still an incumbent).</p>
+<p>A simplified version of these data is <a href="assets/retirement.csv">retirement.csv</a></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>retirement <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://ilundberg.github.io/eventhistory/assets/retirement.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>These data contain</p>
+<ul>
+<li><code>number</code> indexes Supreme Court justices</li>
+<li><code>name</code> contains names</li>
+<li><code>state</code> contains the justice’s home state</li>
+<li><code>age_appointed</code> is the age at which the justice was appointed</li>
+<li><code>status</code> indicates how the term ended (<code>Resigned</code>, <code>Retired</code>, or <code>Died</code>)</li>
+<li><code>t</code> is the total time from appointment until <code>status</code></li>
+</ul>
+<p>The graph below shows the cumulative proportion in each status over time.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="data_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>

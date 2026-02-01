@@ -1,0 +1,104 @@
+---
+title: "Helper Functions"
+format:
+  html:
+    toc: true
+    toc-expansion: true
+    fig-height: 3
+---
+
+```{r, echo = F, message = F, warning = F}
+library(tidyverse)
+library(survival)
+```
+
+Translating survival models to quantities of interest (such as survival curves) can be cumbersome. While the exercise is worth doing once, students have suggested that it would be helpful to have functions that could carry out some of the steps automatically. Below are two functions that we use in the class to bundle these steps.
+
+## `viz_survreg`: Visualize a `survreg` model
+
+The [`viz_survreg`](assets/viz_survreg.R) function visualizes a survival model estimated with the `survreg` function.
+
+* The argument `x` is a fitted model object of class `survreg`
+* The function prints a `ggplot` object with estiamted hazard and survival curves
+
+Currently, this function only supports `survreg` models with `dist = "weibull"`, `dist = "exponential"`, or `dist = "lognormal"`. It will plot the estimated curves at the minimum, median, and maximum values of the linear predictor $\vec{X}'\hat{\vec\beta}$.
+
+You can click [`viz_survreg`](assets/viz_survreg.R) to see the source code. You can load this function with.
+
+```{r, eval = F}
+source("https://ilundberg.github.io/eventhistory/assets/viz_survreg.R")
+```
+```{r, echo = F}
+source("assets/viz_survreg.R")
+```
+
+To illustrate this function, the code below loads the `first_marriage_duration` data,
+
+```{r, echo = F, message = F, warning = F}
+first_marriage_duration <- read_csv("assets/first_marriage_duration.csv")
+```
+```{r, eval = F}
+first_marriage_duration <- read_csv("https://ilundberg.github.io/eventhistory/assets/first_marriage_duration.csv")
+```
+
+estimates a Weibull survival model,
+
+```{r}
+weibull_model <- survreg(
+  Surv(time, event = 1 - censored) ~ 1,
+  data = first_marriage_duration,
+  dist = "weibull"
+)
+```
+
+and then visualizes the estimated model.
+
+```{r, message = F, fig.height = 4}
+viz_survreg(weibull_model)
+```
+
+## `km_compare`: Compare to Kaplan-Meier
+
+The [`km_compare`](assets/km_compare.R) function compares model-based survival estimates to nonparametric Kaplan-Meier estimates.
+
+* The argument `x` is a fitted model object of class `survreg`
+* The optional argument `subgroup_rows` is a numeric vector with the indices of cases from the fitted model object where you seek to make predictions.
+     * If provided, the function will compare a Kaplan-Meier curve on this subgroup to the model-based predicted survival curve averaged over this subgroup.
+     * If not provided, the function will compare a Kaplan-Meier curve on the full data to the model-bsaed predictions averaged over the full data.
+* The function prints a `ggplot` object with estiamted hazard and survival curves
+
+Currently, this function only supports `survreg` models with `dist = "weibull"`, `dist = "exponential"`, or `dist = "lognormal"`.
+
+You can click [`km_compare`](assets/km_compare.R) to see the source code. You can load this function with.
+
+```{r, eval = F}
+source("https://ilundberg.github.io/eventhistory/assets/km_compare.R")
+```
+```{r, echo = F}
+source("assets/km_compare.R")
+```
+
+To illustrate this function, the code below loads the `first_marriage_duration` data,
+
+```{r, echo = F, message = F, warning = F}
+first_marriage_duration <- read_csv("assets/first_marriage_duration.csv")
+```
+```{r, eval = F}
+first_marriage_duration <- read_csv("https://ilundberg.github.io/eventhistory/assets/first_marriage_duration.csv")
+```
+
+estimates a Weibull survival model,
+
+```{r}
+weibull_model <- survreg(
+  Surv(time, event = 1 - censored) ~ 1,
+  data = first_marriage_duration,
+  dist = "weibull"
+)
+```
+
+and then visualizes the Kaplan-Meier comparison with the helper function.
+
+```{r, message = F}
+km_compare(weibull_model)
+```

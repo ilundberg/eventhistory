@@ -122,8 +122,12 @@ window.Quarto = {
 <span class="menu-text">Problem Sets</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./datasets.html"> 
-<span class="menu-text">Data Sets</span></a>
+    <a class="nav-link" href="./data.html"> 
+<span class="menu-text">Data</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./helper_functions.html"> 
+<span class="menu-text">Helper Functions</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./assets/syllabus.pdf"> 
@@ -243,6 +247,7 @@ window.Quarto = {
   <li><a href="#problem-set-1-key-concepts" id="toc-problem-set-1-key-concepts" class="nav-link active" data-scroll-target="#problem-set-1-key-concepts">Problem Set 1: Key Concepts</a></li>
   <li><a href="#problem-set-2-exponential" id="toc-problem-set-2-exponential" class="nav-link" data-scroll-target="#problem-set-2-exponential">Problem Set 2: Exponential</a></li>
   <li><a href="#problem-set-3-weibull" id="toc-problem-set-3-weibull" class="nav-link" data-scroll-target="#problem-set-3-weibull">Problem Set 3: Weibull</a></li>
+  <li><a href="#problem-set-4-recap-of-survival-analysis" id="toc-problem-set-4-recap-of-survival-analysis" class="nav-link" data-scroll-target="#problem-set-4-recap-of-survival-analysis">Problem Set 4: Recap of Survival Analysis</a></li>
   </ul>
 </nav>
     </div>
@@ -367,7 +372,29 @@ window.Quarto = {
 <li>At each point of the survival curve, calculate the 2.5 and 97.5 percentiles of the empirical distribution of simulated draws.</li>
 </ul></li>
 </ol>
-<!-- ## Problem Set 4: Unmeasured Heterogeneity and Competing Risks -->
+</section>
+<section id="problem-set-4-recap-of-survival-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="problem-set-4-recap-of-survival-analysis">Problem Set 4: Recap of Survival Analysis</h2>
+<p>This problem set asks you to carry out a survival analysis of your choosing using concepts we have learned in the course. Choose one of the NLSY datasets on the <a href="./data.html">data</a> page, which include</p>
+<ul>
+<li><a href="nlsy_outcomes.csv">assets/nlsy_outcomes.csv</a> which contains time to high school completion, college completion, marriage, and parenthood with a few basic covariates
+<ul>
+<li>In this dataset, you would likely choose 1 of the 4 outcomes</li>
+</ul></li>
+<li><a href="employment_duration.csv">assets/employment_duration.csv</a> which contains the duration of spells of employment, with many covariates defined at the start of the spell</li>
+<li><a href="first_marriage_duration.csv">assets/first_marriage_duration.csv</a> which contains the duration of first marriages, with many covariates defined at the start of the spell</li>
+</ul>
+<p>Below are the questions for the problem set.</p>
+<ol type="1">
+<li>Define time 0, time to event, and censoring for your question.</li>
+<li>Visualize survival with Kaplan-Meier. Interpret something about the estimated curve.</li>
+<li>Using one or more covariates and a model with a parametric hazard, compare survival curves across subgroups.
+<ul>
+<li>Explain why you made your particular modeling choices.</li>
+</ul></li>
+<li>In words, give an example of non-ignorable censoring that could exist in your setting.</li>
+<li>In words, give an example of unmeasured heterogeneity that could exist in your setting. How might this affect the estimated hazard function?</li>
+</ol>
 <!-- A researcher analyzes a setting where many subjects have cause-specific hazards (e.g., die from cancer or from heart disease). If $J = j$ is a particula cause of death, one can define a cause-specific hazard function -->
 <!-- $$h_j(t) = \frac{f(T = t, J = j)}{S(t)}$$ -->
 <!-- where the numerator is the probability density of death at $T = t$ from hazard $J = j$ and the denominator is the probability of survival to time $t$ without dying from any cause. -->

@@ -1,5 +1,10 @@
 ---
 title: "Data"
+format:
+  html:
+    toc: true
+    toc-expansion: true
+    fig-height: 3
 ---
 
 ```{r, echo = F, message = F, warning = F}
@@ -10,7 +15,7 @@ library(foreach)
 
 This page is a reference for several datasets that we use in the course.
 
-## NLSY: Many outcomes
+## Four life outcomes
 
 The file [assets/nlsy_outcomes.csv](nlsy_outcomes.csv) contains data from the [NLSY97](https://www.bls.gov/nls/nlsy97.htm) cross-sectional sample (excluding oversamples). Each person (indexed by `id`) has four rows corresponding to four outcomes: high school completion, BA completion, marriage, and first birth.
 
@@ -119,4 +124,115 @@ survfit(
   geom_line() +
   geom_hline(yintercept = 0, linetype = "dashed") +
   labs(y = "Survival: Probability of\nRemaining Married", x = "Time (Age in Years)")
+```
+
+## U.S. life table deaths
+
+Using 2023 U.S. age-specific mortality data from an [NCHS report](https://www.cdc.gov/nchs/products/databriefs/db548.htm), I generated deaths for a hypothetical population that experiences these rates, available in [deaths.csv](assets/deaths.csv).
+
+```{r, eval = F}
+deaths <- read_csv("https://ilundberg.github.io/eventhistory/assets/deaths.csv")
+```
+
+These data include
+
+* `id` indexes simulated persons
+* `age` is the time variable
+* `died` is whether the person died (`died = 1`) or was censored (`died = 0`)
+
+The figure below visualizes Kaplan-Meier survival estimates in these data.
+
+```{r, echo = FALSE, warning = F, message = F}
+deaths <- read_csv(file = "assets/deaths.csv")
+survfit(
+  Surv(age, event = died) ~ 1, 
+  data = deaths
+) |>
+  broom::tidy() |>
+  ggplot(aes(x = time, y = estimate)) +
+  geom_line() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(y = "Survival", x = "Age")
+```
+
+## Heart recipients
+
+These data come from a medical trial that tracked survival outcomes of patients receiving heart transplants. 
+
+> Crowley, J., & Hu, M. (1977). Covariance analysis of heart transplant survival data. Journal of the American Statistical Association, 72(357), 27-36.
+
+The trail enrolled people eligible for heart transplants, some of whom later received transplants and some did not. The full data are available in the `jasa` data object of the `survival` package. A simplified version of the data focuses on survival outcomes post-transplant for transplant recipients. This simplified file is [heart_recipients.csv](assets/heart_recipients.csv).
+
+```{r, eval = F}
+heart_recipients <- read_csv("https://ilundberg.github.io/eventhistory/assets/heart_recipients.csv")
+```
+
+In the `heart_recipients` data,
+
+* `t` is time in years from transplant until either death or censoring
+* `c` is censoring, coded `TRUE` for censoring and `FALSE` for death
+* `age` is the patient's age at the time of transplant
+
+Below is a Kaplan-Meier survival curve with these data.
+
+```{r, echo = F, warning = F, message = F}
+heart_recipients <- read_csv("assets/heart_recipients.csv")
+survfit(
+  Surv(t, event = 1 - c) ~ 1, 
+  data = heart_recipients
+) |>
+  broom::tidy() |>
+  ggplot(aes(x = time, y = estimate)) +
+  geom_line() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(y = "Survival", x = "Time Since Transplant (Years)")
+```
+
+## Justice retirement
+
+These data were originally collected by German Rodriguez ([original source](https://grodri.github.io/survival/justices)). He used Wikipedia and the Supreme Court website to create a dataset on the time that Supreme Court justices were in office, and how their time ended (retirement, resignation, death, still an incumbent).
+
+A simplified version of these data is [retirement.csv](assets/retirement.csv)
+
+```{r, eval = F}
+retirement <- read_csv("https://ilundberg.github.io/eventhistory/assets/retirement.csv")
+```
+
+These data contain
+
+- `number` indexes Supreme Court justices
+- `name` contains names
+- `state` contains the justice's home state
+- `age_appointed` is the age at which the justice was appointed
+- `status` indicates how the term ended (`Resigned`, `Retired`, or `Died`)
+- `t` is the total time from appointment until `status`
+
+The graph below shows the cumulative proportion in each status over time.
+
+```{r, echo = F, message = F, warning = F}
+library(foreach)
+retirement <- read_csv("assets/retirement.csv")
+by_years <- foreach(years_val = 1:35, .combine = "rbind") %do% {
+  tibble(
+    years = years_val,
+    active = mean(retirement$t > years_val),
+    retired = mean(retirement$t <= years_val & retirement$status == "Retired"),
+    resigned = mean(retirement$t <= years_val & retirement$status == "Resigned"),
+    died = mean(retirement$t <= years_val & retirement$status == "Died")
+  )
+}
+by_years |>
+  pivot_longer(cols = -years, names_to = "status") |>
+  ggplot(aes(x = years, y = value, color = status, linetype = status)) +
+  geom_line() +
+  labs(
+    x = "Years Since Appointment",
+    y = "Probability of Status",
+    color = "Status",
+    linetype = "Status",
+    title = "Mortality and retirement of Supreme Court justices",
+    caption = "The retired status includes those who resigned."
+  ) +
+  scale_color_discrete(labels = stringr::str_to_sentence) +
+  scale_linetype_discrete(labels = stringr::str_to_sentence)
 ```
