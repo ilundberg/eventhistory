@@ -313,7 +313,7 @@ window.Quarto = {
 <p>This page is a reference for several datasets that we use in the course.</p>
 <section id="four-life-outcomes" class="level2">
 <h2 class="anchored" data-anchor-id="four-life-outcomes">Four life outcomes</h2>
-<p>The file <a href="nlsy_outcomes.csv">assets/nlsy_outcomes.csv</a> contains data from the <a href="https://www.bls.gov/nls/nlsy97.htm">NLSY97</a> cross-sectional sample (excluding oversamples). Each person (indexed by <code>id</code>) has four rows corresponding to four outcomes: high school completion, BA completion, marriage, and first birth.</p>
+<p>The file <a href="assets/nlsy_outcomes.csv">nlsy_outcomes.csv</a> contains data from the <a href="https://www.bls.gov/nls/nlsy97.htm">NLSY97</a> cross-sectional sample (excluding oversamples). Each person (indexed by <code>id</code>) has four rows corresponding to four outcomes: high school completion, BA completion, marriage, and first birth.</p>
 <ul>
 <li><code>id</code> is the person identifier</li>
 <li><code>sex</code> is a covariate from the baseline interview</li>
@@ -339,7 +339,7 @@ window.Quarto = {
 <section id="employment-duration" class="level2">
 <h2 class="anchored" data-anchor-id="employment-duration">Employment duration</h2>
 <p>This dataset can be used to model the duration of an employment spell as a function of covariates defined at the beginning of the spell.</p>
-<p>The file <a href="employment_duration.csv">assets/employment_duration.csv</a> contains data from the <a href="https://www.bls.gov/nls/nlsy97.htm">NLSY97</a> cross-sectional sample (excluding oversamples). Each row is a (person <span class="math inline">\(\times\)</span> employment spell). Variables are defined as follows:</p>
+<p>The file <a href="assets/employment_duration.csv">employment_duration.csv</a> contains data from the <a href="https://www.bls.gov/nls/nlsy97.htm">NLSY97</a> cross-sectional sample (excluding oversamples). Each row is a (person <span class="math inline">\(\times\)</span> employment spell). Variables are defined as follows:</p>
 <ul>
 <li><code>id</code> is a person identifier</li>
 <li><code>time</code> is the duration of the employment spell in years. It begins with the month a respondent moves from being non-employed to being employed at least one week. It ends with the month a respondent becomes non-employed again for an entire month.</li>
@@ -364,7 +364,7 @@ window.Quarto = {
 <section id="first-marriage-duration" class="level2">
 <h2 class="anchored" data-anchor-id="first-marriage-duration">First marriage duration</h2>
 <p>This dataset can be used to model the duration of a first marriage as a function of covariates defined at the beginning of the marriage. It can also be used to reason about competing risks, because marriages end for several reasons recorded in the <code>how_end</code> variable.</p>
-<p>The file <a href="first_marriage_duration.csv">assets/first_marriage_duration.csv</a> contains data from the <a href="https://www.bls.gov/nls/nlsy97.htm">NLSY97</a> cross-sectional sample (excluding oversamples). Each row is a person who reports the start of a first marriage.</p>
+<p>The file <a href="assets/first_marriage_duration.csv">first_marriage_duration.csv</a> contains data from the <a href="https://www.bls.gov/nls/nlsy97.htm">NLSY97</a> cross-sectional sample (excluding oversamples). Each row is a person who reports the start of a first marriage.</p>
 <ul>
 <li><code>id</code> is a person identifier</li>
 <li><code>censored</code> is an indicator for being censored, coded <code>TRUE</code> if the last interview occurred while the respondent was still married and <code>FALSE</code> if otherwise (i.e., end of marriage was observed)</li>

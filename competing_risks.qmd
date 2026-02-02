@@ -52,7 +52,8 @@ retirement <- read_csv("https://ilundberg.github.io/eventhistory/assets/retireme
 
 Initially, the justices are all active. Over time since appointment, they gradually move into one of two final states: either death (`status = "Died"`) or retirement (`status = "Resigned"` or `status = "Retired"`).
 
-```{r, warning = F, message = F, echo = F}
+```{r, warning = F, message = F}
+#| code-fold: true
 library(foreach)
 by_years <- foreach(years_val = 1:35, .combine = "rbind") %do% {
   tibble(

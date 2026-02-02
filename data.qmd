@@ -17,7 +17,7 @@ This page is a reference for several datasets that we use in the course.
 
 ## Four life outcomes
 
-The file [assets/nlsy_outcomes.csv](nlsy_outcomes.csv) contains data from the [NLSY97](https://www.bls.gov/nls/nlsy97.htm) cross-sectional sample (excluding oversamples). Each person (indexed by `id`) has four rows corresponding to four outcomes: high school completion, BA completion, marriage, and first birth.
+The file [nlsy_outcomes.csv](assets/nlsy_outcomes.csv) contains data from the [NLSY97](https://www.bls.gov/nls/nlsy97.htm) cross-sectional sample (excluding oversamples). Each person (indexed by `id`) has four rows corresponding to four outcomes: high school completion, BA completion, marriage, and first birth.
 
 -   `id` is the person identifier
 -   `sex` is a covariate from the baseline interview
@@ -61,7 +61,7 @@ foreach(outcome_value = c("educ_hs","educ_ba","married","parent"), .combine = "r
 
 This dataset can be used to model the duration of an employment spell as a function of covariates defined at the beginning of the spell.
 
-The file [assets/employment_duration.csv](employment_duration.csv) contains data from the [NLSY97](https://www.bls.gov/nls/nlsy97.htm) cross-sectional sample (excluding oversamples). Each row is a (person $\times$ employment spell). Variables are defined as follows:
+The file [employment_duration.csv](assets/employment_duration.csv) contains data from the [NLSY97](https://www.bls.gov/nls/nlsy97.htm) cross-sectional sample (excluding oversamples). Each row is a (person $\times$ employment spell). Variables are defined as follows:
 
 -   `id` is a person identifier
 -   `time` is the duration of the employment spell in years. It begins with the month a respondent moves from being non-employed to being employed at least one week. It ends with the month a respondent becomes non-employed again for an entire month.
@@ -95,7 +95,7 @@ survfit(
 
 This dataset can be used to model the duration of a first marriage as a function of covariates defined at the beginning of the marriage. It can also be used to reason about competing risks, because marriages end for several reasons recorded in the `how_end` variable.
 
-The file [assets/first_marriage_duration.csv](first_marriage_duration.csv) contains data from the [NLSY97](https://www.bls.gov/nls/nlsy97.htm) cross-sectional sample (excluding oversamples). Each row is a person who reports the start of a first marriage.
+The file [first_marriage_duration.csv](assets/first_marriage_duration.csv) contains data from the [NLSY97](https://www.bls.gov/nls/nlsy97.htm) cross-sectional sample (excluding oversamples). Each row is a person who reports the start of a first marriage.
 
 -   `id` is a person identifier
 -   `censored` is an indicator for being censored, coded `TRUE` if the last interview occurred while the respondent was still married and `FALSE` if otherwise (i.e., end of marriage was observed)
