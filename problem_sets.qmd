@@ -71,10 +71,10 @@ For more information on the data see `?survival::veteran`.
 
 This problem set asks you to carry out a survival analysis of your choosing using concepts we have learned in the course. Choose one of the NLSY datasets on the [data](data.qmd) page, which include
 
-* [assets/nlsy_outcomes.csv](nlsy_outcomes.csv) which contains time to high school completion, college completion, marriage, and parenthood with a few basic covariates
+* [nlsy_outcomes.csv](assets/nlsy_outcomes.csv) which contains time to high school completion, college completion, marriage, and parenthood with a few basic covariates
      * In this dataset, you would likely choose 1 of the 4 outcomes
-* [assets/employment_duration.csv](employment_duration.csv) which contains the duration of spells of employment, with many covariates defined at the start of the spell
-* [assets/first_marriage_duration.csv](first_marriage_duration.csv) which contains the duration of first marriages, with many covariates defined at the start of the spell
+* [employment_duration.csv](assets/employment_duration.csv) which contains the duration of spells of employment, with many covariates defined at the start of the spell
+* [first_marriage_duration.csv](assets/first_marriage_duration.csv) which contains the duration of first marriages, with many covariates defined at the start of the spell
 
 Below are the questions for the problem set.
 
