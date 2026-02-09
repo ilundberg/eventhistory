@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Causal Inference with Survival Outcomes – SOCIOL 213B: Applied Event History Analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-2757cfadcc89ddbfb9e61569f8c3689f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">SOCIOL 213B: Applied Event History Analysis</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./problem_sets.html"> 
+<span class="menu-text">Problem Sets</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./data.html"> 
+<span class="menu-text">Data</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./helper_functions.html"> 
+<span class="menu-text">Helper Functions</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./assets/syllabus.pdf"> 
+<span class="menu-text">Syllabus</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./about_me.html"> 
+<span class="menu-text">About Me</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./causal_survival_outcome.html">Causal Inference in Event History Settings</a></li><li class="breadcrumb-item"><a href="./causal_survival_outcome.html">Causal Inference with Survival Outcomes</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Descriptive Survival Analysis</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./survival_concepts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Survival Analysis: Key Concepts</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./kaplanmeier.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Kaplan-Meier</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bernoulli.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MLE Review: Bernoulli</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./exponential.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exponential</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./weibull.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Weibull</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./lognormal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lognormal</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./piecewise_exponential.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Piecewise Exponential</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./proportional_hazards.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Proportional Hazards</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./cox.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Cox Proportional Hazards</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./unmeasured_heterogeneity.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Unmeasured Heterogeneity</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./competing_risks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Competing Risks</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Causal Inference in Event History Settings</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./causal_survival_outcome.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Causal Inference with Survival Outcomes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./observational.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Observational Studies</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./outcome_model.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Outcome Modeling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./marginal_structural_model.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MSM with One Treatment Period</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#review-of-causal-inference" id="toc-review-of-causal-inference" class="nav-link active" data-scroll-target="#review-of-causal-inference">Review of causal inference</a>
+  <ul class="collapse">
+  <li><a href="#fundamental-problem-of-causal-inference" id="toc-fundamental-problem-of-causal-inference" class="nav-link" data-scroll-target="#fundamental-problem-of-causal-inference">Fundamental problem of causal inference</a></li>
+  <li><a href="#mathematical-notation" id="toc-mathematical-notation" class="nav-link" data-scroll-target="#mathematical-notation">Mathematical notation</a></li>
+  </ul></li>
+  <li><a href="#survival-outcomes-what-changes" id="toc-survival-outcomes-what-changes" class="nav-link" data-scroll-target="#survival-outcomes-what-changes">Survival outcomes: What changes?</a></li>
+  <li><a href="#clock-seems-to-start-before-treatment" id="toc-clock-seems-to-start-before-treatment" class="nav-link" data-scroll-target="#clock-seems-to-start-before-treatment">Clock seems to start before treatment</a></li>
+  <li><a href="#clock-seems-to-start-after-treatment" id="toc-clock-seems-to-start-after-treatment" class="nav-link" data-scroll-target="#clock-seems-to-start-after-treatment">Clock seems to start after treatment</a>
+  <ul class="collapse">
+  <li><a href="#option-redefine-the-outcome" id="toc-option-redefine-the-outcome" class="nav-link" data-scroll-target="#option-redefine-the-outcome">Option: Redefine the outcome</a></li>
+  <li><a href="#option-mediation-estimands" id="toc-option-mediation-estimands" class="nav-link" data-scroll-target="#option-mediation-estimands">Option: Mediation estimands</a></li>
+  <li><a href="#option-principal-stratification-estimands" id="toc-option-principal-stratification-estimands" class="nav-link" data-scroll-target="#option-principal-stratification-estimands">Option: Principal stratification estimands</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./causal_survival_outcome.html">Causal Inference in Event History Settings</a></li><li class="breadcrumb-item"><a href="./causal_survival_outcome.html">Causal Inference with Survival Outcomes</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Causal Inference with Survival Outcomes</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="review-of-causal-inference" class="level2">
+<h2 class="anchored" data-anchor-id="review-of-causal-inference">Review of causal inference</h2>
+<blockquote class="blockquote">
+<p>This material is taken from Soc 212B.</p>
+</blockquote>
+<section id="fundamental-problem-of-causal-inference" class="level3">
+<h3 class="anchored" data-anchor-id="fundamental-problem-of-causal-inference">Fundamental problem of causal inference</h3>
+<p>Health professionals often advise people to eat a Mediterranean diet high in healthy fats such as olive oil, whole grains, and fruits. There is descriptive evidence that lifespans are longer among people who eat a Mediterranean diet compared with among people who eat a standard diet. But does eating a Mediterranean diet cause longer lifespan? The figure below visualizes this question in the potential outcomes framework.</p>
+<p><img src="assets/mediterranean_science_table.png" class="img-fluid"></p>
+<p>In this hypothetical example, each row corresponds to a person. Person 1 follows a Mediterranean diet and is observed to have a lifespan indicated in blue. Person 2 does not follow a Mediterranean diet and is observed to have a lifespan indicated in green. The descriptive evidence is that lifespans are longer among those eating a Mediterranean diet (blue outcomes on the left) compared with those eating standard diets (green outcomes on the left).</p>
+<p>The right side of the figure corresponds to the causal claim, which is different. Person 1 has two <strong>potential outcomes</strong>: a lifespan that would be realized under a Mediterranean diet and a lifespan that would be realized under a standard diet. The causal effect for Person 1 is the difference between the lifespans that would be realized for that person under each of the two diets. But there is a fundamental problem: person 1 ate a Mediterranean diet, and we did not get to observe their outcome under a standard diet. The fundamental problem of causal inference (<a href="https://www.tandfonline.com/doi/abs/10.1080/01621459.1986.10478354">Holland 1986</a>) is that causal claims involve a contrast between potential outcomes, but for each unit only one of these potential outcomes is realized. The other is counterfactual and cannot be directly observed.</p>
+<p>We will need additional argument and assumptions to use the factual data (left side of the figure) in order to produce answers about causal effects (right side of the figure). Causal inference is a missing data problem insofar as many of the potential outcomes we need are missing.</p>
+</section>
+<section id="mathematical-notation" class="level3">
+<h3 class="anchored" data-anchor-id="mathematical-notation">Mathematical notation</h3>
+<p>Because each person has more than one potential outcome, we need new mathematical notation to formalize causal claims. We will use subscripts to indicate units (rows of our data). Let <span class="math inline">\(Y_i\)</span> be the outcome for person <span class="math inline">\(i\)</span>, such as whether person <span class="math inline">\(i\)</span> survived. Let <span class="math inline">\(A_i\)</span> be the treatment of person <span class="math inline">\(i\)</span>, for example taking the value or the value . To refer more abstractly to a value the treatment could take, we use the lower case notation <span class="math inline">\(a\)</span> for a treatment value. Define potential outcomes <span class="math inline">\(Y_i^\text{MediterraneanDiet}\)</span> and <span class="math inline">\(Y_i^\text{StandardDiet}\)</span> as the lifespan outcomes that person <span class="math inline">\(i\)</span> would realize under each of the treatment conditions. More generally, let <span class="math inline">\(Y_i^a\)</span> denote the potential outcome for unit <span class="math inline">\(i\)</span> that would be realized if assigned to treatment value <span class="math inline">\(a\)</span>.</p>
+<p>The causal effect is a contrast across potential outcomes. For example, the causal effect on Ian’s lifespan of eating a Mediterranean diet versus a standard diet is <span class="math display">\[Y_\text{Ian}^\text{MediterraneanDiet} - Y_\text{Ian}^\text{StandardDiet}\]</span></p>
+<p>To connect causal claims to ideas we have already covered from sampling, we will adopt a framework in which potential outcomes are fixed quantities with randomness arising from sampling and/or from random treatment assignment. Each person has a fixed outcome <span class="math inline">\(Y_i^\text{MediterraneanDiet}\)</span> that would be observed if they were sampled and assigned a Mediterranean diet. This is just like how every baseball player from last week had a salary that would be observed if they were sampled. We will sometimes omit the <span class="math inline">\(i\)</span> subscript to refer to the random variable for the potential outcome of a randomly-sampled person from the population, <span class="math inline">\(Y^\text{MediterraneanDiet}\)</span>.</p>
+</section>
+</section>
+<section id="survival-outcomes-what-changes" class="level2">
+<h2 class="anchored" data-anchor-id="survival-outcomes-what-changes">Survival outcomes: What changes?</h2>
+<p>What is different for survival outcomes? In some sense, very little changes. At time <span class="math inline">\(t = 0\)</span>, each participant <span class="math inline">\(i\)</span> is randomized to the treatment <span class="math inline">\(A_i = 0\)</span> or <span class="math inline">\(A_i = 1\)</span>. We might define survival <span class="math inline">\(Y_i\)</span> as the time since that point until death.</p>
+<p>Very little has changed. Given that you already know survival models, one trivial change is that there may be censoring: some people drop out of the study (<span class="math inline">\(C_i = 1)\)</span> before death. But under ignorable censoring, this change is easily solved by using Kaplan-Meier or a parametric survival model like the Weibull. Simply estimate survival curves in the treated and untreated groups.</p>
+<p>In a simple and well-designed study, nothing else changes. But in many realistic settings, causal inference for survival outcomes brings additional care that must be placed on the alignment of the clock.</p>
+</section>
+<section id="clock-seems-to-start-before-treatment" class="level2">
+<h2 class="anchored" data-anchor-id="clock-seems-to-start-before-treatment">Clock seems to start before treatment</h2>
+<p>When setting up a survival analysis, one of the first questions is what time should be time zero. The wrong choice can make your causal inference much more complicated, as we illustrate through an example.</p>
+<p>A set of <span class="math inline">\(n\)</span> patients diagnosed with a type of cancer at time <span class="math inline">\(t\)</span> are enrolled in a study. At a later time point <span class="math inline">\(t'&gt;t\)</span>, those who are still alive are randomized to an experimental treatment <span class="math inline">\(A_i = 1\)</span> or to the existing standard of care <span class="math inline">\(A_i = 0\)</span>. A researcher then studies the causal effect of the treatment on survival time <span class="math inline">\(Y_i\)</span>.</p>
+<p>For defining survival time <span class="math inline">\(Y_i\)</span>, how should the researcher define time 0?</p>
+<ol type="a">
+<li>Survival since birth</li>
+<li>Survival since diagnosis (time 0 = <span class="math inline">\(t\)</span>)</li>
+<li>Survival since treatment assignment (time 0 = <span class="math inline">\(t'\)</span>)</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Click to see answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The answer is (c): you should define survival since the time of treatment assignment. The treatment effect is how treatment affects survival after it is implemented.</p>
+<p>What goes wrong under (a) or (b)? Some patients die between time 0 and the time treatment is assigned. These patients must be dropped from the study because they do not have treatment values. A consequence of this is known as immortal time bias: during the time from time 0 to time <span class="math inline">\(t'\)</span>, no one in the study can die (see Hernan et al.&nbsp;<a href="https://doi.org/10.1016/j.jclinepi.2016.04.014">2016</a> and <a href="http://doi.org/10.1097/EDE.0000000000001808">2025</a>).</p>
+</div>
+</div>
+</div>
+</section>
+<section id="clock-seems-to-start-after-treatment" class="level2">
+<h2 class="anchored" data-anchor-id="clock-seems-to-start-after-treatment">Clock seems to start after treatment</h2>
+<p>Ideally, the clock starts at the time of treatment. But what if the most reasonable place for the clock to start seems to be a time long after treatment? This can lead to other problems.</p>
+<p>As an example, consider a demographer who studies the causal effect of a college degree (<span class="math inline">\(A_i\)</span>) on the duration of first marriages (<span class="math inline">\(Y_i\)</span>). The demographer restricts the sample to those who marry and starts the clock at the time when the first marriage begins.</p>
+<p>What goes wrong with the clock in the example above? Think about</p>
+<ul>
+<li>who is eligible for the study</li>
+<li>how is time 0 defined for each of them</li>
+</ul>
+<p>For simplicity, you may</p>
+<ul>
+<li>assume that no one marries until their education is completed</li>
+<li>assume that you are able to randomly assign college degrees to those eligible for the study</li>
+</ul>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Click to see answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Suppose all high school graduates are eligible for the study. You randomly assign some to college degrees (<span class="math inline">\(A_i = 1\)</span>) and others to stop education after high school (<span class="math inline">\(A_i = 0\)</span>). You may be tempted to start the clock at entry into first marriage. But only some of the people go on to become married: say <span class="math inline">\(M_i=1\)</span> if enters first marriage and <span class="math inline">\(M_i = 0\)</span> otherwise. Time zero is only defined for <span class="math inline">\(M_i = 1\)</span>. What is worse, it is plausible that the value of <span class="math inline">\(M_i\)</span> is itself shaped by the treatment.</p>
+</div>
+</div>
+</div>
+<p>What should these researchers do? There are at least two options.</p>
+<section id="option-redefine-the-outcome" class="level3">
+<h3 class="anchored" data-anchor-id="option-redefine-the-outcome">Option: Redefine the outcome</h3>
+<p>Let the clock start at age 25. Define education (<span class="math inline">\(A_i\)</span>) at age 25. Define time to event <span class="math inline">\(Y_i\)</span> as the time until a first marriage ends or death, whichever is sooner. Now every person has a time 0 and an outcome. But you are no longer studying duration of first marriage; you are now studying age of marital dissolution or death.</p>
+</section>
+<section id="option-mediation-estimands" class="level3">
+<h3 class="anchored" data-anchor-id="option-mediation-estimands">Option: Mediation estimands</h3>
+<p>Let <span class="math inline">\(Y_i^{a,m = 1}\)</span> be the marital duration that person <span class="math inline">\(i\)</span> would experience if assigned to education value <span class="math inline">\(A_i = a\)</span> and assigned to enter a first marriage (<span class="math inline">\(M_i = m = 1\)</span>). Then all people have a marital duration <span class="math inline">\(Y_i^{a,m_i=1}\)</span> that would be realized under each treatment value <span class="math inline">\(a\)</span>. The causal estimand might be a controlled direct effect,</p>
+<p><span class="math display">\[
+\text{P}(Y^{a=1,m=1} &gt; t) - \text{P}(Y^{a=0,m=1} &gt; t)
+\]</span></p>
+<p>which is the causal effect of a college degree (<span class="math inline">\(a = 1\)</span> vs <span class="math inline">\(a = 0\)</span>) on first marriage survival longer than <span class="math inline">\(t\)</span> in a world where everyone is assigned to enter a first marriage (<span class="math inline">\(m = 1\)</span>).</p>
+<p>A future page will introduce methods to estimate this estimand in observational settings.</p>
+</section>
+<section id="option-principal-stratification-estimands" class="level3">
+<h3 class="anchored" data-anchor-id="option-principal-stratification-estimands">Option: Principal stratification estimands</h3>
+<p>In theory, one could define the latent subpopulation who would get married under either treatment assignment: <span class="math inline">\(M_i^{a=0}=M_i^{a=1}=1\)</span>. One can then use principal stratification to set-identify the causal effect of treatment on first marriage duration in this latent set.</p>
+<p><span class="math display">\[
+\text{P}(Y^{a=1} &gt; t\mid M^{a=0}=M^{a=1}=1) - \text{P}(Y^{a=0,m=1} &gt; t\mid M^{a=0}=M^{a=1}=1)
+\]</span></p>
+<p>This is a somewhat complicated estimand with a complicated estimation strategy. We will not cover it in class (though I am working on a paper about this estimand).</p>
+<p><strong>Next pages will be: Observational studies. Mediation.</strong></p>
+<!-- ## Simple randomized trial -->
+<!-- For each person $i$, let $A_i$ be a randomized treatment variable. Let $Y_i^a$ be the potential outcome under treatment value $a$. For example, if the treatment takes the values treated ($a = 1$) and untreated ($a = 0$), the $Y_i^1$ is the outcome that would be realized if $A_i = 1$ and $Y_i^0$ is the outcome that would be realized if $A_i=0$. -->
+<!-- > Concrete example: To do. -->
+<!-- One potential outcome is realized: $Y_i = Y_i^{A_i}$, which is the outcome under the treatment value that was actually assigned. All other potential outcomes $Y_i^a$ for $a\neq A_i$ are counterfactual outcomes: they did not factually occur. -->
+<!-- > Concrete example: To do. -->
+<!-- In a simple randomized experiment, the treatment $A$ is assigned completely at random so that it is independent of the potential outcomes ($Y^a$ for all $a$). Thus, the distribution of $Y^a$ in the full population equals the distribution $(Y\mid A = a)$ of the realized outcome among the subgroup who received treatment. Thus, by carrying out a statistical estimator among those with $A = a$, we can estimate quantities of the (unobservable) full-population distribution of $Y^a$. -->
+<!-- ```{r} -->
+<!-- heart_trial <- tibble(survival::jasa) |>  -->
+<!--   transmute( -->
+<!--     time0 = case_when( -->
+<!--       !is.na(tx.date) ~ tx.date, -->
+<!--       is.na(tx.date) ~ accept.dt -->
+<!--     ), -->
+<!--     age = time0 - birth.dt, -->
+<!--     time = fu.date - time0, -->
+<!--     treated = !is.na(tx.date), -->
+<!--     event = fustat -->
+<!--   ) |> -->
+<!--   mutate( -->
+<!--     age = time_length(age, unit = "years"),  -->
+<!--     time = time_length(time, unit = "years") -->
+<!--   ) |> -->
+<!--   # Remove odd cases where time = 0, likely data error -->
+<!--   filter(time > 0) -->
+<!-- ``` -->
+<!-- Naive estimator of 1-year survival. -->
+<!-- ```{r} -->
+<!-- heart_trial |> -->
+<!--   filter(!(time < 1 & event == 0)) |> -->
+<!--   group_by(treated) |> -->
+<!--   summarize(survival = mean(time >= 1)) -->
+<!-- ``` -->
+<!-- Better estimator of 1-year survival. -->
+<!-- ```{r} -->
+<!-- model <- survreg(Surv(time, event) ~ treated, data = heart_trial) -->
+<!-- km_compare(model) -->
+<!-- to_predict <- tibble(treated = c(FALSE,TRUE)) -->
+<!-- to_predict |> -->
+<!--   mutate( -->
+<!--     xb = predict(model, newdata = to_predict, type = "linear"), -->
+<!--     shape = 1 / model$scale, -->
+<!--     estimate = pweibull(1, shape = shape, scale = exp(xb), lower.tail = FALSE) -->
+<!--   ) -->
+<!-- heart_trial |> -->
+<!--   filter(!(time < years(1) & event == 0)) |> -->
+<!--   group_by(treated) |> -->
+<!--   summarize(survival = mean(time >= 1)) -->
+<!-- ``` -->
+<!--   select(fu.date, accept.dt, time) -->
+<!--   # Keep those who received a transplant -->
+<!--   filter(!is.na(tx.date)) |> -->
+<!--   # Remove if died on the day of transplant -->
+<!--   filter(tx.date != fu.date) |> -->
+<!--   # Construct variables we will use -->
+<!--   mutate( -->
+<!--     # Age at transplant is difference between treatment date and birth date -->
+<!--     age = as.numeric(difftime(tx.date, birth.dt, units = "days")) / 365.25, -->
+<!--     # Time is difference between follow-up date and treatment date -->
+<!--     t = as.numeric(difftime(fu.date, tx.date, units = "days")) / 365.25, -->
+<!--     # Censoring is defined by follow-up status -->
+<!--     c = fustat == 0 -->
+<!--   ) |> -->
+<!--   select(age, c, t) |> -->
+<!--   print(n = 3) -->
+<!-- ``` -->
+<!-- ###  -->
+<!-- Do not  -->
+<!-- ### Conditionally randomized trial -->
+<!-- ### Observational study -->
+<!-- ### Estimation by outcome modeling -->
+<!-- ### Estimation by weighting -->
+<!-- ## Mediation -->
+<!-- We will focus on controlled direct effects. -->
+<!-- ## Time-to-event outcomes -->
+<!-- What is different with a time-to-event outcome $Y$? Nothing fundamental, but there are some common problems that we will illustrate through a series of hypothetical examples. -->
+<!-- ## Common analysis errors that are easy to fix -->
+<!-- ### Common error: Drop the censored -->
+<!-- ```{r} -->
+<!-- lambda_treated <- .5 -->
+<!-- lambda_untreated <- 1 -->
+<!-- ``` -->
+<!-- Effect on survival at 2 years. -->
+<!-- ```{r} -->
+<!-- true_effect <- pexp(q = 2, rate = lambda_treated, lower.tail = FALSE) - -->
+<!--   pexp(q = 2, rate = lambda_untreated, lower.tail = FALSE) -->
+<!-- ``` -->
+<!-- Misleading naive comparison: -->
+<!-- ```{r} -->
+<!-- sim <- tibble(id = 1:1000) |> -->
+<!--   mutate( -->
+<!--     treated = rbinom(n(), 1, .5), -->
+<!--     event_time = rexp(n(), rate = ifelse(treated, lambda_treated, lambda_untreated)), -->
+<!--     censor_time = rexp(n()), -->
+<!--     time = ifelse(event_time < censor_time, event_time, censor_time), -->
+<!--     censored = ifelse(event_time < censor_time, FALSE, TRUE) -->
+<!--   ) -->
+<!-- ``` -->
+<!-- How does the treatment affect survival at $t = 2$? A naive approach drops the censored. -->
+<!-- ```{r} -->
+<!-- naive <- sim |> -->
+<!--   # Naive approach: Drop if censored before 2 -->
+<!--   filter(!(censored & time < 2)) |> -->
+<!--   # Then take mean survival -->
+<!--   summarize( -->
+<!--     naive_estimate = mean(time >= 2) -->
+<!--   ) |> -->
+<!--   print() -->
+<!-- ``` -->
+<!-- You know how to get a correct estimate: use a survival model that handles censoring. Kaplan-Meier is one approach. -->
+<!-- ```{r} -->
+<!-- km <- survfit(Surv(time, 1 - censored) ~ treated, data = sim) -->
+<!-- km |> -->
+<!--   broom::tidy() |> -->
+<!--   group_by(strata) |> -->
+<!--   filter(time <= 2) |> -->
+<!--   slice_tail(n = 1) |> -->
+<!--   ungroup() |> -->
+<!--   select(strata, estimate) |> -->
+<!--   pivot_wider(names_from = "strata", values_from = "estimate") |> -->
+<!--   mutate(effect = `treated=1` - `treated=0`) -->
+<!-- ``` -->
+<!-- An Exponential model is another approach. -->
+<!-- ```{r} -->
+<!-- exponential <- survreg(Surv(time, 1 - censored) ~ treated, data = sim, dist = "exponential") -->
+<!-- to_predict <- tibble(treated = 0:1) -->
+<!-- predicted <- to_predict |> -->
+<!--   mutate( -->
+<!--     x_beta = predict(exponential, newdata = to_predict, type = "linear"), -->
+<!--     lambda = 1 / exp(x_beta), -->
+<!--     survival = pexp(q = 2, rate = lambda, lower.tail = FALSE) -->
+<!--   ) -->
+<!-- predicted |> -->
+<!--   select(treated, survival) |> -->
+<!--   pivot_wider(names_from = "treated", values_from = "survival", names_prefix = "treated_") |> -->
+<!--   mutate(effect = treated_1 - treated_0) -->
+<!-- ``` -->
+<!-- We can compare histograms over many repetitions. -->
+<!-- ```{r} -->
+<!-- #| code-fold: true -->
+<!-- simulations <- foreach(rep = 1:100, .combine = "rbind") %do% { -->
+<!--   sim <- tibble(id = 1:1000) |> -->
+<!--     mutate( -->
+<!--       treated = rbinom(n(), 1, .5), -->
+<!--       event_time = rexp(n(), rate = ifelse(treated, lambda_treated, lambda_untreated)), -->
+<!--       censor_time = rexp(n()), -->
+<!--       time = ifelse(event_time < censor_time, event_time, censor_time), -->
+<!--       censored = ifelse(event_time < censor_time, FALSE, TRUE) -->
+<!--     ) -->
+<!--   to_predict <- tibble(treated = 0:1) -->
+<!--   # NAIVE ESTIMATE -->
+<!--   naive_estimate <- sim |> -->
+<!--     # Naive approach: Drop if censored before 2 -->
+<!--     filter(!(censored & time < 2)) |> -->
+<!--     # Then take mean survival -->
+<!--     group_by(treated) |> -->
+<!--     summarize( -->
+<!--       naive_estimate = mean(time >= 2) -->
+<!--     ) |> -->
+<!--     pivot_wider(names_from = "treated", values_from = "naive_estimate") |> -->
+<!--     transmute(method = "Naive", effect = `1` - `0`) -->
+<!--   # KAPLAN-MEIER ESTIMATE -->
+<!--   km <- survfit(Surv(time, 1 - censored) ~ treated, data = sim) -->
+<!--   km_estimate <- km |> -->
+<!--     broom::tidy() |> -->
+<!--     group_by(strata) |> -->
+<!--     filter(time <= 2) |> -->
+<!--     slice_tail(n = 1) |> -->
+<!--     ungroup() |> -->
+<!--     select(strata, estimate) |> -->
+<!--     pivot_wider(names_from = "strata", values_from = "estimate") |> -->
+<!--     mutate(effect = `treated=1` - `treated=0`, -->
+<!--            method = "Kaplan-Meier") |> -->
+<!--     select(method, effect) -->
+<!--   # EXPONENTIAL ESTIMATES -->
+<!--   exponential <- survreg(Surv(time, 1 - censored) ~ treated, data = sim, dist = "exponential") -->
+<!--   predicted <- to_predict |> -->
+<!--     mutate( -->
+<!--       x_beta = predict(exponential, newdata = to_predict, type = "linear"), -->
+<!--       lambda = 1 / exp(x_beta), -->
+<!--       survival = pexp(q = 2, rate = lambda, lower.tail = FALSE) -->
+<!--     ) -->
+<!--   exponential_estimate <- predicted |> -->
+<!--     select(treated, survival) |> -->
+<!--     pivot_wider(names_from = "treated", values_from = "survival", names_prefix = "treated_") |> -->
+<!--     mutate(effect = treated_1 - treated_0) |> -->
+<!--     mutate(method = "Exponential") |> -->
+<!--     select(method, effect) -->
+<!--   return( -->
+<!--     naive_estimate |> -->
+<!--       bind_rows(km_estimate) |> -->
+<!--       bind_rows(exponential_estimate) -->
+<!--   ) -->
+<!-- } -->
+<!-- simulations |> -->
+<!--   mutate(method = fct_rev(method)) |> -->
+<!--   ggplot(aes(x = effect)) + -->
+<!--   geom_histogram(bins = 10) + -->
+<!--   facet_wrap(~method, ncol = 1, labeller = as_labeller(\(x) paste(x,"Estimator"))) + -->
+<!--   geom_vline(xintercept = true_effect, linetype = "dashed") + -->
+<!--   labs( -->
+<!--     x = "Effect of Treatment on Survival at t = 2", -->
+<!--     y = "Count Across Simulations", -->
+<!--     caption = "Dashed line is the true effect.\nHistogram is estimates over many simulated samples." -->
+<!--   ) -->
+<!-- ``` -->
+<!-- ### Common error: Hazards with unmeasured heterogeneity -->
+<!-- Show that survival curve estimates are fine even though hazard ratios are not. -->
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

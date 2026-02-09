@@ -1,0 +1,124 @@
+---
+title: "Outcome Modeling"
+format:
+  html:
+    toc: true
+    toc-expansion: true
+---
+
+```{r, echo = F, warning = F, message = F}
+library(tidyverse)
+theme_set(theme_minimal())
+library(survival)
+library(foreach)
+```
+
+Outcome modeling is a general tool for estimating causal effects under selection on observables. This page introduces this idea with a focus on survival outcome modeling for time-to-event data in the presence of ignorable censoring.
+
+## From identification to outcome modeling
+
+The identification page ended with this equation:
+
+$$
+\begin{aligned}
+\text{P}(Y^a > t) 
+&= \sum_{\vec{x}} \text{P}(Y^a>t\mid\vec{X} = \vec{x})\text{P}(\vec{X} = \vec{x}) &\text{by law of total probability} \\
+&= \sum_{\vec{x}} \text{P}(Y>t\mid \vec{X} = \vec{x}, A = a)\text{P}(\vec{X} = \vec{x}) &\text{by selection on observables}
+\end{aligned}
+$$
+
+The equation above sums over strata $\vec{x}$ weighted by their size. We can equivalently write the estimand as a sum over individuals in the population of size $N$,
+
+$$
+\begin{aligned}
+\text{P}(Y^a > t) 
+&= \frac{1}{N}\sum_{i=1}^N \text{P}(Y>t\mid\vec{X} = \vec{x}_i, A = a) &\text{by selection on observables}
+\end{aligned}
+$$
+
+which is equivalent because each $\vec{x}$ values is weighted by the sum of population units with that $\vec{x}$ value.
+
+## Sample estimator in math
+
+Suppose we have a simple random sample $\vec{S}$ where each $S_i$ indicates inclusion in the sample and the sample size is $\sum_{i=1}^N S_i = n$. A sample estimator is the analogous sample mean,
+
+$$
+\begin{aligned}
+\hat{\text{P}}_{\vec{S}}(Y^a > t) 
+&= \frac{1}{n}\sum_{i:S_i=1} \hat{\text{P}}_{\vec{S}}(Y>t\mid\vec{X} = \vec{x}_i, A = a) &\text{by selection on observables}
+\end{aligned}
+$$
+
+where $\hat{\text{P}}_{\vec{S}}$ refers to the probability estimated in sample $\vec{S}$. This points to an estimation strategy:
+
+1. **Model:** Learn a survival model for $Y > t$ given $\vec{X}$ and $A$
+2. **Modify data:** Set $A_i = a$ for all $i$
+3. **Predict.** For each $i$, predict the counterfactual survival probability.
+4. **Average.** Take the average across all people.
+
+To estimate causal effects, repeat steps (1--4) for each treatment value $a$ and difference over treatment values.
+
+## Worked example in code
+
+The `veteran` data in the `survival` package contains a randomized controlled trial in which lung cancer patients were randomly assigned to a standard or experimental medical treatment (`trt` = 1 for standard, `trt` = 2 for experimental). The outcome variable is `time` and death is indicated by `status` = 1 vs censored with `status = 0`. Pre-treatment covariates are
+
+* `karno`: Karnofsky performance score (100=good)
+* `diagtime`: Months from diagnosis to randomization
+* `age`: In years
+* `prior`: Whether the patient had prior therapy
+
+Imagine that these data were not from a randomized trial, but rather an observational study. Assume ignorable censoring and that selection on observables holds with these confounders. Write code to estimate the causal effect of treatment on survival at time $t = 52$ weeks.
+
+Try sketching it out for yourself before looking at the code below.
+
+Step 1. **Model:** Learn a survival model for $Y > t$ given $\vec{X}$ and $A$
+
+```{r}
+#| code-fold: true
+model <- survreg(
+  Surv(time, status) ~ trt * (karno + diagtime + age + prior),
+  data = veteran,
+  dist = "weibull"
+)
+```
+
+Step 2. **Modify data:** Set $A_i = a$ for all $i$
+
+```{r}
+#| code-fold: true
+under_treatment <- veteran |> mutate(trt = 2)
+under_control <- veteran |> mutate(trt = 1)
+```
+
+Step 3. **Predict.** For each $i$, predict the counterfactual survival probability.
+
+```{r}
+#| code-fold: true
+survival_probability <- function(model, newdata, time) {
+  newdata |>
+    mutate(
+    shape = 1 / model$scale,
+    xb = predict(model, type = "linear", newdata = newdata),
+    survival_prob = pweibull(
+      q = time,
+      shape = shape,
+      scale = exp(xb)
+    )
+  )
+}
+
+s_under_treatment <- model |>
+  survival_probability(newdata = under_treatment, time = 52)
+
+s_under_control <- model |>
+  survival_probability(newdata = under_control, time = 52)
+```
+
+Step 4. **Average.** Take the average across all people.
+
+```{r}
+#| code-fold: true
+s_under_treatment |> select(survival_prob) |> summarize_all(mean)
+s_under_control |> select(survival_prob) |> summarize_all(mean)
+```
+

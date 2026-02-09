@@ -27,17 +27,25 @@ website:
     style: "docked"
     search: true
     contents:
-      - survival_concepts.qmd
-      - kaplanmeier.qmd
-      - bernoulli.qmd
-      - exponential.qmd
-      - weibull.qmd
-      - lognormal.qmd
-      - piecewise_exponential.qmd
-      - proportional_hazards.qmd
-      - cox.qmd
-      - unmeasured_heterogeneity.qmd
-      - competing_risks.qmd
+      - section: "Descriptive Survival Analysis"
+        contents:
+        - survival_concepts.qmd
+        - kaplanmeier.qmd
+        - bernoulli.qmd
+        - exponential.qmd
+        - weibull.qmd
+        - lognormal.qmd
+        - piecewise_exponential.qmd
+        - proportional_hazards.qmd
+        - cox.qmd
+        - unmeasured_heterogeneity.qmd
+        - competing_risks.qmd
+      - section: "Causal Inference in Event History Settings"
+        contents:
+        - causal_survival_outcome.qmd
+        - observational.qmd
+        - outcome_model.qmd
+        - marginal_structural_model.qmd
 
 format:
   html:

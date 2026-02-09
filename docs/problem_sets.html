@@ -20,6 +20,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -168,72 +203,118 @@ window.Quarto = {
         </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
-        <li class="sidebar-item">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Descriptive Survival Analysis</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./survival_concepts.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Survival Analysis: Key Concepts</span></a>
   </div>
 </li>
-        <li class="sidebar-item">
+          <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./kaplanmeier.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Kaplan-Meier</span></a>
   </div>
 </li>
-        <li class="sidebar-item">
+          <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./bernoulli.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">MLE Review: Bernoulli</span></a>
   </div>
 </li>
-        <li class="sidebar-item">
+          <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./exponential.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Exponential</span></a>
   </div>
 </li>
-        <li class="sidebar-item">
+          <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./weibull.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Weibull</span></a>
   </div>
 </li>
-        <li class="sidebar-item">
+          <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./lognormal.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Lognormal</span></a>
   </div>
 </li>
-        <li class="sidebar-item">
+          <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./piecewise_exponential.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Piecewise Exponential</span></a>
   </div>
 </li>
-        <li class="sidebar-item">
+          <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./proportional_hazards.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Proportional Hazards</span></a>
   </div>
 </li>
-        <li class="sidebar-item">
+          <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./cox.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Cox Proportional Hazards</span></a>
   </div>
 </li>
-        <li class="sidebar-item">
+          <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./unmeasured_heterogeneity.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Unmeasured Heterogeneity</span></a>
   </div>
 </li>
-        <li class="sidebar-item">
+          <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./competing_risks.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Competing Risks</span></a>
   </div>
 </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Causal Inference in Event History Settings</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./causal_survival_outcome.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Causal Inference with Survival Outcomes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./observational.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Observational Studies</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./outcome_model.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Outcome Modeling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./marginal_structural_model.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MSM with One Treatment Period</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
     </ul>
     </div>
 </nav>
@@ -248,6 +329,7 @@ window.Quarto = {
   <li><a href="#problem-set-2-exponential" id="toc-problem-set-2-exponential" class="nav-link" data-scroll-target="#problem-set-2-exponential">Problem Set 2: Exponential</a></li>
   <li><a href="#problem-set-3-weibull" id="toc-problem-set-3-weibull" class="nav-link" data-scroll-target="#problem-set-3-weibull">Problem Set 3: Weibull</a></li>
   <li><a href="#problem-set-4-recap-of-survival-analysis" id="toc-problem-set-4-recap-of-survival-analysis" class="nav-link" data-scroll-target="#problem-set-4-recap-of-survival-analysis">Problem Set 4: Recap of Survival Analysis</a></li>
+  <li><a href="#problem-set-5-causal-effect-on-survival" id="toc-problem-set-5-causal-effect-on-survival" class="nav-link" data-scroll-target="#problem-set-5-causal-effect-on-survival">Problem Set 5: Causal Effect on Survival</a></li>
   </ul>
 </nav>
     </div>
@@ -395,15 +477,43 @@ window.Quarto = {
 <li>In words, give an example of non-ignorable censoring that could exist in your setting.</li>
 <li>In words, give an example of unmeasured heterogeneity that could exist in your setting. How might this affect the estimated hazard function?</li>
 </ol>
-<!-- A researcher analyzes a setting where many subjects have cause-specific hazards (e.g., die from cancer or from heart disease). If $J = j$ is a particula cause of death, one can define a cause-specific hazard function -->
-<!-- $$h_j(t) = \frac{f(T = t, J = j)}{S(t)}$$ -->
-<!-- where the numerator is the probability density of death at $T = t$ from hazard $J = j$ and the denominator is the probability of survival to time $t$ without dying from any cause. -->
-<!-- A researcher might estimate $h_j(t)$ by treating death by $J = j$ as the event and death by any other cause as censoring. -->
-<!-- 1. Consider two settings. In which setting is ignorable censoring more credible, and why? -->
-<!--      a. The event is death, the cause of interest is death by COVID-19, and the other causes are other diseases. -->
-<!--      b. The event is  -->
-<!-- Would be nice to have a credible competing risks setting for the problem set, then ask them to apply in a less credible setting. -->
-<!-- Would be nice to have a setting with one large group and then subgroups (for Cox model). -->
+</section>
+<section id="problem-set-5-causal-effect-on-survival" class="level2">
+<h2 class="anchored" data-anchor-id="problem-set-5-causal-effect-on-survival">Problem Set 5: Causal Effect on Survival</h2>
+<p>The file <code>employment_duration.csv</code> contains information on spells of employment.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>employment_duration <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://ilundberg.github.io/eventhistory/assets/employment_duration.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>At the start of each employment spell, we observe whether the respondent works <code>fulltime = TRUE</code> or <code>fulltime = FALSE</code>, where <code>fulltime</code> is an indicator of working 40+ hours in at least one week during the first month of the job. This problem set considers a causal question: to what degree does being employed full-time at the start affect the length of the employment spell?</p>
+<p>We will make the simplifying assumptions of ignorable censoring and that selection on observables holds conditional on the following confounder set: <code>race</code>, <code>sex</code>, <code>age</code>, and <code>education</code>.</p>
+<p>As context, below are the descriptive Kaplan-Meier survival curves by full-time status (with no confounder adjustment).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="problem_sets_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>As a concrete data point, the probability of remaining employed for 5 years among those in each treatment group is given below. There is approximately an 8 percentage point difference across treatment conditions.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 2
+# Groups:   Treatment_Value [2]
+  Treatment_Value Survives_5_Years
+  &lt;chr&gt;                      &lt;dbl&gt;
+1 fulltime=FALSE             0.154
+2 fulltime=TRUE              0.231</code></pre>
+</div>
+</div>
+<ol type="1">
+<li><p>Estimate a Weibull model for employment duration as a function of the treatment <code>fulltime</code> and the confounders <code>race</code>, <code>sex</code>, <code>age</code>, and <code>education</code>.</p></li>
+<li><p>Create two new data frames to make predictions. Each begins as <code>employment_duration</code>. In the first data frame, set <code>fulltime = TRUE</code> for all cases. In the second data frame, set <code>fulltime = FALSE</code> for all cases.</p></li>
+<li><p>In each data frame, use your model to predict the probability of surviving (remaining in the employment spell) for at least 5 years, for every person in the data frame.</p></li>
+<li><p>Take the average of the predicted probabilities. These are estimates of <span class="math inline">\(\text{P}(Y^{\text{fulltime} = \text{TRUE}} &gt; 5)\)</span> and <span class="math inline">\(\text{P}(Y^{\text{fulltime} = \text{FALSE}} &gt; 5)\)</span>. Report each estimate and the difference between them, which is your estimated causal effect. How does it compare to the 8 percentage point descriptive difference?</p></li>
+</ol>
+<p><strong>Note.</strong> This is not part of the assignment because we have already practiced it previously, but worth noting. You can imagine running a loop over many time points and then creating counterfactual survival curves for the population-average survival in each counterfactual scenario. The problem set just chose one time point (time = 5) for illustration.</p>
 
 
 </section>

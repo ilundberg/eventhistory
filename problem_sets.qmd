@@ -85,19 +85,48 @@ Below are the questions for the problem set.
 4. In words, give an example of non-ignorable censoring that could exist in your setting.
 5. In words, give an example of unmeasured heterogeneity that could exist in your setting. How might this affect the estimated hazard function?
 
-<!-- A researcher analyzes a setting where many subjects have cause-specific hazards (e.g., die from cancer or from heart disease). If $J = j$ is a particula cause of death, one can define a cause-specific hazard function -->
+## Problem Set 5: Causal Effect on Survival
 
-<!-- $$h_j(t) = \frac{f(T = t, J = j)}{S(t)}$$ -->
-<!-- where the numerator is the probability density of death at $T = t$ from hazard $J = j$ and the denominator is the probability of survival to time $t$ without dying from any cause. -->
+The file `employment_duration.csv` contains information on spells of employment.
 
-<!-- A researcher might estimate $h_j(t)$ by treating death by $J = j$ as the event and death by any other cause as censoring. -->
+```{r, eval = FALSE}
+employment_duration <- read_csv("https://ilundberg.github.io/eventhistory/assets/employment_duration.csv")
+```
+```{r, echo = FALSE, message = F, warning = F}
+employment_duration <- read_csv("assets/employment_duration.csv")
+```
 
-<!-- 1. Consider two settings. In which setting is ignorable censoring more credible, and why? -->
-<!--      a. The event is death, the cause of interest is death by COVID-19, and the other causes are other diseases. -->
-<!--      b. The event is  -->
+At the start of each employment spell, we observe whether the respondent works `fulltime = TRUE` or `fulltime = FALSE`, where `fulltime` is an indicator of working 40+ hours in at least one week during the first month of the job. This problem set considers a causal question: to what degree does being employed full-time at the start affect the length of the employment spell?
 
-<!-- Would be nice to have a credible competing risks setting for the problem set, then ask them to apply in a less credible setting. -->
+We will make the simplifying assumptions of ignorable censoring and that selection on observables holds conditional on the following confounder set: `race`, `sex`, `age`, and `education`.
 
-<!-- Would be nice to have a setting with one large group and then subgroups (for Cox model). -->
+As context, below are the descriptive Kaplan-Meier survival curves by full-time status (with no confounder adjustment). 
+```{r, echo = FALSE, fig.height = 3}
+km <- survfit(Surv(time, event = 1 - censored) ~ fulltime, data = employment_duration)
+km |>
+  broom::tidy() |>
+  ggplot(aes(x = time, y = estimate, color = strata)) +
+  geom_line()
+```
 
+As a concrete data point, the probability of remaining employed for 5 years among those in each treatment group is given below. There is approximately an 8 percentage point difference across treatment conditions.
 
+```{r, echo = F}
+km |>
+  broom::tidy() |>
+  filter(time <= 5) |>
+  group_by(strata) |>
+  slice_tail(n = 1) |>
+  select(strata, estimate) |>
+  rename(Treatment_Value = strata, Survives_5_Years = estimate)
+```
+
+1. Estimate a Weibull model for employment duration as a function of the treatment `fulltime` and the confounders `race`, `sex`, `age`, and `education`.
+
+2. Create two new data frames to make predictions. Each begins as `employment_duration`. In the first data frame, set `fulltime = TRUE` for all cases. In the second data frame, set `fulltime = FALSE` for all cases.
+
+3. In each data frame, use your model to predict the probability of surviving (remaining in the employment spell) for at least 5 years, for every person in the data frame.
+
+4. Take the average of the predicted probabilities. These are estimates of $\text{P}(Y^{\text{fulltime} = \text{TRUE}} > 5)$ and $\text{P}(Y^{\text{fulltime} = \text{FALSE}} > 5)$. Report each estimate and the difference between them, which is your estimated causal effect. How does it compare to the 8 percentage point descriptive difference?
+
+**Note.** This is not part of the assignment because we have already practiced it previously, but worth noting. You can imagine running a loop over many time points and then creating counterfactual survival curves for the population-average survival in each counterfactual scenario. The problem set just chose one time point (time = 5) for illustration.

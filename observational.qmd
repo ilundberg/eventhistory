@@ -1,0 +1,65 @@
+---
+title: "Observational Studies"
+format:
+  html:
+    toc: true
+    toc-expansion: true
+---
+
+```{r, echo = F, warning = F, message = F}
+library(tidyverse)
+theme_set(theme_minimal())
+library(survival)
+library(foreach)
+```
+
+In an observational study, the researcher does not control the treatment assignment mechanism. Instead, we proceed by causal assumptions about how the world has assigned the treatment.
+
+We focus here on designs relying on **selection on observables**: the assumption that counterfactual distributions are identified by factual distributions conditional on measured variables $\vec{X}$.
+
+$$
+\underbrace{(Y^a\mid \vec{X} = \vec{x})}_{\substack{\text{Distribution of}\\\text{Potential Outcome}\\\text{Under Treatment Value }a\\\text{Among }\vec{X} = \vec{x}}} \underbrace{\sim}_{\substack{\text{Is Distributed}\\\text{The Same As}}} \underbrace{(Y\mid A = a, \vec{X} = \vec{x})}_{\substack{\text{Distribution of}\\\text{Factual Outcome}\\\text{Among Those With}\\A = a \text{ and }\vec{X} = \vec{x}}}
+$$
+
+Sometimes selection on observables is written as a statement of conditional independence: the distribution of the potential outcome is independent of the actual treatment assigned conditional on $\vec{X}$.
+
+$$
+Y^a ⫫ A\mid \vec{X}
+$$
+
+## Causal identification
+
+Causal identification is a mathematical proof linking a causal estimand (involving potential outcomes) to a statistical quantity involving only factual random variables. Causal identifiction is possible under selection on observables.
+
+For example, suppose our estimand is survival at time $t$ that would be realized on average if exposed to treatment value $a$. The proof below begins with a causal estimand involving $Y^a$ and equates this (by assumptions) to a statistical estimand involving only $\vec{X}$ and $Y$.
+
+$$
+\begin{aligned}
+\text{P}(Y^a > t) 
+&= \sum_{\vec{x}} \text{P}(Y^a>t\mid\vec{X} = \vec{x})\text{P}(\vec{X} = \vec{x}) &\text{by law of total probability} \\
+&= \sum_{\vec{x}} \text{P}(Y>t\mid \vec{X} = \vec{x}, A = a)\text{P}(\vec{X} = \vec{x}) &\text{by selection on observables}
+\end{aligned}
+$$
+
+## When does selection on observables hold?
+
+> This section is an abbreviated review of a topic from 212B.
+
+Selection on observables rests on causal assumptions about why the treatment $A$ is statistically related to the outcome $Y$. You might think of two main reasons.
+
+1. $A$ causes $Y$
+2. A variable $X$ causes both $A$ and $Y$
+3. (Note that other reasons can exist beyond these two, but we will focus on these two initially)
+
+Selection on observables seeks to rule out all non-causal sources of association (e.g., 2) and isolate the causal effect of interest (1).
+
+How do we isolate a causal source? As an example, suppose that $A$ and $Y$ are associated only from sources 1 and 2 above: a causal effect $A\rightarrow Y$ and a common cause $A\leftarrow X \rightarrow Y$. Suppose we carry out analysis on a subgroup taking the value $X = x$. Within this subgroup, every unit has the same value of $X$. The common-cause source (2) cannot create an association between $A$ and $Y$ in this subgroup. Thus, any remaining association between $A$ and $Y$ within the subgroup must arise from the causal effect (source 1). Conditioning on $X$ isolates this causal source and thus identifies the causal effect.
+
+Directed Acyclic Graphs (DAGs, [Pearl 2000](https://bayes.cs.ucla.edu/BOOK-2K/)) are a mathematical tool that (among other uses) can help to reason about when selection on observables will hold. To use a DAG, one first:
+
+* formalizes causal beliefs in a visual graph with nodes representing variables and arrows representing causal effects
+* lists all paths between the treatment $A$ and the outcome $Y$
+* crosses off paths blocked when conditioning on $\vec{X}$
+* determines whether the remaining paths are causal
+
+This was a topic covered extensively in Soc 212B, so I am not covering it extensively here to avoid duplication. For those curious, the materials on DAGs are available [here](https://ilundberg.github.io/soc212b/nonparametric_identification.html#nodes-edges-and-paths).
