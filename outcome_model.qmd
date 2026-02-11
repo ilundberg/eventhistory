@@ -94,24 +94,30 @@ Step 3. **Predict.** For each $i$, predict the counterfactual survival probabili
 
 ```{r}
 #| code-fold: true
-survival_probability <- function(model, newdata, time) {
+survival_probability <- function(model, newdata, time_point) {
+  # Check that `time_point` is not a column of `newdata`
+  if (any(colnames(newdata) == "time_point")) {
+    stop("Error: Function will not work if time_point is both an argument and a column of newdata. To use this function, revise model and newdata so they do not involve a variable named time_point.")
+  }
   newdata |>
     mutate(
     shape = 1 / model$scale,
     xb = predict(model, type = "linear", newdata = newdata),
     survival_prob = pweibull(
-      q = time,
+      q = time_point,
       shape = shape,
-      scale = exp(xb)
+      scale = exp(xb),
+      lower.tail = FALSE
     )
   )
 }
 
 s_under_treatment <- model |>
-  survival_probability(newdata = under_treatment, time = 52)
+  survival_probability(newdata = under_treatment, time_point = 52) |>
+  head()
 
 s_under_control <- model |>
-  survival_probability(newdata = under_control, time = 52)
+  survival_probability(newdata = under_control, time_point = 52)
 ```
 
 Step 4. **Average.** Take the average across all people.
