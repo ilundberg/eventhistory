@@ -22,7 +22,7 @@ This page introduces this idea with a focus on survival outcome modeling for tim
 
 ## Concept of weighting
 
-Consider a person $i$ who receives treatment with probability $\P(A = 1\mid \vec{X} = \vec{x}_i) = 20\%$. We can think about 5 people who are observationally identical to person $i$ (with $\vec{X} = \vec{x}_i$). The 20\% probability means that in expectation one of these people is treated and 4 others are not. If person $i$ is treated, we might say they represent a total of 5 people. We could calculate that probability by taking the inverse of the probability of treatment: $\frac{1}{0.2} = 5$. This is the intuition of **inverse probability of treatment weighting**.
+Consider a person $i$ who receives treatment with probability $\text{P}(A = 1\mid \vec{X} = \vec{x}_i) = 20\%$. We can think about 5 people who are observationally identical to person $i$ (with $\vec{X} = \vec{x}_i$). The 20\% probability means that in expectation one of these people is treated and 4 others are not. If person $i$ is treated, we might say they represent a total of 5 people. We could calculate that probability by taking the inverse of the probability of treatment: $\frac{1}{0.2} = 5$. This is the intuition of **inverse probability of treatment weighting**.
 
 More generally, define a function that takes a treatment value $a$ and confounder vector $\vec{x}$ and returns an inverse probability of treatment weight.
 
