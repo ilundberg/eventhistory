@@ -1,0 +1,96 @@
+---
+title: "Longitudinal Weighting"
+format:
+  html:
+    toc: true
+    toc-expansion: true
+---
+
+```{r, echo = F, warning = F, message = F}
+library(tidyverse)
+theme_set(theme_minimal())
+library(survival)
+library(foreach)
+```
+
+This page does not have a written resource as much as the others, because we will talk through these issues together in class with an exercise and with slides.
+
+* [slides](slides/intermediate_confounding.pdf) on how longitudinal treatments are difficult to study due to intermediate confounding
+* [slides](slides/longitudinal_weighting.pdf) on how to estimate effects of longitudinal treatments by longitudinal inverse probability weighting and marginal structural models
+
+In the beginning of the longitudinal weighting section, we will do this class exercise together.
+
+## Class exercise
+
+> Here is a [PDF version](slides/ipw_dynamic_exercise.pdf) of this exercise.
+
+You teach a class of $n = 16$ elementary students. At each time point $t$, the student can either be below grade level ($L_t = 1$) or not below grade level ($L_t = 0$). You can assign extra support $A_t = 1$ (e.g., reading practice with a parent volunteer) to some but not all of the students; the untreated students have $A_t = 0$.
+
+We will study this process over two time periods: $t = 0$ and $t = 1$. The outcome would be something defined after these periods, but for our purposes there will be no outcome. We will focus on how you would weight, which would apply to any outcome you might care about.
+
+Here is how the causal process unfolds:
+
+* At time 0, you see that 50\% of the class is below grade level: $P(L_0 = 1) = 0.5$
+* At every time period $t$, treatment is assigned so that
+  * those below grade level $L_{t} = 1$ receive extra support $A_{t+1} = 1$ with probability 1
+  * those not below grade level $L_{t} = 0$ receive extra support $A_{t+1} = 1$ with probability 0.5
+* At every time period $t$, treatment affects the next confounder
+  * if you receive support $A_t = 1$, then you will not fall behind $P(L_{t+1} = 1) = 0$
+  * if you do not receive support $A_t = 0$, then you have a 50\% chance of falling behind: $P(L_{t+1} = 1) = 0.5$
+  
+## Draw a DAG
+
+The first task of the exercise is to draw a DAG for this causal process.
+
+## Determine weights
+
+The table below shows data from this causal process. Your task is to fill in the weight columns with a pencil.
+
+```{r, echo = F}
+d <- data.frame(ID = 1:16,
+                L0 = rep(c(1,0),each = 8)) %>%
+  group_by(L0) %>%
+  mutate(A0 = case_when(L0 == 1 ~ rep(1,n()),
+                        L0 == 0 ~ rep(c(1,0), each = n() / 2))) %>%
+  group_by(A0) %>%
+  mutate(L1 = case_when(A0 == 1 ~ 0,
+                        A0 == 0 ~ rep(c(1,0), n() / 2))) %>%
+  group_by(L1) %>%
+  mutate(A1 = case_when(L1 == 1 ~ rep(1,n()),
+                        L1 == 0 ~ rep(c(1,0), n() / 2))) %>%
+  ungroup() %>%
+  mutate_all(as.integer) %>%
+  mutate(w0 = "", w1 = "", w = "")
+knitr::kable(d)
+#print(xtable::xtable(d,
+#      caption = "Weighting Two Time Periods: A Table to Fill In"),
+#      include.rownames = F, size = "Large")
+```
+
+### Weights for $E(Y\mid do(A_0 = 1))$
+
+Suppose we want to estimate the expected outcome under an intervention to set $A_0 = 1$. We plan to reweight the 12 units observed with $A_0 = 1$. What weight should we put on each of these 6 units?
+
+Note that $L_0$ is a sufficient conditioning set.
+
+### Weights for $E(Y\mid do(A_1 = 1))$
+
+Suppose we want to estimate the expected outcome under an intervention to set $A_1 = 1$. We plan to reweight the 9 units observed with $A_1 = 1$. What weight should we put on each of these 6 units?
+
+Note that $L_1$ is a sufficient conditioning set.
+
+### Weights for $E(Y\mid do(A_0 = 1, A_1 = 1))$
+
+Suppose we want to estimate the expected outcome under an intervention to set $A_0 = 1$ and $A_1 = 1$. We plan to reweight the 6 units observed in this condition. What weight should we put on each of these 6 units?
+
+### Intuition check
+
+Using your weight from 1.3,
+
+* take a weighted average of $L_0$. Does your result match the factual distribution of $L_0$?
+* take a weighted average of $L_1$. Does your result match the factual distribution of $L_1$?
+
+Think about why you would get the answers above.
+
+
+

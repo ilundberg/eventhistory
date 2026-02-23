@@ -130,3 +130,32 @@ km |>
 4. Take the average of the predicted probabilities. These are estimates of $\text{P}(Y^{\text{fulltime} = \text{TRUE}} > 5)$ and $\text{P}(Y^{\text{fulltime} = \text{FALSE}} > 5)$. Report each estimate and the difference between them, which is your estimated causal effect. How does it compare to the 8 percentage point descriptive difference?
 
 **Note.** This is not part of the assignment because we have already practiced it previously, but worth noting. You can imagine running a loop over many time points and then creating counterfactual survival curves for the population-average survival in each counterfactual scenario. The problem set just chose one time point (time = 5) for illustration.
+
+## Problem Set 6: Longitudinal Treatments
+
+A researcher wants to know the expected potential outcome $\text{E}(Y^{a_0,a_1})$ under an intervention to set $A_0 = a_0$ and $A_1 = a_1$. Assume that variables named $A,L,Y$ are observed but variables named $U$ are unobserved.
+
+1. In which of settings A--D can this causal estimand be identified using the simple mean $\text{E}(Y\mid A_0 = a_0, A_1 = a_1)$?
+2. In which of settings A--D can this causal estimand be identified using inverse probability weights applied in a marginal structural model, adjusting at each period for the observed past?
+
+![](assets/dynamic_settings.png)
+
+3. Now focus on Setting D. For Setting D, explain how $L_1$ complicates the quest to identify the effect of $A_0$ and the effect of $A_1$ with the same adjustment set for both effects.
+
+The next part practices estimating a marginal structural model in a dynamic setting designed to be as simple as possible.
+
+Suppose a teacher observes students who are struggling academically ($L_t = 1$) or not ($L_t = 0)$ in every time period $t$. The teacher can assign students to receive extra support ($A_t = 1$) or not ($A_t = 0$). The outcome $Y$ is a subsequent measure of skills (e.g., can the student read a picture book to the teacher). The data [pset6.csv](assets/pset6.csv) contains a simulated setting with $n = 128$ students.
+
+In this data generating process,
+
+- Treatment $A_t = 1$ is assigned with higher probabilities to students who are struggling $L_t = 0$.
+- Students who are treated in one period $A_0 = 1$ are never struggling in the next period $L_1 = 0$.
+
+Assume the causal structure represented by Setting D above. Using these data,
+
+4. Fit a logistic regression for each $A_t$, including as predictors all pre-treatment variables entered without interactions.
+5. Predict the probability of $A_t = 1$ at each time period for every unit. Remember that in R you will need the \texttt{type = "response"} option. For grading, what is the predicted probability of $A_0$ for the first unit in the sample?
+6.  Define the generalized propensity score $\pi_{it}$ at each time period $t$ for each unit $i$. When $A_{it}$ 
+7. Define a weight for each unit: $w_i = \frac{1}{\pi_{i0}}\frac{1}{\pi_{i1}}$. For grading, what is the weight on the first unit in the sample?
+8. Estimate a marginal structural model of the form $\text{E}(Y^{a_0,a_1}) = \alpha + \beta_0 a_0 + \beta_1 a_1$. Report the coefficients.
+9. What does your model estimate for the average causal effect $\text{E}(Y^{1,1} - Y^{0,0})$?

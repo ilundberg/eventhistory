@@ -313,6 +313,12 @@ window.Quarto = {
  <span class="menu-text">MSM with One Treatment Period</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./longitudinal_weighting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Longitudinal Weighting</span></a>
+  </div>
+</li>
       </ul>
   </li>
     </ul>
@@ -330,6 +336,7 @@ window.Quarto = {
   <li><a href="#problem-set-3-weibull" id="toc-problem-set-3-weibull" class="nav-link" data-scroll-target="#problem-set-3-weibull">Problem Set 3: Weibull</a></li>
   <li><a href="#problem-set-4-recap-of-survival-analysis" id="toc-problem-set-4-recap-of-survival-analysis" class="nav-link" data-scroll-target="#problem-set-4-recap-of-survival-analysis">Problem Set 4: Recap of Survival Analysis</a></li>
   <li><a href="#problem-set-5-causal-effect-on-survival" id="toc-problem-set-5-causal-effect-on-survival" class="nav-link" data-scroll-target="#problem-set-5-causal-effect-on-survival">Problem Set 5: Causal Effect on Survival</a></li>
+  <li><a href="#problem-set-6-longitudinal-treatments" id="toc-problem-set-6-longitudinal-treatments" class="nav-link" data-scroll-target="#problem-set-6-longitudinal-treatments">Problem Set 6: Longitudinal Treatments</a></li>
   </ul>
 </nav>
     </div>
@@ -514,6 +521,34 @@ window.Quarto = {
 <li><p>Take the average of the predicted probabilities. These are estimates of <span class="math inline">\(\text{P}(Y^{\text{fulltime} = \text{TRUE}} &gt; 5)\)</span> and <span class="math inline">\(\text{P}(Y^{\text{fulltime} = \text{FALSE}} &gt; 5)\)</span>. Report each estimate and the difference between them, which is your estimated causal effect. How does it compare to the 8 percentage point descriptive difference?</p></li>
 </ol>
 <p><strong>Note.</strong> This is not part of the assignment because we have already practiced it previously, but worth noting. You can imagine running a loop over many time points and then creating counterfactual survival curves for the population-average survival in each counterfactual scenario. The problem set just chose one time point (time = 5) for illustration.</p>
+</section>
+<section id="problem-set-6-longitudinal-treatments" class="level2">
+<h2 class="anchored" data-anchor-id="problem-set-6-longitudinal-treatments">Problem Set 6: Longitudinal Treatments</h2>
+<p>A researcher wants to know the expected potential outcome <span class="math inline">\(\text{E}(Y^{a_0,a_1})\)</span> under an intervention to set <span class="math inline">\(A_0 = a_0\)</span> and <span class="math inline">\(A_1 = a_1\)</span>. Assume that variables named <span class="math inline">\(A,L,Y\)</span> are observed but variables named <span class="math inline">\(U\)</span> are unobserved.</p>
+<ol type="1">
+<li>In which of settings A–D can this causal estimand be identified using the simple mean <span class="math inline">\(\text{E}(Y\mid A_0 = a_0, A_1 = a_1)\)</span>?</li>
+<li>In which of settings A–D can this causal estimand be identified using inverse probability weights applied in a marginal structural model, adjusting at each period for the observed past?</li>
+</ol>
+<p><img src="assets/dynamic_settings.png" class="img-fluid"></p>
+<ol start="3" type="1">
+<li>Now focus on Setting D. For Setting D, explain how <span class="math inline">\(L_1\)</span> complicates the quest to identify the effect of <span class="math inline">\(A_0\)</span> and the effect of <span class="math inline">\(A_1\)</span> with the same adjustment set for both effects.</li>
+</ol>
+<p>The next part practices estimating a marginal structural model in a dynamic setting designed to be as simple as possible.</p>
+<p>Suppose a teacher observes students who are struggling academically (<span class="math inline">\(L_t = 1\)</span>) or not (<span class="math inline">\(L_t = 0)\)</span> in every time period <span class="math inline">\(t\)</span>. The teacher can assign students to receive extra support (<span class="math inline">\(A_t = 1\)</span>) or not (<span class="math inline">\(A_t = 0\)</span>). The outcome <span class="math inline">\(Y\)</span> is a subsequent measure of skills (e.g., can the student read a picture book to the teacher). The data <a href="assets/pset6.csv">pset6.csv</a> contains a simulated setting with <span class="math inline">\(n = 128\)</span> students.</p>
+<p>In this data generating process,</p>
+<ul>
+<li>Treatment <span class="math inline">\(A_t = 1\)</span> is assigned with higher probabilities to students who are struggling <span class="math inline">\(L_t = 0\)</span>.</li>
+<li>Students who are treated in one period <span class="math inline">\(A_0 = 1\)</span> are never struggling in the next period <span class="math inline">\(L_1 = 0\)</span>.</li>
+</ul>
+<p>Assume the causal structure represented by Setting D above. Using these data,</p>
+<ol start="4" type="1">
+<li>Fit a logistic regression for each <span class="math inline">\(A_t\)</span>, including as predictors all pre-treatment variables entered without interactions.</li>
+<li>Predict the probability of <span class="math inline">\(A_t = 1\)</span> at each time period for every unit. Remember that in R you will need the option. For grading, what is the predicted probability of <span class="math inline">\(A_0\)</span> for the first unit in the sample?</li>
+<li>Define the generalized propensity score <span class="math inline">\(\pi_{it}\)</span> at each time period <span class="math inline">\(t\)</span> for each unit <span class="math inline">\(i\)</span>. When <span class="math inline">\(A_{it}\)</span></li>
+<li>Define a weight for each unit: <span class="math inline">\(w_i = \frac{1}{\pi_{i0}}\frac{1}{\pi_{i1}}\)</span>. For grading, what is the weight on the first unit in the sample?</li>
+<li>Estimate a marginal structural model of the form <span class="math inline">\(\text{E}(Y^{a_0,a_1}) = \alpha + \beta_0 a_0 + \beta_1 a_1\)</span>. Report the coefficients.</li>
+<li>What does your model estimate for the average causal effect <span class="math inline">\(\text{E}(Y^{1,1} - Y^{0,0})\)</span>?</li>
+</ol>
 
 
 </section>

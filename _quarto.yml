@@ -46,6 +46,7 @@ website:
         - observational.qmd
         - outcome_model.qmd
         - marginal_structural_model.qmd
+        - longitudinal_weighting.qmd
 
 format:
   html:
