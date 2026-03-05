@@ -537,13 +537,13 @@ window.Quarto = {
 <p>Suppose a teacher observes students who are struggling academically (<span class="math inline">\(L_t = 1\)</span>) or not (<span class="math inline">\(L_t = 0)\)</span> in every time period <span class="math inline">\(t\)</span>. The teacher can assign students to receive extra support (<span class="math inline">\(A_t = 1\)</span>) or not (<span class="math inline">\(A_t = 0\)</span>). The outcome <span class="math inline">\(Y\)</span> is a subsequent measure of skills (e.g., can the student read a picture book to the teacher). The data <a href="assets/pset6.csv">pset6.csv</a> contains a simulated setting with <span class="math inline">\(n = 128\)</span> students.</p>
 <p>In this data generating process,</p>
 <ul>
-<li>Treatment <span class="math inline">\(A_t = 1\)</span> is assigned with higher probabilities to students who are struggling <span class="math inline">\(L_t = 0\)</span>.</li>
+<li>Treatment <span class="math inline">\(A_t = 1\)</span> is assigned with higher probabilities to students who are struggling <span class="math inline">\(L_t = 1\)</span>.</li>
 <li>Students who are treated in one period <span class="math inline">\(A_0 = 1\)</span> are never struggling in the next period <span class="math inline">\(L_1 = 0\)</span>.</li>
 </ul>
 <p>Assume the causal structure represented by Setting D above. Using these data,</p>
 <ol start="4" type="1">
 <li>Fit a logistic regression for each <span class="math inline">\(A_t\)</span>, including as predictors all pre-treatment variables entered without interactions.</li>
-<li>Predict the probability of <span class="math inline">\(A_t = 1\)</span> at each time period for every unit. Remember that in R you will need the option. For grading, what is the predicted probability of <span class="math inline">\(A_0\)</span> for the first unit in the sample?</li>
+<li>Predict the probability of <span class="math inline">\(A_t = 1\)</span> at each time period for every unit. Remember that in R you will need the <code>type = "response"</code> option. For grading, what is the predicted probability of <span class="math inline">\(A_0\)</span> for the first unit in the sample?</li>
 <li>Define the generalized propensity score <span class="math inline">\(\pi_{it}\)</span> at each time period <span class="math inline">\(t\)</span> for each unit <span class="math inline">\(i\)</span>. When <span class="math inline">\(A_{it}\)</span></li>
 <li>Define a weight for each unit: <span class="math inline">\(w_i = \frac{1}{\pi_{i0}}\frac{1}{\pi_{i1}}\)</span>. For grading, what is the weight on the first unit in the sample?</li>
 <li>Estimate a marginal structural model of the form <span class="math inline">\(\text{E}(Y^{a_0,a_1}) = \alpha + \beta_0 a_0 + \beta_1 a_1\)</span>. Report the coefficients.</li>

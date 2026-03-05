@@ -148,13 +148,13 @@ Suppose a teacher observes students who are struggling academically ($L_t = 1$) 
 
 In this data generating process,
 
-- Treatment $A_t = 1$ is assigned with higher probabilities to students who are struggling $L_t = 0$.
+- Treatment $A_t = 1$ is assigned with higher probabilities to students who are struggling $L_t = 1$.
 - Students who are treated in one period $A_0 = 1$ are never struggling in the next period $L_1 = 0$.
 
 Assume the causal structure represented by Setting D above. Using these data,
 
 4. Fit a logistic regression for each $A_t$, including as predictors all pre-treatment variables entered without interactions.
-5. Predict the probability of $A_t = 1$ at each time period for every unit. Remember that in R you will need the \texttt{type = "response"} option. For grading, what is the predicted probability of $A_0$ for the first unit in the sample?
+5. Predict the probability of $A_t = 1$ at each time period for every unit. Remember that in R you will need the `type = "response"` option. For grading, what is the predicted probability of $A_0$ for the first unit in the sample?
 6.  Define the generalized propensity score $\pi_{it}$ at each time period $t$ for each unit $i$. When $A_{it}$ 
 7. Define a weight for each unit: $w_i = \frac{1}{\pi_{i0}}\frac{1}{\pi_{i1}}$. For grading, what is the weight on the first unit in the sample?
 8. Estimate a marginal structural model of the form $\text{E}(Y^{a_0,a_1}) = \alpha + \beta_0 a_0 + \beta_1 a_1$. Report the coefficients.
