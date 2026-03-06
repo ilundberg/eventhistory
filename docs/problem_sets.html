@@ -544,7 +544,7 @@ window.Quarto = {
 <ol start="4" type="1">
 <li>Fit a logistic regression for each <span class="math inline">\(A_t\)</span>, including as predictors all pre-treatment variables entered without interactions.</li>
 <li>Predict the probability of <span class="math inline">\(A_t = 1\)</span> at each time period for every unit. Remember that in R you will need the <code>type = "response"</code> option. For grading, what is the predicted probability of <span class="math inline">\(A_0\)</span> for the first unit in the sample?</li>
-<li>Define the generalized propensity score <span class="math inline">\(\pi_{it}\)</span> at each time period <span class="math inline">\(t\)</span> for each unit <span class="math inline">\(i\)</span>. When <span class="math inline">\(A_{it}\)</span></li>
+<li>Define the generalized propensity score <span class="math inline">\(\pi_{it}\)</span> at each time period <span class="math inline">\(t\)</span> for each unit <span class="math inline">\(i\)</span>. When <span class="math inline">\(A_{it}=1\)</span>, this is the probability of treatment. When <span class="math inline">\(A_{it}=0\)</span>, this is the probability of being untreated.</li>
 <li>Define a weight for each unit: <span class="math inline">\(w_i = \frac{1}{\pi_{i0}}\frac{1}{\pi_{i1}}\)</span>. For grading, what is the weight on the first unit in the sample?</li>
 <li>Estimate a marginal structural model of the form <span class="math inline">\(\text{E}(Y^{a_0,a_1}) = \alpha + \beta_0 a_0 + \beta_1 a_1\)</span>. Report the coefficients.</li>
 <li>What does your model estimate for the average causal effect <span class="math inline">\(\text{E}(Y^{1,1} - Y^{0,0})\)</span>?</li>
