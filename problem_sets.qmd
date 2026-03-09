@@ -159,3 +159,15 @@ Assume the causal structure represented by Setting D above. Using these data,
 7. Define a weight for each unit: $w_i = \frac{1}{\pi_{i0}}\frac{1}{\pi_{i1}}$. For grading, what is the weight on the first unit in the sample?
 8. Estimate a marginal structural model of the form $\text{E}(Y^{a_0,a_1}) = \alpha + \beta_0 a_0 + \beta_1 a_1$. Report the coefficients.
 9. What does your model estimate for the average causal effect $\text{E}(Y^{1,1} - Y^{0,0})$?
+
+## Problem Set 7: Course wrap-up
+
+This problem set is a chance to reflect on the course and how it connects to your research. It is also a chance for me to gather feedback about what works well and what could be improved in the course.
+
+1. What is an example of an event history problem in your research area? This could involve a time-to-event outcome or a sequence of events as treatments. How might you use a method from this course to answer that question?
+2. Think of a statistical concept you did not know before this quarter that you now understand. What was that concept? Why do you think it particularly stuck with you? Are there ways the course design made that concept easier to learn?
+3. Is there a concept from the course that you wish you understood better? Do you have ideas for how we could cover that concept better when this course is taught again?
+
+
+
+
